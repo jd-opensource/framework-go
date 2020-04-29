@@ -7,5 +7,5 @@ package framework
 
 // TODO
 type RandomGenerator interface {
-
+	NextBytes(size int) []byte
 }

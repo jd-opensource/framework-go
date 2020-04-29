@@ -7,6 +7,7 @@ package framework
 
 // 密文
 type Ciphertext interface {
+	CryptoBytes
 
 	// 原始的密文数据
 	GetRawCiphertext() []byte

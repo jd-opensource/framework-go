@@ -1,4 +1,4 @@
-package common
+package sha
 
 import (
 	"crypto/sha256"

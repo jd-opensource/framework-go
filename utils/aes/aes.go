@@ -1,4 +1,4 @@
-package common
+package aes
 
 // AES ECB PKCS7
 
@@ -7,7 +7,7 @@ import (
 	"crypto/aes"
 )
 
-func AesEncrypt(data, key []byte) ([]byte, error) {
+func Encrypt(data, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func pKCS7Padding(ciphertext []byte, blockSize int) []byte {
 	return append(ciphertext, padtext...)
 }
 
-func AesDecrypt(data, key []byte) ([]byte, error) {
+func Decrypt(data, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err

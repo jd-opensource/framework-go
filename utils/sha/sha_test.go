@@ -1,4 +1,4 @@
-package common
+package sha
 
 import (
 	"github.com/stretchr/testify/require"

@@ -7,14 +7,29 @@ import "framework-go/crypto/framework"
  * @Date: 2020/4/28 3:06 下午
  */
 
+var (
+	AES       = AESEncryptionFunction{}
+	ED25519   = ED25519SignatureFunction{}
+	RIPEMD160 = RIPEMD160HashFunction{}
+	SHA256    = SHA256HashFunction{}
+	GO_RANDOM = GoRandomFunction{}
+	ECDSA     = ECDSASignatureFunction{}
+	RSA       = RSACryptoFunction{}
+)
+
 var _ framework.CryptoService = (*ClassicCryptoService)(nil)
 
-// TODO
-
 type ClassicCryptoService struct {
+	functions []framework.CryptoFunction
+}
 
+func NewClassicCryptoService() ClassicCryptoService {
+	// TODO
+	return ClassicCryptoService{
+		[]framework.CryptoFunction{SHA256},
+	}
 }
 
 func (c ClassicCryptoService) GetFunctions() []framework.CryptoFunction {
-	panic("implement me")
+	return c.functions
 }

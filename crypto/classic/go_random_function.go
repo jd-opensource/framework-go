@@ -7,7 +7,7 @@ import "framework-go/crypto/framework"
  * @Date: 2020/4/28 3:46 下午
  */
 
-var _ framework.RandomFunction = (GoRandomFunction)(nil)
+var _ framework.RandomFunction = (*GoRandomFunction)(nil)
 
 // TODO
 type GoRandomFunction struct {

@@ -1,4 +1,4 @@
-package common
+package base58
 
 import (
 	"errors"
@@ -47,7 +47,7 @@ func newAlphabet(alphabet string) *base58Alphabet {
 	return ret
 }
 
-func Base58Encode(input []byte) string {
+func Encode(input []byte) string {
 	inputLength := len(input)
 	prefixZeroes := 0
 	for prefixZeroes < inputLength && input[prefixZeroes] == 0 {
@@ -93,7 +93,7 @@ func Base58Encode(input []byte) string {
 	return string(retStrRunes)
 }
 
-func Base58Decode(input string) ([]byte, error) {
+func Decode(input string) ([]byte, error) {
 	capacity := utf8.RuneCountInString(input)*733/1000 + 1
 	output := make([]byte, capacity)
 	outputReverseEnd := capacity - 1

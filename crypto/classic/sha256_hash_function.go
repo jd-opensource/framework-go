@@ -1,6 +1,10 @@
 package classic
 
-import "framework-go/crypto/framework"
+import (
+	"framework-go/crypto/framework"
+	"framework-go/utils/bytes"
+	"framework-go/utils/sha"
+)
 
 /**
  * @Author: imuge
@@ -9,28 +13,37 @@ import "framework-go/crypto/framework"
 
 var _ framework.HashFunction = (*SHA256HashFunction)(nil)
 
-// TODO
+var SHA256_DIGEST_BYTES = 256 / 8
 
 type SHA256HashFunction struct {
-	
 }
 
 func (S SHA256HashFunction) GetAlgorithm() framework.CryptoAlgorithm {
-	panic("implement me")
+	return SHA256_ALGORITHM
 }
 
 func (S SHA256HashFunction) Hash(data []byte) framework.HashDigest {
-	panic("implement me")
+	if data == nil {
+		panic("data is null!")
+	}
+
+	return framework.NewHashDigest(SHA256_ALGORITHM, sha.Sha256(data))
 }
 
 func (S SHA256HashFunction) Verify(digest framework.HashDigest, data []byte) bool {
-	panic("implement me")
+	hashDigest := S.Hash(data)
+	return bytes.Equals(hashDigest.ToBytes(), digest.ToBytes())
 }
 
 func (S SHA256HashFunction) SupportHashDigest(digestBytes []byte) bool {
-	panic("implement me")
+	// 验证输入字节数组长度=算法标识长度+摘要长度，以及算法标识；
+	return SHA256_DIGEST_BYTES == len(digestBytes) && SHA256_ALGORITHM.Match(digestBytes, 0)
 }
 
 func (S SHA256HashFunction) ResolveHashDigest(digestBytes []byte) framework.HashDigest {
-	panic("implement me")
+	if S.SupportHashDigest(digestBytes) {
+		return framework.NewHashDigest(SHA256_ALGORITHM, digestBytes)
+	} else {
+		panic("digestBytes is invalid!")
+	}
 }
