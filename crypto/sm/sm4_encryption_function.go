@@ -11,7 +11,6 @@ var _ framework.SymmetricEncryptionFunction = (*SM4EncryptionFunction)(nil)
 
 // TODO
 type SM4EncryptionFunction struct {
-	
 }
 
 func (S SM4EncryptionFunction) GenerateSymmetricKey() framework.SymmetricKey {
@@ -22,11 +21,11 @@ func (S SM4EncryptionFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	panic("implement me")
 }
 
-func (S SM4EncryptionFunction) Encrypt(key framework.SymmetricKey, data []byte) framework.Ciphertext {
+func (S SM4EncryptionFunction) Encrypt(key framework.SymmetricKey, data []byte) framework.SymmetricCiphertext {
 	panic("implement me")
 }
 
-func (S SM4EncryptionFunction) Decrypt(key framework.SymmetricKey, ciphertext framework.Ciphertext) []byte {
+func (S SM4EncryptionFunction) Decrypt(key framework.SymmetricKey, ciphertext framework.SymmetricCiphertext) []byte {
 	panic("implement me")
 }
 
@@ -34,7 +33,7 @@ func (S SM4EncryptionFunction) SupportSymmetricKey(symmetricKeyBytes []byte) boo
 	panic("implement me")
 }
 
-func (S SM4EncryptionFunction) ResolveSymmetricKey(symmetricKeyBytes []byte) framework.SymmetricKey {
+func (S SM4EncryptionFunction) ParseSymmetricKey(symmetricKeyBytes []byte) framework.SymmetricKey {
 	panic("implement me")
 }
 
@@ -42,6 +41,6 @@ func (S SM4EncryptionFunction) SupportCiphertext(ciphertextBytes []byte) bool {
 	panic("implement me")
 }
 
-func (S SM4EncryptionFunction) ResolveCiphertext(ciphertextBytes []byte) framework.SymmetricCiphertext {
+func (S SM4EncryptionFunction) ParseCiphertext(ciphertextBytes []byte) framework.SymmetricCiphertext {
 	panic("implement me")
 }

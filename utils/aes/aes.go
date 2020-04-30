@@ -5,9 +5,16 @@ package aes
 import (
 	"bytes"
 	"crypto/aes"
+	"crypto/rand"
 )
 
-func Encrypt(data, key []byte) ([]byte, error) {
+func GenerateRandomBytes(size int) []byte {
+	bytes := make([]byte, size)
+	rand.Read(bytes)
+	return bytes
+}
+
+func Encrypt(key, data []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -29,7 +36,7 @@ func pKCS7Padding(ciphertext []byte, blockSize int) []byte {
 	return append(ciphertext, padtext...)
 }
 
-func Decrypt(data, key []byte) ([]byte, error) {
+func Decrypt(key, data []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -47,5 +54,9 @@ func Decrypt(data, key []byte) ([]byte, error) {
 func pKCS7UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unpadding := int(origData[length-1])
-	return origData[:(length - unpadding)]
+	if length - unpadding > 0 {
+		return origData[:(length - unpadding)]
+	} else {
+		return origData
+	}
 }

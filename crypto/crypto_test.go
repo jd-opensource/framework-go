@@ -120,3 +120,27 @@ func TestECDSA(t *testing.T) {
 	require.True(t, f1.Verify(jdPub, data, digest))
 	require.True(t, f1.Verify(jdPub, data, f1.Sign(jdPriv, data)))
 }
+
+func TestAES(t *testing.T) {
+	function := GetCryptoFunctionByName(classic.AES_ALGORITHM.Name)
+
+	key := (function.(framework.SymmetricKeyGenerator)).GenerateSymmetricKey()
+	fmt.Println("key: " + key.ToBase58())
+	data := []byte("imuge")
+
+	// encrypt
+	f2 := function.(framework.SymmetricEncryptionFunction)
+	encrypt := f2.Encrypt(key, data)
+	require.Equal(t, data, f2.Decrypt(key, encrypt))
+	/**
+		encrypt from JD Chain
+	key: QpSBcurXWsee5RSTtXradaaFfp
+	encrypt: 6Pyw6X5mVwbpeoqXohBUqMkGZ
+	*/
+	keyBytes, _ := base58.Decode("QpSBcurXWsee5RSTtXradaaFfp")
+	jdKey := framework.ParseSymmetricKey(keyBytes)
+	encryptBytes, _ := base58.Decode("6Pyw6X5mVwbpeoqXohBUqMkGZ")
+	jdEncrypt := framework.ParseSymmetricCiphertext(encryptBytes)
+	require.Equal(t, data, f2.Decrypt(jdKey, jdEncrypt))
+
+}
