@@ -1,7 +1,6 @@
 package bytes
 
 import (
-	"bytes"
 	"encoding/binary"
 )
 
@@ -124,24 +123,30 @@ func ToBoolean(b byte) bool {
 }
 
 func ToInt16(b []byte) int16 {
-	bytesBuffer := bytes.NewBuffer(b)
-	var x int16
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
-	return x
+	if len(b) < 2 {
+		for i := 0; i < 2-len(b); i++ {
+			b = append([]byte{0x00}, b...)
+		}
+	}
+	return int16(binary.BigEndian.Uint16(b))
 }
 
 func ToInt(b []byte) int {
-	bytesBuffer := bytes.NewBuffer(b)
-	var x int
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
-	return x
+	if len(b) < 4 {
+		for i := 0; i < 4-len(b); i++ {
+			b = append([]byte{0x00}, b...)
+		}
+	}
+	return int(binary.BigEndian.Uint32(b))
 }
 
 func ToInt64(b []byte) int64 {
-	bytesBuffer := bytes.NewBuffer(b)
-	var x int64
-	binary.Read(bytesBuffer, binary.BigEndian, &x)
-	return x
+	if len(b) < 8 {
+		for i := 0; i < 8-len(b); i++ {
+			b = append([]byte{0x00}, b...)
+		}
+	}
+	return int64(binary.BigEndian.Uint64(b))
 }
 
 func Concat(slices ...[]byte) []byte {

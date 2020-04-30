@@ -51,23 +51,23 @@ func (s Slice) GetByte(offset int) byte {
 func (s Slice) GetInt16(offset int) int16 {
 	off := s.Offset + offset
 	s.checkBoundary(off, 2)
-	return ToInt16(s.Bytes[off:2])
+	return ToInt16(s.Bytes[off : off+2])
 }
 
 func (s Slice) GetInt(offset int) int {
 	off := s.Offset + offset
 	s.checkBoundary(off, 4)
-	return ToInt(s.Bytes[off:4])
+	return ToInt(s.Bytes[off : off+4])
 }
 
 func (s Slice) GetInt64(offset int) int64 {
 	off := s.Offset + offset
 	s.checkBoundary(off, 8)
-	return ToInt64(s.Bytes[off:8])
+	return ToInt64(s.Bytes[off : off+8])
 }
 
 func (s Slice) GetString() string {
-	return ToString(s.Bytes[s.Offset:s.Size])
+	return ToString(s.Bytes[s.Offset : s.Offset+s.Size])
 }
 
 func (s Slice) GetBytesCopy(offset, size int) []byte {
@@ -78,7 +78,7 @@ func (s Slice) GetBytesCopy(offset, size int) []byte {
 		return []byte{}
 	}
 	dst := make([]byte, size)
-	copy(dst, s.Bytes[newOffset:size])
+	copy(dst, s.Bytes[newOffset:newOffset+size])
 	return dst
 }
 

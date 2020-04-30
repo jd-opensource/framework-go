@@ -24,7 +24,7 @@ type SignatureFunction interface {
 	 * @param data 被签名信息
 	 * @return 是否验证通过
 	 */
-	Verify(digest SignatureDigest, pubKey PubKey, data byte) bool
+	Verify(pubKey PubKey, data []byte, digest SignatureDigest) bool
 
 	/**
 	 * 使用私钥恢复公钥；
@@ -48,7 +48,7 @@ type SignatureFunction interface {
 	 * @param privKeyBytes 包含算法标识、密钥掩码和私钥的字节数组
 	 * @return PrivKey形式的私钥
 	 */
-	ResolvePrivKey(privKeyBytes []byte) PrivKey
+	ParsePrivKey(privKeyBytes []byte) PrivKey
 
 	/**
 	 * 校验公钥格式是否满足要求；
@@ -64,7 +64,7 @@ type SignatureFunction interface {
 	 * @param pubKeyBytes 包含算法标识、密钥掩码和公钥的字节数组
 	 * @return PubKey形式的公钥
 	 */
-	ResolvePubKey(pubKeyBytes []byte) PubKey
+	ParsePubKey(pubKeyBytes []byte) PubKey
 
 	/**
 	 * 校验字节数组形式的签名摘要的格式是否满足要求；
@@ -73,7 +73,7 @@ type SignatureFunction interface {
 	 * @return 是否满足指定算法的签名摘要格式
 	 */
 
-	SupportDigest(digestBytes []byte)
+	SupportDigest(digestBytes []byte) bool
 
 	/**
 	 * 将字节数组形式的签名摘要转换成SignatureDigest格式；
@@ -81,5 +81,5 @@ type SignatureFunction interface {
 	 * @param digestBytes 包含算法标识和签名摘要的字节数组
 	 * @return SignatureDigest形式的签名摘要
 	 */
-	ResolveDigest(digestBytes []byte) SignatureDigest
+	ParseDigest(digestBytes []byte) SignatureDigest
 }

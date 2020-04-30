@@ -19,7 +19,7 @@ type BaseCryptoKey struct {
 
 func NewBaseCryptoKey(algorithm CryptoAlgorithm, rawKeyBytes []byte, keyType CryptoKeyType) BaseCryptoKey {
 	return BaseCryptoKey{
-		NewBaseCryptoBytes(algorithm, rawKeyBytes),
+		NewBaseCryptoBytes(algorithm, EncodeKeyBytes(rawKeyBytes, keyType)),
 		keyType,
 	}
 }

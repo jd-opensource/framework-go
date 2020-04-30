@@ -27,7 +27,7 @@ func (E ED25519SignatureFunction) Sign(privKey framework.PrivKey, data []byte) f
 	panic("implement me")
 }
 
-func (E ED25519SignatureFunction) Verify(digest framework.SignatureDigest, pubKey framework.PubKey, data byte) bool {
+func (E ED25519SignatureFunction) Verify(pubKey framework.PubKey, data []byte, digest framework.SignatureDigest) bool {
 	panic("implement me")
 }
 
@@ -39,7 +39,7 @@ func (E ED25519SignatureFunction) SupportPrivKey(privKeyBytes []byte) bool {
 	panic("implement me")
 }
 
-func (E ED25519SignatureFunction) ResolvePrivKey(privKeyBytes []byte) framework.PrivKey {
+func (E ED25519SignatureFunction) ParsePrivKey(privKeyBytes []byte) framework.PrivKey {
 	panic("implement me")
 }
 
@@ -47,14 +47,14 @@ func (E ED25519SignatureFunction) SupportPubKey(pubKeyBytes []byte) bool {
 	panic("implement me")
 }
 
-func (E ED25519SignatureFunction) ResolvePubKey(pubKeyBytes []byte) framework.PubKey {
+func (E ED25519SignatureFunction) ParsePubKey(pubKeyBytes []byte) framework.PubKey {
 	panic("implement me")
 }
 
-func (E ED25519SignatureFunction) SupportDigest(digestBytes []byte) {
+func (E ED25519SignatureFunction) SupportDigest(digestBytes []byte) bool {
 	panic("implement me")
 }
 
-func (E ED25519SignatureFunction) ResolveDigest(digestBytes []byte) framework.SignatureDigest {
+func (E ED25519SignatureFunction) ParseDigest(digestBytes []byte) framework.SignatureDigest {
 	panic("implement me")
 }

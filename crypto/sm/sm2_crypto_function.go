@@ -20,7 +20,7 @@ func (S SM2CryptoFunction) Sign(privKey framework.PrivKey, data []byte) framewor
 	panic("implement me")
 }
 
-func (S SM2CryptoFunction) Verify(digest framework.SignatureDigest, pubKey framework.PubKey, data byte) bool {
+func (S SM2CryptoFunction) Verify(pubKey framework.PubKey, data []byte, digest framework.SignatureDigest) bool {
 	panic("implement me")
 }
 
@@ -32,7 +32,7 @@ func (S SM2CryptoFunction) SupportPrivKey(privKeyBytes []byte) bool {
 	panic("implement me")
 }
 
-func (S SM2CryptoFunction) ResolvePrivKey(privKeyBytes []byte) framework.PrivKey {
+func (S SM2CryptoFunction) ParsePrivKey(privKeyBytes []byte) framework.PrivKey {
 	panic("implement me")
 }
 
@@ -40,15 +40,15 @@ func (S SM2CryptoFunction) SupportPubKey(pubKeyBytes []byte) bool {
 	panic("implement me")
 }
 
-func (S SM2CryptoFunction) ResolvePubKey(pubKeyBytes []byte) framework.PubKey {
+func (S SM2CryptoFunction) ParsePubKey(pubKeyBytes []byte) framework.PubKey {
 	panic("implement me")
 }
 
-func (S SM2CryptoFunction) SupportDigest(digestBytes []byte) {
+func (S SM2CryptoFunction) SupportDigest(digestBytes []byte) bool {
 	panic("implement me")
 }
 
-func (S SM2CryptoFunction) ResolveDigest(digestBytes []byte) framework.SignatureDigest {
+func (S SM2CryptoFunction) ParseDigest(digestBytes []byte) framework.SignatureDigest {
 	panic("implement me")
 }
 
