@@ -1,6 +1,9 @@
 package classic
 
-import "framework-go/crypto/framework"
+import (
+	"framework-go/crypto/framework"
+	"math/rand"
+)
 
 /**
  * @Author: imuge
@@ -9,15 +12,27 @@ import "framework-go/crypto/framework"
 
 var _ framework.RandomFunction = (*GoRandomFunction)(nil)
 
-// TODO
 type GoRandomFunction struct {
-
 }
 
 func (g GoRandomFunction) GetAlgorithm() framework.CryptoAlgorithm {
-	panic("implement me")
+	return GO_RANDOM_ALGORITHM
 }
 
-func (g GoRandomFunction) Generate(seed []byte) framework.RandomGenerator {
-	panic("implement me")
+func (g GoRandomFunction) Generate(seed int64) framework.RandomGenerator {
+	return GoRandomGenerator{seed}
+}
+
+var _ framework.RandomGenerator = (*GoRandomGenerator)(nil)
+
+type GoRandomGenerator struct {
+	seed int64
+}
+
+func (g GoRandomGenerator) NextBytes(size int) []byte {
+	bytes := make([]byte, size)
+	rand.Seed(g.seed)
+	rand.Read(bytes)
+
+	return bytes
 }

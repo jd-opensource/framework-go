@@ -8,5 +8,5 @@ package framework
 type RandomFunction interface {
 	CryptoFunction
 
-	Generate(seed []byte) RandomGenerator
+	Generate(seed int64) RandomGenerator
 }

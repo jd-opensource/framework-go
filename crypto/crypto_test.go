@@ -85,3 +85,9 @@ func TestRIPEMD160(t *testing.T) {
 	jdHash, _ := base58.Decode("9iHzz2vDyF17WXrn5DdvCZkrwi9Faj")
 	require.True(t, function.Verify(framework.ParseHashDigest(jdHash), data))
 }
+
+func TestGoRandom(t *testing.T) {
+	function := GetRandomFunctionByName(classic.GO_RANDOM_ALGORITHM.Name)
+	bytes := function.Generate(100).NextBytes(10)
+	require.Equal(t, 10, len(bytes))
+}
