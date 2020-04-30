@@ -39,5 +39,5 @@ type HashFunction interface {
 	 * @param digestBytes 包含算法标识和hash摘要的字节数组
 	 * @return HashDigest形式的hash摘要
 	 */
-	ResolveHashDigest(digestBytes []byte) HashDigest
+	ParseHashDigest(digestBytes []byte) HashDigest
 }

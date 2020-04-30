@@ -31,6 +31,6 @@ func (S SM3HashFunction) SupportHashDigest(digestBytes []byte) bool {
 	panic("implement me")
 }
 
-func (S SM3HashFunction) ResolveHashDigest(digestBytes []byte) framework.HashDigest {
+func (S SM3HashFunction) ParseHashDigest(digestBytes []byte) framework.HashDigest {
 	panic("implement me")
 }

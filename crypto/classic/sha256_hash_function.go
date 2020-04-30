@@ -40,7 +40,7 @@ func (S SHA256HashFunction) SupportHashDigest(digestBytes []byte) bool {
 	return SHA256_DIGEST_BYTES == len(digestBytes) && SHA256_ALGORITHM.Match(digestBytes, 0)
 }
 
-func (S SHA256HashFunction) ResolveHashDigest(digestBytes []byte) framework.HashDigest {
+func (S SHA256HashFunction) ParseHashDigest(digestBytes []byte) framework.HashDigest {
 	if S.SupportHashDigest(digestBytes) {
 		return framework.NewHashDigest(SHA256_ALGORITHM, digestBytes)
 	} else {

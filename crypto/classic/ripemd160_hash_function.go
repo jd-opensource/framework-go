@@ -1,36 +1,48 @@
 package classic
 
-import "framework-go/crypto/framework"
+import (
+	"framework-go/crypto/framework"
+	"framework-go/utils/bytes"
+	"framework-go/utils/ripemd160"
+)
 
 /**
  * @Author: imuge
  * @Date: 2020/4/28 2:42 下午
  */
 
+var (
+	RIPEMD160_DIGEST_BYTES  = 160 / 8
+	RIPEMD160_DIGEST_LENGTH = framework.ALGORYTHM_CODE_SIZE + RIPEMD160_DIGEST_BYTES
+)
+
 var _ framework.HashFunction = (*RIPEMD160HashFunction)(nil)
 
-// TODO
-
 type RIPEMD160HashFunction struct {
-	
 }
 
 func (R RIPEMD160HashFunction) GetAlgorithm() framework.CryptoAlgorithm {
-	panic("implement me")
+	return RIPEMD160_ALGORITHM
 }
 
 func (R RIPEMD160HashFunction) Hash(data []byte) framework.HashDigest {
-	panic("implement me")
+	if data == nil {
+		panic("data is null!")
+	}
+
+	return framework.NewHashDigest(R.GetAlgorithm(), ripemd160.Hash(data))
 }
 
 func (R RIPEMD160HashFunction) Verify(digest framework.HashDigest, data []byte) bool {
-	panic("implement me")
+	hashDigest := R.Hash(data)
+	return bytes.Equals(hashDigest.ToBytes(), digest.ToBytes())
 }
 
 func (R RIPEMD160HashFunction) SupportHashDigest(digestBytes []byte) bool {
-	panic("implement me")
+	// 验证输入字节数组长度=算法标识长度+摘要长度，以及算法标识；
+	return RIPEMD160_DIGEST_LENGTH == len(digestBytes) && R.GetAlgorithm().Match(digestBytes, 0)
 }
 
-func (R RIPEMD160HashFunction) ResolveHashDigest(digestBytes []byte) framework.HashDigest {
-	panic("implement me")
+func (R RIPEMD160HashFunction) ParseHashDigest(digestBytes []byte) framework.HashDigest {
+	return framework.ParseHashDigest(digestBytes)
 }

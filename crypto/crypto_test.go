@@ -73,3 +73,15 @@ func TestRSA(t *testing.T) {
 	require.Equal(t, data, f2.Decrypt(jdPriv, jdEncrypt))
 
 }
+
+func TestRIPEMD160(t *testing.T) {
+	data := []byte("imuge")
+	function := GetHashFunctionByName(classic.RIPEMD160_ALGORITHM.Name)
+	hash := function.Hash(data)
+	fmt.Println("hash: " + hash.ToBase58())
+	require.True(t, function.Verify(hash, data))
+
+	// hash from JD Cahin
+	jdHash, _ := base58.Decode("9iHzz2vDyF17WXrn5DdvCZkrwi9Faj")
+	require.True(t, function.Verify(framework.ParseHashDigest(jdHash), data))
+}
