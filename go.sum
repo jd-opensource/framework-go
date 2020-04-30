@@ -1,3 +1,5 @@
+github.com/ThePiachu/Golang-Koblitz-elliptic-curve-DSA-library v0.0.0-20111226133456-290daa4769cc h1:xp1oXFYigBeTHdwAyglJutUBVapUMn78oGABcP/xG/k=
+github.com/ThePiachu/Golang-Koblitz-elliptic-curve-DSA-library v0.0.0-20111226133456-290daa4769cc/go.mod h1:9F0fDTZMBLHsb5+hrz4ZHtvWJNAvnvrdd2/avPkNNHk=
 github.com/ZZMarquis/gm v1.2.0/go.mod h1:wWbjZYgruQVd7Bb8UkSN8ujU931kx2XUW6nZLCiDE0Q=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

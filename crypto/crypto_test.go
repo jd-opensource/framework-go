@@ -91,3 +91,32 @@ func TestGoRandom(t *testing.T) {
 	bytes := function.Generate(100).NextBytes(10)
 	require.Equal(t, 10, len(bytes))
 }
+
+func TestECDSA(t *testing.T) {
+	function := GetCryptoFunctionByName(classic.ECDSA_ALGORITHM.Name)
+
+	keypair := (function.(framework.AsymmetricKeypairGenerator)).GenerateKeypair()
+	fmt.Println("pub: " + keypair.PubKey.ToBase58())
+	fmt.Println("priv: " + keypair.PrivKey.ToBase58())
+	data := []byte("imuge")
+
+	// sign
+	f1 := function.(framework.SignatureFunction)
+	sign := f1.Sign(keypair.PrivKey, data)
+	fmt.Println("sign: " + sign.ToBase58())
+	require.True(t, f1.Verify(keypair.PubKey, data, sign))
+	/**
+		sign from JD Chain
+	priv: 7VfjcJcaRNj9vUf8mUXK6JVctZDAn4s8Z3DeANUuzse6sjRj
+	pub: 9WsnN76eDpCQaDygNpejcTXQYrwJ44H9wEVmFs7FcgJQxTSjZkTziezk8x9Z2XngvQFHdeJUYvXA7BoCWVbaAtCUwoR5j
+	sign: SMQtcRyjBtRg6e5y42a9xrP5D6FLwiAoBJdnRE9GB6MaSWFqjqc8onhC5YYf3QjUtxeeVXwEgoNuraBUUapxTnF41K
+	 */
+	privBytes, _ := base58.Decode("7VfjcJcaRNj9vUf8mUXK6JVctZDAn4s8Z3DeANUuzse6sjRj")
+	jdPriv := framework.ParsePrivKey(privBytes)
+	pubBytes, _ := base58.Decode("9WsnN76eDpCQaDygNpejcTXQYrwJ44H9wEVmFs7FcgJQxTSjZkTziezk8x9Z2XngvQFHdeJUYvXA7BoCWVbaAtCUwoR5j")
+	jdPub := framework.ParsePubKey(pubBytes)
+	digestBytes, _ := base58.Decode("SMQtcRyjBtRg6e5y42a9xrP5D6FLwiAoBJdnRE9GB6MaSWFqjqc8onhC5YYf3QjUtxeeVXwEgoNuraBUUapxTnF41K")
+	digest := framework.ParseSignatureDigest(digestBytes)
+	require.True(t, f1.Verify(jdPub, data, digest))
+	require.True(t, f1.Verify(jdPub, data, f1.Sign(jdPriv, data)))
+}
