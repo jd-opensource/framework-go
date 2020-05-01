@@ -1,4 +1,4 @@
-package classic
+package sm
 
 import "framework-go/crypto/framework"
 
@@ -19,9 +19,9 @@ type SMCryptoService struct {
 	functions []framework.CryptoFunction
 }
 
-func NewClassicCryptoService() SMCryptoService {
+func NewSMCryptoService() SMCryptoService {
 	return SMCryptoService{
-		[]framework.CryptoFunction{SM2, SM3, SM4},
+		[]framework.CryptoFunction{SM3},
 	}
 }
 

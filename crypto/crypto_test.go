@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"framework-go/crypto/classic"
 	"framework-go/crypto/framework"
+	"framework-go/crypto/sm"
 	"framework-go/utils/base58"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -110,7 +111,7 @@ func TestECDSA(t *testing.T) {
 	priv: 7VfjcJcaRNj9vUf8mUXK6JVctZDAn4s8Z3DeANUuzse6sjRj
 	pub: 9WsnN76eDpCQaDygNpejcTXQYrwJ44H9wEVmFs7FcgJQxTSjZkTziezk8x9Z2XngvQFHdeJUYvXA7BoCWVbaAtCUwoR5j
 	sign: SMQtcRyjBtRg6e5y42a9xrP5D6FLwiAoBJdnRE9GB6MaSWFqjqc8onhC5YYf3QjUtxeeVXwEgoNuraBUUapxTnF41K
-	 */
+	*/
 	privBytes, _ := base58.Decode("7VfjcJcaRNj9vUf8mUXK6JVctZDAn4s8Z3DeANUuzse6sjRj")
 	jdPriv := framework.ParsePrivKey(privBytes)
 	pubBytes, _ := base58.Decode("9WsnN76eDpCQaDygNpejcTXQYrwJ44H9wEVmFs7FcgJQxTSjZkTziezk8x9Z2XngvQFHdeJUYvXA7BoCWVbaAtCUwoR5j")
@@ -143,4 +144,16 @@ func TestAES(t *testing.T) {
 	jdEncrypt := framework.ParseSymmetricCiphertext(encryptBytes)
 	require.Equal(t, data, f2.Decrypt(jdKey, jdEncrypt))
 
+}
+
+func TestSM3(t *testing.T) {
+	data := []byte("imuge")
+	function := GetHashFunctionByName(sm.SM3_ALGORITHM.Name)
+	hash := function.Hash(data)
+	fmt.Println("hash: " + hash.ToBase58())
+	require.True(t, function.Verify(hash, data))
+
+	// hash from JD Cahin
+	jdHash, _ := base58.Decode("iybT4tbHSX7Xb8rkohVSRTDrNcbxrdXEB7UAuVG6nkjrqU")
+	require.True(t, function.Verify(framework.ParseHashDigest(jdHash), data))
 }

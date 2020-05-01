@@ -1,4 +1,4 @@
-package classic
+package sm
 
 import "framework-go/crypto/framework"
 
@@ -14,6 +14,22 @@ var _ framework.SignatureFunction = (*SM2CryptoFunction)(nil)
 
 type SM2CryptoFunction struct {
 
+}
+
+func (S SM2CryptoFunction) Encrypt(pubKey framework.PubKey, data []byte) framework.AsymmetricCiphertext {
+	panic("implement me")
+}
+
+func (S SM2CryptoFunction) Decrypt(privKey framework.PrivKey, ciphertext framework.AsymmetricCiphertext) []byte {
+	panic("implement me")
+}
+
+func (S SM2CryptoFunction) SupportCiphertext(ciphertextBytes []byte) bool {
+	panic("implement me")
+}
+
+func (S SM2CryptoFunction) ParseCiphertext(ciphertextBytes []byte) framework.AsymmetricCiphertext {
+	panic("implement me")
 }
 
 func (S SM2CryptoFunction) Sign(privKey framework.PrivKey, data []byte) framework.SignatureDigest {

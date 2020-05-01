@@ -1,4 +1,4 @@
-package classic
+package sm
 
 import "framework-go/crypto/framework"
 

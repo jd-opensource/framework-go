@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"framework-go/crypto/classic"
 	"framework-go/crypto/framework"
+	"framework-go/crypto/sm"
 )
 
 /**
@@ -18,12 +19,19 @@ var (
 )
 
 func init() {
-	functionArray := classic.NewClassicCryptoService().GetFunctions()
-	for _, function := range functionArray {
+	classicArray := classic.NewClassicCryptoService().GetFunctions()
+	for _, function := range classicArray {
 		functions[function.GetAlgorithm().Code] = function
 		algorithms[function.GetAlgorithm().Code] = function.GetAlgorithm()
 		names[function.GetAlgorithm().Name] = function.GetAlgorithm().Code
 	}
+	smArray := sm.NewSMCryptoService().GetFunctions()
+	for _, function := range smArray {
+		functions[function.GetAlgorithm().Code] = function
+		algorithms[function.GetAlgorithm().Code] = function.GetAlgorithm()
+		names[function.GetAlgorithm().Name] = function.GetAlgorithm().Code
+	}
+
 }
 
 // 获取算法定义

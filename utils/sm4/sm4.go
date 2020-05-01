@@ -11,7 +11,7 @@ import (
 	"github.com/ZZMarquis/gm/sm4"
 )
 
-func Sm4Enc(key, iv, plantText []byte, paddingStatus bool) ([]byte, error) {
+func SM4Enc(key, iv, plantText []byte, paddingStatus bool) ([]byte, error) {
 	block, err := sm4.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func Sm4Enc(key, iv, plantText []byte, paddingStatus bool) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func Sm4Dec(key, iv, ciphertext []byte, paddingStatus bool) ([]byte, error) {
+func SM4Dec(key, iv, ciphertext []byte, paddingStatus bool) ([]byte, error) {
 	block, err := sm4.NewCipher(key)
 	if err != nil {
 		return nil, err
