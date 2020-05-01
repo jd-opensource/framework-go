@@ -25,7 +25,7 @@ type ClassicCryptoService struct {
 
 func NewClassicCryptoService() ClassicCryptoService {
 	return ClassicCryptoService{
-		[]framework.CryptoFunction{SHA256, RSA, RIPEMD160, GO_RANDOM, ECDSA, AES},
+		[]framework.CryptoFunction{SHA256, RSA, RIPEMD160, GO_RANDOM, ECDSA, AES, ED25519},
 	}
 }
 

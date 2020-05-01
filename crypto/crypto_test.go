@@ -157,3 +157,32 @@ func TestSM3(t *testing.T) {
 	jdHash, _ := base58.Decode("iybT4tbHSX7Xb8rkohVSRTDrNcbxrdXEB7UAuVG6nkjrqU")
 	require.True(t, function.Verify(framework.ParseHashDigest(jdHash), data))
 }
+
+func TestED25519(t *testing.T) {
+	function := GetCryptoFunctionByName(classic.ED25519_ALGORITHM.Name)
+
+	keypair := (function.(framework.AsymmetricKeypairGenerator)).GenerateKeypair()
+	fmt.Println("pub: " + keypair.PubKey.ToBase58())
+	fmt.Println("priv: " + keypair.PrivKey.ToBase58())
+	data := []byte("imuge")
+
+	// sign
+	f1 := function.(framework.SignatureFunction)
+	sign := f1.Sign(keypair.PrivKey, data)
+	fmt.Println("sign: " + sign.ToBase58())
+	require.True(t, f1.Verify(keypair.PubKey, data, sign))
+	/**
+		sign from JD Chain
+	priv: 7VeRTM6yy16ukoBir7iUi7aGVw9aC5qpitSQzQMQoc7G3WWj
+	pub: 7VeR75Psea7Uxfdt7N1pwrVnfdVUZEM8JqmgMQ1az5NBgvJd
+	sign: SMKtVHEE3torvRmqQvqyDzj2Eg2Lnx2nXoMgcqecjtFZ5EWLq1TWQfAqKzFvxJZjpmQB3GQii9P452pcZM71kdrsYq
+	*/
+	privBytes, _ := base58.Decode("7VeRTM6yy16ukoBir7iUi7aGVw9aC5qpitSQzQMQoc7G3WWj")
+	jdPriv := framework.ParsePrivKey(privBytes)
+	pubBytes, _ := base58.Decode("7VeR75Psea7Uxfdt7N1pwrVnfdVUZEM8JqmgMQ1az5NBgvJd")
+	jdPub := framework.ParsePubKey(pubBytes)
+	digestBytes, _ := base58.Decode("SMKtVHEE3torvRmqQvqyDzj2Eg2Lnx2nXoMgcqecjtFZ5EWLq1TWQfAqKzFvxJZjpmQB3GQii9P452pcZM71kdrsYq")
+	digest := framework.ParseSignatureDigest(digestBytes)
+	require.True(t, f1.Verify(jdPub, data, digest))
+	require.True(t, f1.Verify(jdPub, data, f1.Sign(jdPriv, data)))
+}
