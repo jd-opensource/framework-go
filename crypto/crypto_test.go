@@ -234,3 +234,27 @@ func TestSM2(t *testing.T) {
 	require.Equal(t, data, f2.Decrypt(jdPriv, jdEncrypt))
 
 }
+
+func TestSM4(t *testing.T) {
+	function := GetCryptoFunctionByName(sm.SM4_ALGORITHM.Name)
+
+	key := (function.(framework.SymmetricKeyGenerator)).GenerateSymmetricKey()
+	fmt.Println("key: " + key.ToBase58())
+	data := []byte("imuge")
+
+	// encrypt
+	f2 := function.(framework.SymmetricEncryptionFunction)
+	encrypt := f2.Encrypt(key, data)
+	require.Equal(t, data, f2.Decrypt(key, encrypt))
+	/**
+		encrypt from JD Chain
+	key: QoXGJnDkzPVJewMb61PJCmQjV3
+	encrypt: 3wUY7AWLVjznyyWS8fFd5jdVsaLnByWWhe7WPLb2i6Na4jb
+	*/
+	keyBytes, _ := base58.Decode("QoXGJnDkzPVJewMb61PJCmQjV3")
+	jdKey := framework.ParseSymmetricKey(keyBytes)
+	encryptBytes, _ := base58.Decode("3wUY7AWLVjznyyWS8fFd5jdVsaLnByWWhe7WPLb2i6Na4jb")
+	jdEncrypt := framework.ParseSymmetricCiphertext(encryptBytes)
+	require.Equal(t, data, f2.Decrypt(jdKey, jdEncrypt))
+
+}

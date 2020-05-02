@@ -7,11 +7,44 @@ package sm4
 import (
 	"bytes"
 	"crypto/cipher"
+	"crypto/rand"
 	"errors"
 	"github.com/ZZMarquis/gm/sm4"
 )
 
-func SM4Enc(key, iv, plantText []byte, paddingStatus bool) ([]byte, error) {
+var (
+	KEY_SIZE = 16
+	IV_SIZE  = 16
+)
+
+func GenerateSymmetricKey() []byte {
+	bytes := make([]byte, KEY_SIZE)
+	rand.Read(bytes)
+	return bytes
+}
+
+func Encrypt(key, data []byte) []byte {
+	iv := make([]byte, IV_SIZE)
+	rand.Reader.Read(iv[:])
+	encrypt, err := encrypt(key, iv, data, true)
+	if err != nil {
+		panic(err)
+	}
+
+	return append(iv, encrypt...)
+}
+
+func Decrypt(key, data []byte) []byte {
+	iv := data[:IV_SIZE]
+	decrypt, err := decrypt(key, iv, data[IV_SIZE:], true)
+	if err != nil {
+		panic(err)
+	}
+
+	return decrypt
+}
+
+func encrypt(key, iv, plantText []byte, paddingStatus bool) ([]byte, error) {
 	block, err := sm4.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -27,7 +60,7 @@ func SM4Enc(key, iv, plantText []byte, paddingStatus bool) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func SM4Dec(key, iv, ciphertext []byte, paddingStatus bool) ([]byte, error) {
+func decrypt(key, iv, ciphertext []byte, paddingStatus bool) ([]byte, error) {
 	block, err := sm4.NewCipher(key)
 	if err != nil {
 		return nil, err

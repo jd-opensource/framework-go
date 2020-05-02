@@ -1,6 +1,9 @@
 package sm
 
-import "framework-go/crypto/framework"
+import (
+	"framework-go/crypto/framework"
+	"framework-go/utils/sm4"
+)
 
 /**
  * @Author: imuge
@@ -22,7 +25,7 @@ type SM4EncryptionFunction struct {
 }
 
 func (S SM4EncryptionFunction) GenerateSymmetricKey() framework.SymmetricKey {
-	panic("implement me")
+	return framework.NewSymmetricKey(S.GetAlgorithm(), sm4.GenerateSymmetricKey())
 }
 
 func (S SM4EncryptionFunction) GetAlgorithm() framework.CryptoAlgorithm {
@@ -30,11 +33,11 @@ func (S SM4EncryptionFunction) GetAlgorithm() framework.CryptoAlgorithm {
 }
 
 func (S SM4EncryptionFunction) Encrypt(key framework.SymmetricKey, data []byte) framework.SymmetricCiphertext {
-	panic("implement me")
+	return framework.NewSymmetricCiphertext(S.GetAlgorithm(), sm4.Encrypt(key.GetRawKeyBytes(), data))
 }
 
 func (S SM4EncryptionFunction) Decrypt(key framework.SymmetricKey, ciphertext framework.SymmetricCiphertext) []byte {
-	panic("implement me")
+	return sm4.Decrypt(key.GetRawKeyBytes(), ciphertext.GetRawCiphertext())
 }
 
 func (S SM4EncryptionFunction) SupportSymmetricKey(symmetricKeyBytes []byte) bool {
