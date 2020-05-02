@@ -186,3 +186,51 @@ func TestED25519(t *testing.T) {
 	require.True(t, f1.Verify(jdPub, data, digest))
 	require.True(t, f1.Verify(jdPub, data, f1.Sign(jdPriv, data)))
 }
+
+func TestSM2(t *testing.T) {
+	function := GetCryptoFunctionByName(sm.SM2_ALGORITHM.Name)
+
+	keypair := (function.(framework.AsymmetricKeypairGenerator)).GenerateKeypair()
+	fmt.Println("pub: " + keypair.PubKey.ToBase58())
+	fmt.Println("priv: " + keypair.PrivKey.ToBase58())
+	data := []byte("imuge")
+
+	// sign
+	f1 := function.(framework.SignatureFunction)
+	sign := f1.Sign(keypair.PrivKey, data)
+	fmt.Println("sign: " + sign.ToBase58())
+	require.True(t, f1.Verify(keypair.PubKey, data, sign))
+	/**
+		sign from JD Chain
+	priv: LFywdTJVKv5wEePWFjEzJQUrF6mKTgQSmNsNaPii92waZUPr
+	pub: SFZ6LmrKBMRosm7vU2BokkGAA49CHChA8Zj8nkQ8XmBqbvdK8v84j2MbAfnFAomUqDDzpnkpnvLhJpNCk7PWnRiWZepAB
+	sign: 2JBHNrz4P7pSfusqTN3BSVNpGW8c7hyu2AGgVKcg8S1ejyxebvUpuoeNUSj91HJfpqofRykgRQ7gdMuuBn9ChY2eQe2
+	*/
+	privBytes, _ := base58.Decode("LFywdTJVKv5wEePWFjEzJQUrF6mKTgQSmNsNaPii92waZUPr")
+	jdPriv := framework.ParsePrivKey(privBytes)
+	pubBytes, _ := base58.Decode("SFZ6LmrKBMRosm7vU2BokkGAA49CHChA8Zj8nkQ8XmBqbvdK8v84j2MbAfnFAomUqDDzpnkpnvLhJpNCk7PWnRiWZepAB")
+	jdPub := framework.ParsePubKey(pubBytes)
+	digestBytes, _ := base58.Decode("2JBHNrz4P7pSfusqTN3BSVNpGW8c7hyu2AGgVKcg8S1ejyxebvUpuoeNUSj91HJfpqofRykgRQ7gdMuuBn9ChY2eQe2")
+	digest := framework.ParseSignatureDigest(digestBytes)
+	require.True(t, f1.Verify(jdPub, data, digest))
+	require.True(t, f1.Verify(jdPub, data, f1.Sign(jdPriv, data)))
+
+	// encrypt
+	f2 := function.(framework.AsymmetricEncryptionFunction)
+	encrypt := f2.Encrypt(keypair.PubKey, data)
+	require.Equal(t, data, f2.Decrypt(keypair.PrivKey, encrypt))
+	/**
+		encrypt from JD Chain
+	priv: LFywfT3KKSrLYRe9tfvEskex2sRJ8BNBkGgT1MuueM5qmGha
+	pub: SFZ6LitpLXid9XViSzjx1iAcTqjdZRk2M2hmFZBtHYKfAtrSrLvhV8FzNrvjdw66aD7WwWRzDNxWccU3mNHfNtFwxhWtr
+	encrypt: r5uFp51LYJge6ZoUyhNMonXAxXwx2QtkiN76yiyHEVYQEYUHQSEXwvz4wXzoBeFwTTJRLKK1FgZHq43vjJJB8y8VdwSKVo7e78dwWNhTNG8AJdNLrhDtN9M96kVBgFiig6WGMQkixhpiwV
+	*/
+	privBytes, _ = base58.Decode("LFywfT3KKSrLYRe9tfvEskex2sRJ8BNBkGgT1MuueM5qmGha")
+	jdPriv = framework.ParsePrivKey(privBytes)
+	pubBytes, _ = base58.Decode("SFZ6LitpLXid9XViSzjx1iAcTqjdZRk2M2hmFZBtHYKfAtrSrLvhV8FzNrvjdw66aD7WwWRzDNxWccU3mNHfNtFwxhWtr")
+	jdPub = framework.ParsePubKey(pubBytes)
+	encryptBytes, _ := base58.Decode("r5uFp51LYJge6ZoUyhNMonXAxXwx2QtkiN76yiyHEVYQEYUHQSEXwvz4wXzoBeFwTTJRLKK1FgZHq43vjJJB8y8VdwSKVo7e78dwWNhTNG8AJdNLrhDtN9M96kVBgFiig6WGMQkixhpiwV")
+	jdEncrypt := framework.ParseAsymmetricCiphertext(encryptBytes)
+	require.Equal(t, data, f2.Decrypt(jdPriv, jdEncrypt))
+
+}

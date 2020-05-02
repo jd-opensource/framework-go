@@ -21,7 +21,7 @@ type SMCryptoService struct {
 
 func NewSMCryptoService() SMCryptoService {
 	return SMCryptoService{
-		[]framework.CryptoFunction{SM3, SM4},
+		[]framework.CryptoFunction{SM3, SM4, SM2},
 	}
 }
 
