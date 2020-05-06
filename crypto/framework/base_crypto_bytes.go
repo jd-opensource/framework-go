@@ -13,7 +13,7 @@ import (
 var _ CryptoBytes = (*BaseCryptoBytes)(nil)
 
 type BaseCryptoBytes struct {
-	bytes.Bytes
+	*bytes.Bytes
 	algorithm int16
 }
 

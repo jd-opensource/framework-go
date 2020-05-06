@@ -24,21 +24,21 @@ type Bytes struct {
 	data   []byte
 }
 
-func NewBytes(b []byte) Bytes {
+func NewBytes(b []byte) *Bytes {
 	if b == nil {
 		panic("data is null!")
 	}
-	return Bytes{
+	return &Bytes{
 		prefix: nil,
 		data:   b,
 	}
 }
 
-func NewBytesWithPrefix(prefix *Bytes, b []byte) Bytes {
+func NewBytesWithPrefix(prefix *Bytes, b []byte) *Bytes {
 	if b == nil {
 		panic("data is null!")
 	}
-	return Bytes{
+	return &Bytes{
 		prefix: prefix,
 		data:   b,
 	}
@@ -57,11 +57,11 @@ func (b *Bytes) GetDirectBytes() []byte {
 	return b.data
 }
 
-func (b *Bytes) ConcatBytes(key Bytes) Bytes {
+func (b *Bytes) ConcatBytes(key Bytes) *Bytes {
 	return NewBytesWithPrefix(b, key.data)
 }
 
-func (b *Bytes) Concat(key []byte) Bytes {
+func (b *Bytes) Concat(key []byte) *Bytes {
 	return NewBytesWithPrefix(b, key)
 }
 
@@ -137,8 +137,8 @@ func (b *Bytes) ToBytes() []byte {
 
 func init() {
 	for i := 0; i < MAX_CACHE; i++ {
-		INT_BYTES[i] = NewBytes(IntToBytes(i))
-		LONG_BYTES[i] = NewBytes(Int64ToBytes(int64(i)))
+		INT_BYTES[i] = *NewBytes(IntToBytes(i))
+		LONG_BYTES[i] = *NewBytes(Int64ToBytes(int64(i)))
 	}
 }
 
@@ -157,17 +157,21 @@ func (b *Bytes) ToUTF8String() string {
 	return ToString(b.ToBytes())
 }
 
-func FromInt(value int) Bytes {
+func FromInt(value int) *Bytes {
 	if value > -1 && value < MAX_CACHE {
-		return INT_BYTES[value]
+		return &INT_BYTES[value]
 	}
 	return NewBytes(IntToBytes(value))
 }
 
-func FromString(str string) Bytes {
+func FromString(str string) *Bytes {
 	return NewBytes(StringToBytes(str))
 }
 
-func FromBase58(str string) Bytes {
-	return NewBytes(StringToBytes(str))
+func FromBase58(str string) *Bytes {
+	bytes, err := base58.Decode(str)
+	if err != nil {
+		panic(err)
+	}
+	return NewBytes(bytes)
 }

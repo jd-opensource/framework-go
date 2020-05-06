@@ -11,13 +11,13 @@ import (
  * @Date: 2020/5/2 12:05 下午
  */
 
-func TestAesEncrypt(t *testing.T) {
+func TestEncrypt(t *testing.T) {
 	key := GenerateSymmetricKey()
 	encrypt := Encrypt(key, []byte("abc"))
 	require.NotNil(t, encrypt)
 }
 
-func TestAesDecrypt(t *testing.T) {
+func TestDecrypt(t *testing.T) {
 	key := GenerateSymmetricKey()
 	encrypt := Encrypt(key, []byte("abc"))
 	require.NotNil(t, encrypt)

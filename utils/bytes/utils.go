@@ -13,8 +13,8 @@ var (
 	DEFAULT_CHARSET = "UTF-8"
 	MAX_BUFFER_SIZE = 1024 * 1024 * 1024
 	BUFFER_SIZE     = 64
-	TRUE_BYTE       = []byte{1}
-	FALSE_BYTE      = []byte{0}
+	TRUE_BYTE       = byte(0x01)
+	FALSE_BYTE      = byte(0x00)
 )
 
 /**
@@ -79,7 +79,7 @@ func IntToBytes(value int) []byte {
 	return bytes
 }
 
-func BoolToBytes(value bool) []byte {
+func BoolToBytes(value bool) byte {
 	if value {
 		return TRUE_BYTE
 	} else {
@@ -115,7 +115,7 @@ func ToString(bytes []byte) string {
 }
 
 func ToBoolean(b byte) bool {
-	if b == TRUE_BYTE[0] {
+	if b == TRUE_BYTE {
 		return true
 	}
 

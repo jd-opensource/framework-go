@@ -89,7 +89,7 @@ func (s Slice) GetSlice(offset, size int) Slice {
 }
 
 func (s Slice) ToBytes() []byte {
-	return s.GetBytesCopy(s.Offset, s.Size)
+	return s.GetBytesCopy(0, s.Size)
 }
 
 func (s Slice) checkBoundary(offset, len int) {
