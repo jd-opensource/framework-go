@@ -12,8 +12,8 @@ import (
 
 var (
 	EMPTY_BYTES = NewBytes([]byte{})
-	MAX_CACHE   = 256
-	INT_BYTES   [256]Bytes
+	MAX_CACHE   = int32(256)
+	INT32_BYTES [256]Bytes
 	LONG_BYTES  [256]Bytes
 )
 
@@ -85,7 +85,7 @@ func (b *Bytes) Equals(obj interface{}) bool {
 	if b == obj {
 		return true
 	}
-	ob, ok := obj.(Bytes)
+	ob, ok := obj.(*Bytes)
 	if !ok {
 		return false
 	}
@@ -136,8 +136,8 @@ func (b *Bytes) ToBytes() []byte {
 }
 
 func init() {
-	for i := 0; i < MAX_CACHE; i++ {
-		INT_BYTES[i] = *NewBytes(IntToBytes(i))
+	for i := int32(0); i < MAX_CACHE; i++ {
+		INT32_BYTES[i] = *NewBytes(Int32ToBytes(i))
 		LONG_BYTES[i] = *NewBytes(Int64ToBytes(int64(i)))
 	}
 }
@@ -158,10 +158,21 @@ func (b *Bytes) ToUTF8String() string {
 }
 
 func FromInt(value int) *Bytes {
-	if value > -1 && value < MAX_CACHE {
-		return &INT_BYTES[value]
-	}
 	return NewBytes(IntToBytes(value))
+}
+
+func FromInt32(value int32) *Bytes {
+	if value > -1 && value < MAX_CACHE {
+		return &INT32_BYTES[value]
+	}
+	return NewBytes(Int32ToBytes(value))
+}
+
+func FromInt64(value int64) *Bytes {
+	if value > -1 && value < int64(MAX_CACHE) {
+		return &INT32_BYTES[value]
+	}
+	return NewBytes(Int64ToBytes(value))
 }
 
 func FromString(str string) *Bytes {

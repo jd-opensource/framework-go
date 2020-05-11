@@ -53,18 +53,18 @@ func TestSlice_GetInt16(t *testing.T) {
 	}
 }
 
-func TestSlice_GetInt(t *testing.T) {
+func TestSlice_GetInt32(t *testing.T) {
 	cases := []struct {
 		slice  Slice
 		offset int
-		expect int
+		expect int32
 	}{
-		{NewSlice(IntToBytes(1)), 0, 1},
-		{NewSlice(IntToBytes(2)), 0, 2},
-		{NewSlice(append(IntToBytes(1), IntToBytes(3)...)), 4, 3},
+		{NewSlice(Int32ToBytes(1)), 0, 1},
+		{NewSlice(Int32ToBytes(2)), 0, 2},
+		{NewSlice(append(Int32ToBytes(1), Int32ToBytes(3)...)), 4, 3},
 	}
 	for _, c := range cases {
-		assert.Equal(t, c.expect, c.slice.GetInt(c.offset))
+		assert.Equal(t, c.expect, c.slice.GetInt32(c.offset))
 	}
 }
 

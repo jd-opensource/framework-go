@@ -2,6 +2,7 @@ package bytes
 
 import (
 	"encoding/binary"
+	"math"
 )
 
 /**
@@ -39,7 +40,15 @@ func int16ToBytes(value int16, bytes []byte, offset int) int {
  * @param offset 写入转换结果的起始位置；
  * @return 返回写入的长度；
  */
-func intToBytes(value int, bytes []byte, offset int) int {
+func int32ToBytes(value int32, bytes []byte, offset int) int {
+	bytes[offset] = (byte)((value >> 24) & 0x00FF)
+	bytes[offset+1] = (byte)((value >> 16) & 0x00FF)
+	bytes[offset+2] = (byte)((value >> 8) & 0x00FF)
+	bytes[offset+3] = (byte)(value & 0x00FF)
+	return 4
+}
+
+func intTToBytes(value int, bytes []byte, offset int) int {
 	bytes[offset] = (byte)((value >> 24) & 0x00FF)
 	bytes[offset+1] = (byte)((value >> 16) & 0x00FF)
 	bytes[offset+2] = (byte)((value >> 8) & 0x00FF)
@@ -73,10 +82,26 @@ func int64ToBytes(value int64, bytes []byte, offset int) int {
  * @param value value
  * @return 转换后的二进制数组，高位在前，低位在后；
  */
-func IntToBytes(value int) []byte {
+func Int32ToBytes(value int32) []byte {
 	bytes := make([]byte, 4)
-	intToBytes(value, bytes, 0)
+	int32ToBytes(value, bytes, 0)
 	return bytes
+}
+
+func IntToBytes(value int) []byte {
+	if value <= math.MaxInt32 {
+		return Int32ToBytes(int32(value))
+	} else {
+		return Int64ToBytes(int64(value))
+	}
+}
+
+func ToInt(bys []byte) int {
+	if len(bys) <= 4 {
+		return int(ToInt32(bys))
+	} else {
+		return int(ToInt64(bys))
+	}
 }
 
 func BoolToBytes(value bool) byte {
@@ -131,13 +156,13 @@ func ToInt16(b []byte) int16 {
 	return int16(binary.BigEndian.Uint16(b))
 }
 
-func ToInt(b []byte) int {
+func ToInt32(b []byte) int32 {
 	if len(b) < 4 {
 		for i := 0; i < 4-len(b); i++ {
 			b = append([]byte{0x00}, b...)
 		}
 	}
-	return int(binary.BigEndian.Uint32(b))
+	return int32(binary.BigEndian.Uint32(b))
 }
 
 func ToInt64(b []byte) int64 {

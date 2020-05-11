@@ -16,6 +16,12 @@ func TestIntToBytes(t *testing.T) {
 	require.Equal(t, i, ToInt(bytes.ToBytes()))
 }
 
+func TestInt32ToBytes(t *testing.T) {
+	i := int32(10)
+	bytes := FromInt32(i)
+	require.Equal(t, i, ToInt32(bytes.ToBytes()))
+}
+
 func TestInt16ToBytes(t *testing.T) {
 	i := int16(10)
 	bytes := Int16ToBytes(i)

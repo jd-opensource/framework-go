@@ -54,10 +54,10 @@ func (s Slice) GetInt16(offset int) int16 {
 	return ToInt16(s.Bytes[off : off+2])
 }
 
-func (s Slice) GetInt(offset int) int {
+func (s Slice) GetInt32(offset int) int32 {
 	off := s.Offset + offset
 	s.checkBoundary(off, 4)
-	return ToInt(s.Bytes[off : off+4])
+	return ToInt32(s.Bytes[off : off+4])
 }
 
 func (s Slice) GetInt64(offset int) int64 {
