@@ -130,6 +130,10 @@ func Int16ToBytes(value int16) []byte {
 	return bytes
 }
 
+func Int8ToBytes(value int8) byte {
+	return (byte)(value)
+}
+
 // TODO UTF-8 ?
 func StringToBytes(str string) []byte {
 	return []byte(str)

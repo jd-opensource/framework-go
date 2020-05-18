@@ -1,0 +1,9 @@
+[
+	{
+		"description":"The code and version of data contract.",
+		"dynamic":false,
+		"length":12,
+		"name":"HEAD",
+		"repeatable":false
+	}
+]

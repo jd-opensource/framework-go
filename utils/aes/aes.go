@@ -54,7 +54,7 @@ func Decrypt(key, data []byte) ([]byte, error) {
 func pKCS7UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unpadding := int(origData[length-1])
-	if length - unpadding > 0 {
+	if length-unpadding > 0 {
 		return origData[:(length - unpadding)]
 	} else {
 		return origData

@@ -1,0 +1,44 @@
+[
+	{
+		"description":"The code and version of data contract.",
+		"dynamic":false,
+		"length":12,
+		"name":"HEAD",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getSeed",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getParticipantsHash",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getSettingsHash",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getRolePrivilegesHash",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getUserRolesHash",
+		"repeatable":false
+	}
+]

@@ -1,0 +1,30 @@
+[
+	{
+		"description":"The code and version of data contract.",
+		"dynamic":false,
+		"length":12,
+		"name":"HEAD",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getHash",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getTransactionContent",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getEndpointSignatures",
+		"repeatable":true
+	}
+]

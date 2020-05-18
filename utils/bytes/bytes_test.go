@@ -43,7 +43,7 @@ func TestBytes_GetDirectBytes(t *testing.T) {
 	cases := []struct {
 		prefix *Bytes
 		data   []byte
-		direct   []byte
+		direct []byte
 	}{
 		{nil, []byte("imuge"), []byte("imuge")},
 		{NewBytes([]byte("liu")), []byte("imuge"), []byte("imuge")},

@@ -1,0 +1,30 @@
+[
+	{
+		"description":"The code and version of data contract.",
+		"dynamic":false,
+		"length":12,
+		"name":"HEAD",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getConsensusProvider",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getConsensusSetting",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getCryptoSetting",
+		"repeatable":false
+	}
+]

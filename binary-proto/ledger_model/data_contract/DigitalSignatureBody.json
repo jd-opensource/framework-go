@@ -1,0 +1,28 @@
+{
+	"code":2865,
+	"description":"",
+	"fields":[
+		{
+			"description":"",
+			"genericContract":false,
+			"maxSize":-1,
+			"name":"getPubKey",
+			"numberEncoding":"NONE",
+			"order":1,
+			"primitiveType":"BYTES",
+			"repeatable":false
+		},
+		{
+			"description":"",
+			"genericContract":false,
+			"maxSize":-1,
+			"name":"getDigest",
+			"numberEncoding":"NONE",
+			"order":2,
+			"primitiveType":"BYTES",
+			"repeatable":false
+		}
+	],
+	"name":"DigitalSignatureBody",
+	"version":-256630039951651650
+}

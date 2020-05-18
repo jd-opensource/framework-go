@@ -1,0 +1,16 @@
+[
+	{
+		"description":"The code and version of data contract.",
+		"dynamic":false,
+		"length":12,
+		"name":"HEAD",
+		"repeatable":false
+	},
+	{
+		"description":"",
+		"dynamic":true,
+		"length":-1,
+		"name":"getInitSetting",
+		"repeatable":false
+	}
+]
