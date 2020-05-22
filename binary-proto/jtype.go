@@ -1,8 +1,6 @@
 package binary_proto
 
-import (
-	"framework-go/utils/bytes"
-)
+import "framework-go/utils/bytes"
 
 var _ DataContract = (*JType)(nil)
 
@@ -22,12 +20,15 @@ type JType struct {
 	I64ms []int64  `primitiveType:"INT64" numberEncoding:"LONG" repeatable:"true" numberEncoding:"LONG"`
 	Bools []bool   `primitiveType:"BOOLEAN" repeatable:"true"`
 	Texts []string `primitiveType:"TEXT" repeatable:"true"`
+	enum  JEnum    `refEnum:"2"`
+	enums []JEnum  `refEnum:"2" repeatable:"true"`
 }
 
 func NewJType() JType {
 	return JType{
 		8, 16, 32, 64, 64, true, "text", bytes.StringToBytes("bytes"),
 		[]int8{8, 8}, []int16{16, 16}, []int32{32, 32}, []int64{64, 64}, []int64{64, 64}, []bool{true, false}, []string{"text1", "text2"},
+		JEnumOne, []JEnum{JEnumOne, JEnumTwo},
 	}
 }
 
@@ -36,7 +37,7 @@ func (p JType) Code() int32 {
 }
 
 func (p JType) Version() int64 {
-	return 6998934717933545896
+	return -8834083962099753635
 }
 
 func (p JType) Name() string {

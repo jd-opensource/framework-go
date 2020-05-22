@@ -92,8 +92,18 @@ func encodeString(data string) []byte {
 	return encodeBytes(bytes.StringToBytes(data))
 }
 
-func encodeEnum(refEnum int) []byte {
-	return nil
+func encodeEnum(c *Codec, value int64, refEnum int) []byte {
+	contract := (c.enumMap[int32(refEnum)]).(EnumContract)
+	switch contract.Type() {
+	case PRIMITIVETYPE_INT8:
+		return []byte{encodeInt8(int8(value))}
+	case PRIMITIVETYPE_INT16:
+		return encodeInt16(int16(value))
+	case PRIMITIVETYPE_INT32:
+		return encodeInt32(int32(value))
+	default:
+		panic("un support enum value type, int8,int16,int32 only")
+	}
 }
 
 func encodeArrayHeader(count int) []byte {

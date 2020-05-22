@@ -91,7 +91,7 @@ func (c *Codec) Encode(obj interface{}) ([]byte, error) {
 				} else if refContract != 0 { // 引用其他契约
 					buf = append(buf, encodeContract(refContract)...)
 				} else if refEnum != 0 { // 引用枚举
-					buf = append(buf, encodeEnum(refEnum)...)
+					buf = append(buf, encodeEnum(c, value.Int(), refEnum)...)
 				} else { // 基础类型字段
 					buf = append(buf, encodePrimitiveType(value, primitiveType, numberMask)...)
 				}

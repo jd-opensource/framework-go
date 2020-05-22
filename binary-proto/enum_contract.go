@@ -9,6 +9,15 @@ package binary_proto
 枚举契约契约
 */
 type EnumContract interface {
-	// 注册枚举
-	RegisterEnum()
+
+	// 唯一标识
+	Code() int32
+	// 字段基础类型信息，只支持INT8,INT16,INT32
+	Type() string
+	// 标识名称
+	Name() string
+	// 描述信息
+	Description() string
+
+	GetValue(CODE int32) EnumContract
 }
