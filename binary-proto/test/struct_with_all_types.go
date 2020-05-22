@@ -27,6 +27,8 @@ type StructWithAllTypes struct {
 	enums   []RefEnum     `refEnum:"2" repeatable:"true"`
 	JP      RefContract   `refContract:"3"`
 	JPs     []RefContract `refContract:"3" repeatable:"true"`
+	JG      RefContract   `genericContract:"true"`
+	JGs     []RefContract `genericContract:"true" repeatable:"true"`
 }
 
 func NewStructWithAllTypes() StructWithAllTypes {
@@ -34,6 +36,7 @@ func NewStructWithAllTypes() StructWithAllTypes {
 		8, 16, 32, 64, 64, true, "text", bytes.StringToBytes("bytes"),
 		[]int8{8, 8}, []int16{16, 16}, []int32{32, 32}, []int64{64, 64}, []int64{64, 64}, []bool{true, false}, []string{"text1", "text2"},
 		ONE, []RefEnum{ONE, TWO},
+		NewRefContract(), []RefContract{NewRefContract(), NewRefContract()},
 		NewRefContract(), []RefContract{NewRefContract(), NewRefContract()},
 	}
 }
@@ -43,7 +46,7 @@ func (p StructWithAllTypes) Code() int32 {
 }
 
 func (p StructWithAllTypes) Version() int64 {
-	return 4719784014675470359
+	return 7041625623689641766
 }
 
 func (p StructWithAllTypes) Name() string {
