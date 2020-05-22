@@ -86,10 +86,10 @@ func (c *Codec) Encode(obj interface{}) ([]byte, error) {
 				} else {
 					value = vField.Index(j)
 				}
-				if genericContract { // 泛型编码
-					buf = append(buf, encodeGeneric(refContract)...)
+				if genericContract { // 泛型编码, 目前与encodeContract无差别
+					buf = append(buf, encodeGeneric(c, value.Interface())...)
 				} else if refContract != 0 { // 引用其他契约
-					buf = append(buf, encodeContract(refContract)...)
+					buf = append(buf, encodeContract(c, value.Interface())...)
 				} else if refEnum != 0 { // 引用枚举
 					buf = append(buf, encodeEnum(c, value.Int(), refEnum)...)
 				} else { // 基础类型字段

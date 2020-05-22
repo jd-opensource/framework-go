@@ -110,10 +110,16 @@ func encodeArrayHeader(count int) []byte {
 	return bytes.NUMBERMASK_NORMAL.WriteMask(int64(count))
 }
 
-func encodeGeneric(refContract int) []byte {
-	return nil
+func encodeGeneric(c *Codec, v interface{}) []byte {
+	// 与非泛型引用无差别
+	return encodeContract(c, v)
 }
 
-func encodeContract(refContract int) []byte {
-	return nil
+func encodeContract(c *Codec, v interface{}) []byte {
+	buf, err := c.Encode(v.(DataContract))
+	if err != nil {
+		panic(err)
+	}
+	buf = append(encodeSize(len(buf)), buf...)
+	return buf
 }

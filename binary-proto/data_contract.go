@@ -17,6 +17,4 @@ type DataContract interface {
 	Name() string
 	// 描述信息
 	Description() string
-	// 注册契约
-	Register()
 }
