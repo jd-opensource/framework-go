@@ -151,6 +151,10 @@ func ToBoolean(b byte) bool {
 	return false
 }
 
+func ToInt8(b byte) int8 {
+	return int8(b)
+}
+
 func ToInt16(b []byte) int16 {
 	if len(b) < 2 {
 		for i := 0; i < 2-len(b); i++ {

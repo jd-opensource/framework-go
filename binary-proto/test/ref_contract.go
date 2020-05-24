@@ -9,6 +9,10 @@ import "framework-go/binary-proto"
 
 var _ binary_proto.DataContract = (*RefContract)(nil)
 
+func init() {
+	binary_proto.Cdc.RegisterContract(RefContract{}.Code(), RefContract{})
+}
+
 type RefContract struct {
 	I8 int8 `primitiveType:"INT8"`
 }

@@ -14,7 +14,6 @@ import (
 var Cdc = Codec{
 	make(map[int32]interface{}),
 	make(map[int32]interface{}),
-	make(map[int32]interface{}),
 }
 
 type Codec struct {
@@ -22,8 +21,6 @@ type Codec struct {
 	contractMap map[int32]interface{}
 	// 枚举类型 // TODO 未支持多版本
 	enumMap map[int32]interface{}
-	// 枚举类型 // TODO 未支持多版本
-	GenericMap map[int32]interface{}
 }
 
 /**
@@ -86,7 +83,7 @@ func (c *Codec) Encode(obj interface{}) ([]byte, error) {
 				} else {
 					value = vField.Index(j)
 				}
-				if genericContract { // 泛型编码, 目前与encodeContract无差别
+				if genericContract { // 泛型编码
 					buf = append(buf, encodeGeneric(c, value.Interface())...)
 				} else if refContract != 0 { // 引用其他契约
 					buf = append(buf, encodeContract(c, value.Interface())...)
@@ -105,7 +102,70 @@ func (c *Codec) Encode(obj interface{}) ([]byte, error) {
 /**
 解码
 */
-func (c *Codec) Decode(data []byte, obj interface{}) {
+func (c *Codec) Decode(data []byte) (interface{}, error) {
+	offset := int64(12)
+	// 解析头信息
+	code, _ := decodeHeader(data[:offset])
+	contract := c.contractMap[code]
+	rt := reflect.TypeOf(contract)
+	obj := reflect.New(rt)
+	rv := obj.Elem()
+
+	// 解析字段信息
+	for i := 0; i < rt.NumField(); i++ {
+		tField := rt.Field(i)
+		vField := rv.Field(i)
+		_, _, _, primitiveType, refContract, refEnum, genericContract, _, numberMask, repeatable, err := resolveTags(tField)
+		if err != nil {
+			return nil, err
+		}
+
+		if primitiveType == PRIMITIVETYPE_BYTES { // 字节数组
+			bs, size := decodeBytes(data[offset:])
+			vField.SetBytes(bs)
+			offset += size
+		} else {
+			repeat := 1
+			size := int64(0)
+			if repeatable {
+				// 编码数组头信息
+				repeat, size = decodeArrayHeader(data[offset:])
+				offset += size
+				// 初始化数组
+				vField = reflect.MakeSlice(tField.Type, repeat, repeat)
+			}
+
+			for j := 0; j < repeat; j++ {
+				var value reflect.Value
+				if !repeatable {
+					value = vField
+				} else {
+					value = vField.Index(j)
+				}
+				if genericContract { // 泛型编码
+					contract, size := decodeContract(c, data[offset:])
+					value.Set(reflect.ValueOf(contract))
+					offset += size
+				} else if refContract != 0 { // 引用其他契约
+					contract, size := decodeContract(c, data[offset:])
+					value.Set(reflect.ValueOf(contract))
+					offset += size
+				} else if refEnum != 0 { // 引用枚举
+					enum, size := decodeEnum(c, data[offset:], refEnum)
+					value.Set(reflect.ValueOf(enum))
+					offset += size
+				} else { // 基础类型字段
+					size = decodePrimitiveType(data[offset:], value, primitiveType, numberMask)
+					offset += size
+				}
+			}
+			if repeatable {
+				rv.Field(i).Set(vField)
+			}
+		}
+	}
+
+	return obj.Elem().Interface(), nil
 }
 
 // 解析Tag
