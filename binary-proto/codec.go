@@ -2,6 +2,7 @@ package binary_proto
 
 import (
 	"crypto/sha256"
+	"errors"
 	"framework-go/utils/bytes"
 	"reflect"
 	"strconv"
@@ -22,7 +23,7 @@ type Codec struct {
 	EnumMap map[int32]EnumContract
 }
 
-func NewCodec() *Codec{
+func NewCodec() *Codec {
 	return &Codec{
 		make(map[int32]DataContract),
 		make(map[int32]int64),
@@ -114,6 +115,13 @@ func (c *Codec) Encode(contract DataContract) ([]byte, error) {
 	var err error
 	rt := reflect.TypeOf(contract)
 	rv := reflect.ValueOf(contract)
+	if contract == nil || (rv.Kind() == reflect.Ptr && rv.IsNil()) {
+		return nil, errors.New("nil value")
+	}
+
+	if rv.Kind() == reflect.Ptr {
+		rv = rv.Elem()
+	}
 
 	// 编码头信息
 	buf := bytes.Int32ToBytes(contract.Code())
@@ -146,9 +154,9 @@ func (c *Codec) Encode(contract DataContract) ([]byte, error) {
 					value = vField.Index(j)
 				}
 				if genericContract { // 泛型编码
-					buf = append(buf, encodeGeneric(c, value.Interface())...)
+					buf = append(buf, encodeGeneric(c, refContract, value.Interface())...)
 				} else if refContract != 0 { // 引用其他契约
-					buf = append(buf, encodeContract(c, value.Interface())...)
+					buf = append(buf, encodeContract(c, refContract, value.Interface())...)
 				} else if refEnum != 0 { // 引用枚举
 					buf = append(buf, encodeEnum(c, value.Int(), refEnum)...)
 				} else { // 基础类型字段
@@ -165,9 +173,9 @@ func (c *Codec) Encode(contract DataContract) ([]byte, error) {
 解码
 */
 func (c *Codec) Decode(data []byte) (interface{}, error) {
-	offset := int64(12)
 	// 解析头信息
-	code, _ := decodeHeader(data[:offset])
+	code, _ := decodeHeader(data)
+	offset := int64(12)
 	contract := c.ContractMap[code]
 	rt := reflect.TypeOf(contract)
 	obj := reflect.New(rt)
@@ -204,13 +212,16 @@ func (c *Codec) Decode(data []byte) (interface{}, error) {
 				} else {
 					value = vField.Index(j)
 				}
-				if genericContract { // 泛型编码
+				if genericContract || refContract != 0 { // 泛型/引用其他契约
 					contract, size := decodeContract(c, data[offset:])
-					value.Set(reflect.ValueOf(contract))
-					offset += size
-				} else if refContract != 0 { // 引用其他契约
-					contract, size := decodeContract(c, data[offset:])
-					value.Set(reflect.ValueOf(contract))
+					if contract != nil {
+						if value.Kind() == reflect.Ptr {
+							value.Set(reflect.New(vField.Type().Elem()))
+							value.Elem().Set(reflect.ValueOf(contract))
+						} else {
+							value.Set(reflect.ValueOf(contract))
+						}
+					}
 					offset += size
 				} else if refEnum != 0 { // 引用枚举
 					enum, size := decodeEnum(c, data[offset:], refEnum)

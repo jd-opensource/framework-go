@@ -1,6 +1,7 @@
 package binary_proto
 
 import (
+	"fmt"
 	"framework-go/utils/bytes"
 	"reflect"
 )
@@ -102,12 +103,29 @@ func encodeArrayHeader(count int) []byte {
 	return bytes.NUMBERMASK_NORMAL.WriteMask(int64(count))
 }
 
-func encodeGeneric(c *Codec, v interface{}) []byte {
+func encodeGeneric(c *Codec, refContract int, v interface{}) []byte {
 	// 与非泛型引用无差别
-	return encodeContract(c, v)
+	return encodeContract(c, refContract, v)
 }
 
-func encodeContract(c *Codec, v interface{}) []byte {
+func encodeContract(c *Codec, reflectContract int, v interface{}) []byte {
+	if v == nil || (reflect.ValueOf(v).Kind() == reflect.Ptr && reflect.ValueOf(v).IsNil()) {
+		// 空值，仅编码头信息
+		// 编码头信息
+		contract, ok := c.ContractMap[int32(reflectContract)]
+		if !ok {
+			panic(fmt.Sprintf("contract %d not exists", reflectContract))
+		}
+		buf := bytes.Int32ToBytes(contract.Code())
+		buf = append(buf, bytes.Int64ToBytes(c.VersionMap[contract.Code()])...)
+		buf = append(encodeSize(len(buf)), buf...)
+		return buf
+	}
+	value := reflect.ValueOf(v)
+	if value.Kind() == reflect.Ptr {
+		value = value.Elem()
+	}
+
 	buf, err := c.Encode(v.(DataContract))
 	if err != nil {
 		panic(err)

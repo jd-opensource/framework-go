@@ -132,6 +132,10 @@ func decodeEnum(c *Codec, data []byte, refEnum int) (EnumContract, int64) {
 func decodeContract(c *Codec, data []byte) (interface{}, int64) {
 	len := decodeSize(data)
 	size := bytes.NUMBERMASK_NORMAL.GetMaskLength(len)
+	if len == HEAD_BYTES {
+		// 只有头信息
+		return nil, len + int64(size)
+	}
 	contract, err := c.Decode(data[size : len+int64(size)])
 	if err != nil {
 		panic(err)

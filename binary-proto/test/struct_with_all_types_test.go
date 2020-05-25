@@ -11,7 +11,7 @@ func TestEncode(t *testing.T) {
 	bytes, err := binary_proto.Cdc.Encode(NewStructWithAllTypes())
 	require.Nil(t, err)
 	require.Equal(t,
-		"111HWkwFfXMBaPBx2XAv4LKoGTXngcj8dG7boBohWaFGvMiX9MSVuk876e4ZTVxzfeRmovv1g232FzyVj4szMpDHSVPCrgm6HnqiW1CGC4gRvvcwU5JBz9YM1ohr6SY8evP4ghC8mZa2eRoo5vR8V63FSps23vxD3mHWpGp3hGazd6Pgix6y1xYUcECVT9RD8dfixtL7UZaJzR6hjbecqqVoWSH4ZSEGqsU7BJPDzsMdpdv1PLHdQGFyToXn",
+		"1112RQsc83DvDVJomSUvEPnkBCq1qVQWMKfWYyx2ERvu9oeypyDLzivbM3Rg5icMKzFf2cEBm7rrcYtDomYAnWF4G8DcLq1gtd186eWaSNVWdQzTZkErc4ky53VxMMizsYB2msM8Qsq4qBeNeVbhDa6fSzynbzuM8PXWrCqX6cg9SDJG9J8nEyMWDMGGW41kx49uT9x2A9HNyUA1NrsAx",
 		base58.Encode(bytes))
 }
 

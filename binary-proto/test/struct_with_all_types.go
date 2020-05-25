@@ -29,7 +29,7 @@ type StructWithAllTypes struct {
 	Texts []string      `primitiveType:"TEXT" repeatable:"true"`
 	Enum  RefEnum       `refEnum:"2"`
 	Enums []RefEnum     `refEnum:"2" repeatable:"true"`
-	JP    RefContract   `refContract:"3"`
+	JP    *RefContract  `refContract:"3"`
 	JPs   []RefContract `refContract:"3" repeatable:"true"`
 	JG    RefContract   `refContract:"4" genericContract:"true"`
 	JGs   []RefContract `refContract:"4" genericContract:"true" repeatable:"true"`
@@ -47,7 +47,8 @@ func NewStructWithAllTypes() StructWithAllTypes {
 		[]int64{64, 64}, []bool{true, false}, []string{"text1", "text2"},
 		ONE,
 		[]RefEnum{ONE, TWO},
-		NewRefContract(), []RefContract{NewRefContract(), NewRefContract()},
+		nil,
+		nil, //[]RefContract{NewRefContract(), NewRefContract()},
 		NewRefContract(),
 		[]RefContract{NewRefContract(), NewRefContract()},
 	}
@@ -87,13 +88,13 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if p.Text != contract.Text {
 		return false
 	}
-	if !bytes.Equals(p.Bytes,contract.Bytes) {
+	if !bytes.Equals(p.Bytes, contract.Bytes) {
 		return false
 	}
 	if len(p.I8s) != len(contract.I8s) {
 		return false
 	}
-	for i :=0; i< len(p.I8s); i++ {
+	for i := 0; i < len(p.I8s); i++ {
 		if p.I8s[i] != contract.I8s[i] {
 			return false
 		}
@@ -101,7 +102,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if len(p.I16s) != len(contract.I16s) {
 		return false
 	}
-	for i :=0; i< len(p.I16s); i++ {
+	for i := 0; i < len(p.I16s); i++ {
 		if p.I16s[i] != contract.I16s[i] {
 			return false
 		}
@@ -109,7 +110,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if len(p.I32s) != len(contract.I32s) {
 		return false
 	}
-	for i :=0; i< len(p.I32s); i++ {
+	for i := 0; i < len(p.I32s); i++ {
 		if p.I32s[i] != contract.I32s[i] {
 			return false
 		}
@@ -117,7 +118,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if len(p.I64s) != len(contract.I64s) {
 		return false
 	}
-	for i :=0; i< len(p.I64s); i++ {
+	for i := 0; i < len(p.I64s); i++ {
 		if p.I64s[i] != contract.I64s[i] {
 			return false
 		}
@@ -125,7 +126,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if len(p.I64ms) != len(contract.I64ms) {
 		return false
 	}
-	for i :=0; i< len(p.I64ms); i++ {
+	for i := 0; i < len(p.I64ms); i++ {
 		if p.I64ms[i] != contract.I64ms[i] {
 			return false
 		}
@@ -133,7 +134,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if len(p.Bools) != len(contract.Bools) {
 		return false
 	}
-	for i :=0; i< len(p.Bools); i++ {
+	for i := 0; i < len(p.Bools); i++ {
 		if p.Bools[i] != contract.Bools[i] {
 			return false
 		}
@@ -141,7 +142,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if len(p.Texts) != len(contract.Texts) {
 		return false
 	}
-	for i :=0; i< len(p.Texts); i++ {
+	for i := 0; i < len(p.Texts); i++ {
 		if p.Texts[i] != contract.Texts[i] {
 			return false
 		}
@@ -152,18 +153,22 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if len(p.Enums) != len(contract.Enums) {
 		return false
 	}
-	for i :=0; i< len(p.Enums); i++ {
+	for i := 0; i < len(p.Enums); i++ {
 		if p.Enums[i] != contract.Enums[i] {
 			return false
 		}
 	}
-	if !p.JP.Equals(contract.JP) {
+	if p.JP == nil && contract.JP != nil {
+		return false
+	} else if p.JP != nil && contract.JP == nil {
+		return false
+	} else if p.JP != nil && contract.JP != nil && !p.JP.Equals(*contract.JP) {
 		return false
 	}
 	if len(p.JPs) != len(contract.JPs) {
 		return false
 	}
-	for i :=0; i< len(p.JPs); i++ {
+	for i := 0; i < len(p.JPs); i++ {
 		if !p.JPs[i].Equals(contract.JPs[i]) {
 			return false
 		}
@@ -171,7 +176,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 	if !p.JG.Equals(contract.JG) {
 		return false
 	}
-	for i :=0; i< len(p.JGs); i++ {
+	for i := 0; i < len(p.JGs); i++ {
 		if !p.JGs[i].Equals(contract.JGs[i]) {
 			return false
 		}
