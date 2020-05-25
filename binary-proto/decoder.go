@@ -116,7 +116,7 @@ func decodeArrayHeader(data []byte) (int, int64) {
 }
 
 func decodeEnum(c *Codec, data []byte, refEnum int) (EnumContract, int64) {
-	contract := (c.enumMap[int32(refEnum)]).(EnumContract)
+	contract := (c.EnumMap[int32(refEnum)]).(EnumContract)
 	switch contract.Type() {
 	case PRIMITIVETYPE_INT8:
 		return contract.GetValue(int32(bytes.ToInt8(data[0]))), 1

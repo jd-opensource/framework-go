@@ -10,14 +10,6 @@ import (
  * @Date: 2020/5/21 下午
  */
 
-// 编码头信息
-func encodeHeader(obj interface{}) []byte {
-	contract := obj.(DataContract)
-	buf := bytes.Int32ToBytes(contract.Code())
-	buf = append(buf, bytes.Int64ToBytes(contract.Version())...)
-	return buf
-}
-
 func encodePrimitiveType(v reflect.Value, primitiveType string, numberMask bytes.NumberMask) []byte {
 	switch primitiveType {
 	case PRIMITIVETYPE_NIL:
@@ -93,7 +85,7 @@ func encodeString(data string) []byte {
 }
 
 func encodeEnum(c *Codec, value int64, refEnum int) []byte {
-	contract := (c.enumMap[int32(refEnum)]).(EnumContract)
+	contract := (c.EnumMap[int32(refEnum)]).(EnumContract)
 	switch contract.Type() {
 	case PRIMITIVETYPE_INT8:
 		return []byte{encodeInt8(int8(value))}

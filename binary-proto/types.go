@@ -17,14 +17,5 @@ const (
 	TAG_NUMBERENCODING  = "numberEncoding"  // 动态数值字段，true/false
 	TAG_REPEATABLE      = "repeatable"      // 是否列表，true/false
 
-	PRIMITIVETYPE_NIL     = "NIL"     // 空
-	PRIMITIVETYPE_BOOLEAN = "BOOLEAN" // 布尔
-	PRIMITIVETYPE_INT8    = "INT8"    // int8
-	PRIMITIVETYPE_INT16   = "INT16"   // int16
-	PRIMITIVETYPE_INT32   = "INT32"   // int32
-	PRIMITIVETYPE_INT64   = "INT64"   // int64
-	PRIMITIVETYPE_TEXT    = "TEXT"    // 字符串
-	PRIMITIVETYPE_BYTES   = "BYTES"   // 字节数组
-
 	HEAD_BYTES = 12 // 头信息长度
 )

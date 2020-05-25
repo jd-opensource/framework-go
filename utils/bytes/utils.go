@@ -48,14 +48,6 @@ func int32ToBytes(value int32, bytes []byte, offset int) int {
 	return 4
 }
 
-func intTToBytes(value int, bytes []byte, offset int) int {
-	bytes[offset] = (byte)((value >> 24) & 0x00FF)
-	bytes[offset+1] = (byte)((value >> 16) & 0x00FF)
-	bytes[offset+2] = (byte)((value >> 8) & 0x00FF)
-	bytes[offset+3] = (byte)(value & 0x00FF)
-	return 4
-}
-
 /**
  * 将 long 值转为8字节的二进制数组；
  *

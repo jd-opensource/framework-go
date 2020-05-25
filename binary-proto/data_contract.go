@@ -11,8 +11,6 @@ package binary_proto
 type DataContract interface {
 	// 唯一标识
 	Code() int32
-	// 版本号
-	Version() int64
 	// 标识名称
 	Name() string
 	// 描述信息

@@ -18,6 +18,8 @@ type EnumContract interface {
 	Name() string
 	// 描述信息
 	Description() string
+	// 版本
+	Version() int64
 
 	GetValue(CODE int32) EnumContract
 }

@@ -15,7 +15,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(ONE.Code(), ONE)
+	binary_proto.Cdc.RegisterEnum(ONE)
 }
 
 var _ binary_proto.EnumContract = (*RefEnum)(nil)
@@ -34,6 +34,10 @@ func (J RefEnum) Name() string {
 
 func (J RefEnum) Description() string {
 	return ""
+}
+
+func (J RefEnum) Version() int64 {
+	return 0
 }
 
 func (J RefEnum) GetValue(CODE int32) binary_proto.EnumContract {
