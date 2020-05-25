@@ -31,7 +31,7 @@ type StructWithAllTypes struct {
 	Enums []RefEnum     `refEnum:"2" repeatable:"true"`
 	JP    *RefContract  `refContract:"3"`
 	JPs   []RefContract `refContract:"3" repeatable:"true"`
-	JG    RefContract   `refContract:"4" genericContract:"true"`
+	JG    binary_proto.DataContract   `refContract:"4" genericContract:"true"`
 	JGs   []RefContract `refContract:"4" genericContract:"true" repeatable:"true"`
 }
 
@@ -173,7 +173,7 @@ func (p StructWithAllTypes) Equals(contract StructWithAllTypes) bool {
 			return false
 		}
 	}
-	if !p.JG.Equals(contract.JG) {
+	if !p.JG.(RefContract).Equals(contract.JG.(RefContract)) {
 		return false
 	}
 	for i := 0; i < len(p.JGs); i++ {
