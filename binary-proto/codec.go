@@ -69,9 +69,6 @@ func (c *Codec) Encode(obj interface{}) ([]byte, error) {
 			repeat := 1
 			if repeatable {
 				repeat = rv.Field(i).Len()
-			}
-
-			if repeat > 1 {
 				// 编码数组头信息
 				buf = append(buf, encodeArrayHeader(repeat)...)
 			}
