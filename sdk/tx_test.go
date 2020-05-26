@@ -41,9 +41,7 @@ func TestRegisterUser(t *testing.T) {
 		Timestamp: time.Now().Unix(),
 	}
 	content := ledger_model.TransactionContent{
-		LedgerHash: contentBody.LedgerHash,
-		Operations: contentBody.Operations,
-		Timestamp:  contentBody.Timestamp,
+		TransactionContentBody: contentBody,
 		Hash:       nil,
 	}
 	contentBytes, err := binary_proto.Cdc.Encode(contentBody)

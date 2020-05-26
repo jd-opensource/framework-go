@@ -14,10 +14,8 @@ func init() {
 }
 
 type TransactionContent struct {
-	LedgerHash []byte                      `primitiveType:"BYTES"`
-	Operations []binary_proto.DataContract `refContract:"768" genericContract:"true" repeatable:"true"`
-	Timestamp  int64                       `primitiveType:"INT64"`
-	Hash       []byte                      `primitiveType:"BYTES"`
+	TransactionContentBody
+	Hash []byte `primitiveType:"BYTES"`
 }
 
 func (t TransactionContent) Code() int32 {

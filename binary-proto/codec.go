@@ -1,9 +1,9 @@
 package binary_proto
 
 import (
-	"crypto/sha256"
 	"errors"
 	"framework-go/utils/bytes"
+	"framework-go/utils/sha"
 	"reflect"
 	"strconv"
 )
@@ -38,66 +38,87 @@ func (c *Codec) RegisterContract(contract DataContract) {
 	c.ContractMap[contract.Code()] = contract
 }
 
-// 计算契约版本号
-func (c *Codec) calculateVersion(contract DataContract) {
-	var hasher = sha256.New()
-
+// 计算契约版本号`
+func (c *Codec) CalculateVersion(contract DataContract) error {
 	rt := reflect.TypeOf(contract)
-	// 解析字段信息
+	buf, err := c.calculateFieldVersion(rt)
+	if err != nil {
+		return err
+	}
+	c.VersionMap[contract.Code()] = bytes.ToInt64(sha.Sha256(buf))
+	return nil
+}
+
+func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
+	var buf []byte
 	for i := 0; i < rt.NumField(); i++ {
 		tField := rt.Field(i)
-		_, _, _, primitiveType, refContract, refEnum, genericContract, _, _, repeatable, err := resolveTags(tField)
-		if err != nil {
-			panic(err)
-		}
-		array := byte(0)
-		if repeatable {
-			array = byte(1)
-		}
-		if genericContract { // 泛型编码
-			bs := make([]byte, 14)
-			bs[0] = array
-			bs[1] = byte(3)
-			refCon := (c.ContractMap[int32(refContract)]).(DataContract)
-			copy(bs[2:6], bytes.Int32ToBytes(refCon.Code()))
-			ver, ok := c.VersionMap[refCon.Code()]
-			if !ok {
-				c.calculateVersion(refCon)
-				ver = c.VersionMap[refCon.Code()]
+		if tField.Anonymous { // 嵌套契约
+			bs, err := c.calculateFieldVersion(tField.Type)
+			if err != nil {
+				return nil, err
 			}
-			copy(bs[6:], bytes.Int64ToBytes(ver))
-			hasher.Write(bs)
-		} else if refContract != 0 { // 引用其他契约
-			bs := make([]byte, 14)
-			bs[0] = array
-			bs[1] = byte(2)
-			refCon := (c.ContractMap[int32(refContract)]).(DataContract)
-			copy(bs[2:6], bytes.Int32ToBytes(refCon.Code()))
-			ver, ok := c.VersionMap[refCon.Code()]
-			if !ok {
-				c.calculateVersion(refCon)
-				ver = c.VersionMap[refCon.Code()]
+			buf = append(buf, bs...)
+		} else {
+			_, _, _, primitiveType, refContract, refEnum, genericContract, _, _, repeatable, err := resolveTags(tField)
+			if err != nil {
+				return nil, err
 			}
-			copy(bs[6:], bytes.Int64ToBytes(ver))
-			hasher.Write(bs)
-		} else if refEnum != 0 { // 引用枚举
-			bs := make([]byte, 14)
-			bs[0] = array
-			bs[1] = byte(1)
-			enumCon := (c.EnumMap[int32(refEnum)]).(EnumContract)
-			copy(bs[2:6], bytes.Int32ToBytes(enumCon.Code()))
-			copy(bs[6:], bytes.Int64ToBytes(enumCon.Version()))
-			hasher.Write(bs)
-		} else { // 基础类型字段
-			bs := make([]byte, 6)
-			bs[0] = array
-			bs[1] = byte(0)
-			copy(bs[2:], bytes.Int16ToBytes(int16(GetPrimitiveType(primitiveType))))
-			hasher.Write(bs)
+			array := byte(0)
+			if repeatable {
+				array = byte(1)
+			}
+			if genericContract { // 泛型编码
+				bs := make([]byte, 14)
+				bs[0] = array
+				bs[1] = byte(3)
+				refCon := (c.ContractMap[int32(refContract)]).(DataContract)
+				copy(bs[2:6], bytes.Int32ToBytes(refCon.Code()))
+				ver, ok := c.VersionMap[refCon.Code()]
+				if !ok {
+					err = c.CalculateVersion(refCon)
+					if err != nil {
+						return nil, err
+					}
+					ver = c.VersionMap[refCon.Code()]
+				}
+				copy(bs[6:], bytes.Int64ToBytes(ver))
+				buf = append(buf, bs...)
+			} else if refContract != 0 { // 引用其他契约
+				bs := make([]byte, 14)
+				bs[0] = array
+				bs[1] = byte(2)
+				refCon := (c.ContractMap[int32(refContract)]).(DataContract)
+				copy(bs[2:6], bytes.Int32ToBytes(refCon.Code()))
+				ver, ok := c.VersionMap[refCon.Code()]
+				if !ok {
+					err = c.CalculateVersion(refCon)
+					if err != nil {
+						return nil, err
+					}
+					ver = c.VersionMap[refCon.Code()]
+				}
+				copy(bs[6:], bytes.Int64ToBytes(ver))
+				buf = append(buf, bs...)
+			} else if refEnum != 0 { // 引用枚举
+				bs := make([]byte, 14)
+				bs[0] = array
+				bs[1] = byte(1)
+				enumCon := (c.EnumMap[int32(refEnum)]).(EnumContract)
+				copy(bs[2:6], bytes.Int32ToBytes(enumCon.Code()))
+				copy(bs[6:], bytes.Int64ToBytes(enumCon.Version()))
+				buf = append(buf, bs...)
+			} else { // 基础类型字段
+				bs := make([]byte, 6)
+				bs[0] = array
+				bs[1] = byte(0)
+				copy(bs[2:], bytes.Int16ToBytes(int16(GetPrimitiveType(primitiveType))))
+				buf = append(buf, bs...)
+			}
 		}
 	}
 
-	c.VersionMap[contract.Code()] = bytes.ToInt64(hasher.Sum(nil))
+	return buf, nil
 }
 
 /**
@@ -107,15 +128,22 @@ func (c *Codec) RegisterEnum(enum EnumContract) {
 	c.EnumMap[enum.Code()] = enum
 }
 
+func (c *Codec) Encode(contract DataContract) ([]byte, error) {
+	return c.encode(contract, true)
+}
+
 /**
   编码
 */
-func (c *Codec) Encode(contract DataContract) ([]byte, error) {
+func (c *Codec) encode(contract DataContract, withHead bool) ([]byte, error) {
+	var err error
 	_, ok := c.VersionMap[contract.Code()]
 	if !ok {
-		c.calculateVersion(contract)
+		err = c.CalculateVersion(contract)
+		if err != nil {
+			return nil, err
+		}
 	}
-	var err error
 	rt := reflect.TypeOf(contract)
 	rv := reflect.ValueOf(contract)
 	if contract == nil || (rv.Kind() == reflect.Ptr && rv.IsNil()) {
@@ -123,53 +151,75 @@ func (c *Codec) Encode(contract DataContract) ([]byte, error) {
 	}
 
 	if rv.Kind() == reflect.Ptr {
+		rt = rt.Elem()
 		rv = rv.Elem()
 	}
 
+	var buf []byte
 	// 编码头信息
-	buf := bytes.Int32ToBytes(contract.Code())
-	buf = append(buf, bytes.Int64ToBytes(c.VersionMap[contract.Code()])...)
+	if withHead {
+		buf = append(bytes.Int32ToBytes(contract.Code()), bytes.Int64ToBytes(c.VersionMap[contract.Code()])...)
+	}
 
 	// 编码字段信息
 	for i := 0; i < rt.NumField(); i++ {
 		tField := rt.Field(i)
 		vField := rv.Field(i)
-		_, _, _, primitiveType, refContract, refEnum, genericContract, _, numberMask, repeatable, err := resolveTags(tField)
-		if err != nil {
-			return nil, err
-		}
 
-		if primitiveType == PRIMITIVETYPE_BYTES { // 字节数组
-			buf = append(buf, encodeBytes(vField.Bytes())...)
+		if tField.Anonymous { // 匿名契约字段
+			field, err := c.encode(vField.Interface().(DataContract), false)
+			if err != nil {
+				return nil, err
+			}
+			buf = append(buf, field...)
 		} else {
-			repeat := 1
-			if repeatable {
-				repeat = rv.Field(i).Len()
-				// 编码数组头信息
-				buf = append(buf, encodeArrayHeader(repeat)...)
+			field, err := c.encodeField(tField, vField)
+			if err != nil {
+				return nil, err
 			}
-
-			for j := 0; j < repeat; j++ {
-				var value reflect.Value
-				if !repeatable {
-					value = vField
-				} else {
-					value = vField.Index(j)
-				}
-				if genericContract { // 泛型编码
-					buf = append(buf, encodeGeneric(c, refContract, value.Interface())...)
-				} else if refContract != 0 { // 引用其他契约
-					buf = append(buf, encodeContract(c, refContract, value.Interface())...)
-				} else if refEnum != 0 { // 引用枚举
-					buf = append(buf, encodeEnum(c, value.Int(), refEnum)...)
-				} else { // 基础类型字段
-					buf = append(buf, encodePrimitiveType(value, primitiveType, numberMask)...)
-				}
-			}
+			buf = append(buf, field...)
 		}
 	}
 
 	return buf, err
+}
+
+func (c *Codec) encodeField(tField reflect.StructField, vField reflect.Value) ([]byte, error) {
+	_, _, _, primitiveType, refContract, refEnum, genericContract, _, numberMask, repeatable, err := resolveTags(tField)
+	if err != nil {
+		return nil, err
+	}
+	var buf []byte
+	if primitiveType == PRIMITIVETYPE_BYTES { // 字节数组
+		buf = encodeBytes(vField.Bytes())
+	} else {
+		repeat := 1
+		if repeatable {
+			repeat = vField.Len()
+			// 编码数组头信息
+			buf = append(buf, encodeArrayHeader(repeat)...)
+		}
+
+		for j := 0; j < repeat; j++ {
+			var value reflect.Value
+			if !repeatable {
+				value = vField
+			} else {
+				value = vField.Index(j)
+			}
+			if genericContract { // 泛型编码
+				buf = append(buf, encodeGeneric(c, refContract, value.Interface())...)
+			} else if refContract != 0 { // 引用其他契约
+				buf = append(buf, encodeContract(c, refContract, value.Interface())...)
+			} else if refEnum != 0 { // 引用枚举
+				buf = append(buf, encodeEnum(c, value.Int(), refEnum)...)
+			} else { // 基础类型字段
+				buf = append(buf, encodePrimitiveType(value, primitiveType, numberMask)...)
+			}
+		}
+	}
+
+	return buf, nil
 }
 
 /**
@@ -178,8 +228,20 @@ func (c *Codec) Encode(contract DataContract) ([]byte, error) {
 func (c *Codec) Decode(data []byte) (interface{}, error) {
 	// 解析头信息
 	code, _ := decodeHeader(data)
-	offset := int64(12)
 	contract := c.ContractMap[code]
+
+	value, _, err := c.decode(data[HEAD_BYTES:], contract)
+	if err != nil {
+		return nil, err
+	}
+
+	return value.Elem().Interface(), nil
+}
+
+func (c *Codec) decode(data []byte, contract DataContract) (reflect.Value, int64, error) {
+	var err error
+	// 解析头信息
+	offset := int64(0)
 	rt := reflect.TypeOf(contract)
 	obj := reflect.New(rt)
 	rv := obj.Elem()
@@ -188,60 +250,84 @@ func (c *Codec) Decode(data []byte) (interface{}, error) {
 	for i := 0; i < rt.NumField(); i++ {
 		tField := rt.Field(i)
 		vField := rv.Field(i)
-		_, _, _, primitiveType, refContract, refEnum, genericContract, _, numberMask, repeatable, err := resolveTags(tField)
-		if err != nil {
-			return nil, err
-		}
-
-		if primitiveType == PRIMITIVETYPE_BYTES { // 字节数组
-			bs, size := decodeBytes(data[offset:])
-			vField.SetBytes(bs)
-			offset += size
+		size := int64(0)
+		if tField.Anonymous { // 匿名契约字段
+			var value reflect.Value
+			value, size, err = c.decode(data[offset:], vField.Interface().(DataContract))
+			if err == nil {
+				vField.Set(value.Elem())
+			}
 		} else {
-			repeat := 1
-			size := int64(0)
-			if repeatable {
-				// 编码数组头信息
-				repeat, size = decodeArrayHeader(data[offset:])
-				offset += size
-				// 初始化数组
+			size, err = c.decodeField(tField, vField, data[offset:])
+		}
+		if err != nil {
+			return obj, offset, err
+		}
+		offset += size
+	}
+
+	return obj, offset, nil
+}
+
+func (c *Codec) decodeField(tField reflect.StructField, vField reflect.Value, data []byte) (int64, error) {
+	var offset = int64(0)
+	_, _, _, primitiveType, refContract, refEnum, genericContract, _, numberMask, repeatable, err := resolveTags(tField)
+	if err != nil {
+		return offset, err
+	}
+
+	vFieldOrigin := vField
+
+	if primitiveType == PRIMITIVETYPE_BYTES { // 字节数组
+		bs, size := decodeBytes(data[offset:])
+		vField.SetBytes(bs)
+		offset += size
+	} else {
+		repeat := 1
+		size := int64(0)
+		if repeatable {
+			// 编码数组头信息
+			repeat, size = decodeArrayHeader(data[offset:])
+			offset += size
+			// 初始化数组
+			if repeat > 0 {
 				vField = reflect.MakeSlice(tField.Type, repeat, repeat)
 			}
+		}
 
-			for j := 0; j < repeat; j++ {
-				var value reflect.Value
-				if !repeatable {
-					value = vField
-				} else {
-					value = vField.Index(j)
-				}
-				if genericContract || refContract != 0 { // 泛型/引用其他契约
-					contract, size := decodeContract(c, data[offset:])
-					if contract != nil {
-						if value.Kind() == reflect.Ptr {
-							value.Set(reflect.New(vField.Type().Elem()))
-							value.Elem().Set(reflect.ValueOf(contract))
-						} else {
-							value.Set(reflect.ValueOf(contract))
-						}
+		for j := 0; j < repeat; j++ {
+			var value reflect.Value
+			if !repeatable {
+				value = vField
+			} else {
+				value = vField.Index(j)
+			}
+			if genericContract || refContract != 0 { // 泛型/引用其他契约
+				contract, size := decodeContract(c, data[offset:])
+				if contract != nil {
+					if value.Kind() == reflect.Ptr {
+						value.Set(reflect.New(vField.Type().Elem()))
+						value.Elem().Set(reflect.ValueOf(contract))
+					} else {
+						value.Set(reflect.ValueOf(contract))
 					}
-					offset += size
-				} else if refEnum != 0 { // 引用枚举
-					enum, size := decodeEnum(c, data[offset:], refEnum)
-					value.Set(reflect.ValueOf(enum))
-					offset += size
-				} else { // 基础类型字段
-					size = decodePrimitiveType(data[offset:], value, primitiveType, numberMask)
-					offset += size
 				}
+				offset += size
+			} else if refEnum != 0 { // 引用枚举
+				enum, size := decodeEnum(c, data[offset:], refEnum)
+				value.Set(reflect.ValueOf(enum))
+				offset += size
+			} else { // 基础类型字段
+				size = decodePrimitiveType(data[offset:], value, primitiveType, numberMask)
+				offset += size
 			}
-			if repeatable {
-				rv.Field(i).Set(vField)
-			}
+		}
+		if repeatable {
+			vFieldOrigin.Set(vField)
 		}
 	}
 
-	return obj.Elem().Interface(), nil
+	return offset, nil
 }
 
 // 解析Tag
