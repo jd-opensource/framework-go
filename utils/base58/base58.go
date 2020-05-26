@@ -93,6 +93,15 @@ func Encode(input []byte) string {
 	return string(retStrRunes)
 }
 
+func DecodeNoErr(input string) []byte {
+	bs, err := Decode(input)
+	if err != nil {
+		panic(err)
+	}
+
+	return bs
+}
+
 func Decode(input string) ([]byte, error) {
 	capacity := utf8.RuneCountInString(input)*733/1000 + 1
 	output := make([]byte, capacity)

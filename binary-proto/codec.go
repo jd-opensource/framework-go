@@ -36,7 +36,6 @@ func NewCodec() *Codec {
 */
 func (c *Codec) RegisterContract(contract DataContract) {
 	c.ContractMap[contract.Code()] = contract
-	c.calculateVersion(contract)
 }
 
 // 计算契约版本号
@@ -112,6 +111,10 @@ func (c *Codec) RegisterEnum(enum EnumContract) {
   编码
 */
 func (c *Codec) Encode(contract DataContract) ([]byte, error) {
+	_, ok := c.VersionMap[contract.Code()]
+	if !ok {
+		c.calculateVersion(contract)
+	}
 	var err error
 	rt := reflect.TypeOf(contract)
 	rv := reflect.ValueOf(contract)

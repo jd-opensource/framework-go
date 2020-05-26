@@ -2,7 +2,9 @@ package crypto
 
 import (
 	"fmt"
+	"framework-go/crypto/classic"
 	"framework-go/crypto/framework"
+	"framework-go/utils/base58"
 	"framework-go/utils/sha"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -10,6 +12,7 @@ import (
 
 func TestEncodeDecodePubKey(t *testing.T) {
 	for _, am := range algorithms {
+		fmt.Println(am.Name + ": ")
 		function := GetCryptoFunctionByName(am.Name)
 		f1, ok := function.(framework.AsymmetricKeypairGenerator)
 		if !ok {
@@ -58,4 +61,12 @@ func TestEncodeDecodePrivKeyWithRawPwd(t *testing.T) {
 		require.NotNil(t, decPrivKey)
 		require.Equal(t, base58PrivKey, EncodePrivKeyWithRawPwd(decPrivKey, pwd))
 	}
+}
+
+// 从公钥生成地址
+func TestGenerateAddress(t *testing.T) {
+	function := GetCryptoFunctionByName(classic.ED25519_ALGORITHM.Name).(framework.AsymmetricKeypairGenerator)
+	keyPair := function.GenerateKeypair()
+	address := framework.GenerateAddress(keyPair.PubKey)
+	fmt.Println(base58.Encode(address))
 }
