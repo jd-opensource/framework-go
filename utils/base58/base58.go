@@ -93,7 +93,7 @@ func Encode(input []byte) string {
 	return string(retStrRunes)
 }
 
-func DecodeNoErr(input string) []byte {
+func MustDecode(input string) []byte {
 	bs, err := Decode(input)
 	if err != nil {
 		panic(err)

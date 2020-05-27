@@ -8,7 +8,7 @@ import binary_proto "framework-go/binary-proto"
  */
 
 // 键值操作的数据类型
-type DataType int8
+type DataType uint8
 
 const (
 	NIL              = DataType(binary_proto.NIL)
@@ -30,7 +30,7 @@ const (
 	SIGNATURE_DIGEST = DataType(binary_proto.BASE_TYPE_BYTES | 0x06)
 	HASH_DIGEST      = DataType(binary_proto.BASE_TYPE_BYTES | 0x07)
 	ENCRYPTED_DATA   = DataType(binary_proto.BASE_TYPE_BYTES | 0x08)
-	DATA_CONTRACT    = DataType((byte)(binary_proto.BASE_TYPE_EXT | 0x01))
+	DATA_CONTRACT    = DataType(binary_proto.BASE_TYPE_EXT | 0x01)
 )
 
 func init() {

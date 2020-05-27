@@ -18,6 +18,13 @@ type BlockchainIdentity struct {
 	PubKey  []byte `primitiveType:"BYTES"`
 }
 
+func NewBlockchainIdentity(address, pubKey []byte) BlockchainIdentity {
+	return BlockchainIdentity{
+		Address: address,
+		PubKey:  pubKey,
+	}
+}
+
 func (b BlockchainIdentity) ContractCode() int32 {
 	return binary_proto.BLOCK_CHAIN_IDENTITY
 }

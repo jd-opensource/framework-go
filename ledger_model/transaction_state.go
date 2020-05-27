@@ -8,7 +8,7 @@ import binary_proto "framework-go/binary-proto"
  */
 
 // 交易（事务）执行状态
-type TransactionState int8
+type TransactionState uint8
 
 const (
 	// 成功
@@ -40,11 +40,11 @@ const (
 	// 共识阶段加入新区块哈希预计算功能, 如果来自其他Peer的新区块哈希值不一致，本批次整体回滚
 	IGNORED_BY_CONSENSUS_PHASE_PRECOMPUTE_ROLLBACK = TransactionState(0x45)
 	// 系统错误
-	SYSTEM_ERROR = TransactionState(byte(0x80))
+	SYSTEM_ERROR = TransactionState(0x80)
 	// 超时
-	TIMEOUT = TransactionState(byte(0x81))
+	TIMEOUT = TransactionState(0x81)
 	// 共识错误
-	CONSENSUS_ERROR = TransactionState(byte(0x82))
+	CONSENSUS_ERROR = TransactionState(0x82)
 )
 
 func init() {

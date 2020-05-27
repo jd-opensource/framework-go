@@ -23,7 +23,7 @@ func TestRegisterUser(t *testing.T) {
 	// 账本哈兮
 	ledger, _ := base58.Decode("j5uhqzPUtc3DSadTNPUG4sXxkjXC56oWBmqAdJbtq7MNNj")
 
-	nodePrivKey := crypto.DecodePrivKey("177gjzfT217HTByHAe2FEhirUj8hVYyNL4HfJFvdE5KQ52aDPa75xbuBNior2ia2sv3EXqG", base58.DecodeNoErr("8EjkXVSTxMFjCvNNsTo8RBMDEVQmk7gYkW4SCDuvdsBG"))
+	nodePrivKey := crypto.DecodePrivKey("177gjzfT217HTByHAe2FEhirUj8hVYyNL4HfJFvdE5KQ52aDPa75xbuBNior2ia2sv3EXqG", base58.MustDecode("8EjkXVSTxMFjCvNNsTo8RBMDEVQmk7gYkW4SCDuvdsBG"))
 	nodePubKey := crypto.DecodePubKey("3snPdw7i7PYQzfmYsrrmqWsM9RefGSobRoLa8vEyFbVazfdkvPuF1J")
 
 	// 交易内容

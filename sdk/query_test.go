@@ -2,7 +2,10 @@ package sdk
 
 import (
 	"fmt"
-	resty "github.com/go-resty/resty/v2"
+	"framework-go/crypto"
+	"framework-go/ledger_model"
+	"framework-go/utils/base58"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -12,35 +15,23 @@ import (
  */
 
 func TestQuery(t *testing.T) {
+	nodePrivKey := crypto.DecodePrivKey("177gjzfT217HTByHAe2FEhirUj8hVYyNL4HfJFvdE5KQ52aDPa75xbuBNior2ia2sv3EXqG", base58.MustDecode("8EjkXVSTxMFjCvNNsTo8RBMDEVQmk7gYkW4SCDuvdsBG"))
+	nodePubKey := crypto.DecodePubKey("3snPdw7i7PYQzfmYsrrmqWsM9RefGSobRoLa8vEyFbVazfdkvPuF1J")
+	factory := Connect("localhost", 8081, false, ledger_model.NewBlockchainKeypair(nodePubKey, nodePrivKey))
 
-	client := resty.New()
-	resp, err := client.R().
-		EnableTrace().
-		Get("http://localhost:8081/ledgers/j5uhqzPUtc3DSadTNPUG4sXxkjXC56oWBmqAdJbtq7MNNj")
+	// /ledgers
+	ledgers, err := factory.GetBlockchainService().GetLedgerHashs()
+	require.Nil(t, err)
+	for _, ledger := range ledgers {
+		fmt.Println(ledger.ToBase58())
+	}
 
-	// Explore response object
-	fmt.Println("Response Info:")
-	fmt.Println("Error      :", err)
-	fmt.Println("Status Code:", resp.StatusCode())
-	fmt.Println("Status     :", resp.Status())
-	fmt.Println("Proto      :", resp.Proto())
-	fmt.Println("Time       :", resp.Time())
-	fmt.Println("Received At:", resp.ReceivedAt())
-	fmt.Println("Body       :\n", resp)
-	fmt.Println()
+	// /ledgers/j5uhqzPUtc3DSadTNPUG4sXxkjXC56oWBmqAdJbtq7MNNj
+	ledger, err := factory.GetBlockchainService().GetLedger(ledgers[0])
+	require.Nil(t, err)
+	require.Equal(t, ledgers[0], ledger.Hash)
 
-	// Explore trace info
-	fmt.Println("Request Trace Info:")
-	ti := resp.Request.TraceInfo()
-	fmt.Println("DNSLookup    :", ti.DNSLookup)
-	fmt.Println("ConnTime     :", ti.ConnTime)
-	fmt.Println("TCPConnTime  :", ti.TCPConnTime)
-	fmt.Println("TLSHandshake :", ti.TLSHandshake)
-	fmt.Println("ServerTime   :", ti.ServerTime)
-	fmt.Println("ResponseTime :", ti.ResponseTime)
-	fmt.Println("TotalTime    :", ti.TotalTime)
-	fmt.Println("IsConnReused :", ti.IsConnReused)
-	fmt.Println("IsConnWasIdle:", ti.IsConnWasIdle)
-	fmt.Println("ConnIdleTime :", ti.ConnIdleTime)
-
+	// /ledgers/j5uhqzPUtc3DSadTNPUG4sXxkjXC56oWBmqAdJbtq7MNNj/
+	_, err = factory.GetBlockchainService().GetLedgerAdminInfo(ledgers[0])
+	require.Nil(t, err)
 }
