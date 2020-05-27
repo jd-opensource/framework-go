@@ -87,7 +87,7 @@ func encodeString(data string) []byte {
 
 func encodeEnum(c *Codec, value int64, refEnum int) []byte {
 	contract := (c.EnumMap[int32(refEnum)]).(EnumContract)
-	switch contract.Type() {
+	switch contract.ContractType() {
 	case PRIMITIVETYPE_INT8:
 		return []byte{encodeInt8(int8(value))}
 	case PRIMITIVETYPE_INT16:
@@ -116,8 +116,8 @@ func encodeContract(c *Codec, reflectContract int, v interface{}) []byte {
 		if !ok {
 			panic(fmt.Sprintf("contract %d not exists", reflectContract))
 		}
-		buf := bytes.Int32ToBytes(contract.Code())
-		buf = append(buf, bytes.Int64ToBytes(c.VersionMap[contract.Code()])...)
+		buf := bytes.Int32ToBytes(contract.ContractCode())
+		buf = append(buf, bytes.Int64ToBytes(c.VersionMap[contract.ContractCode()])...)
 		buf = append(encodeSize(len(buf)), buf...)
 		return buf
 	}

@@ -17,11 +17,11 @@ type UserRegisterOperation struct {
 	UserID BlockchainIdentity `refContract:"144"`
 }
 
-func (u UserRegisterOperation) Code() int32 {
+func (u UserRegisterOperation) ContractCode() int32 {
 	return binary_proto.TX_OP_USER_REG
 }
 
-func (u UserRegisterOperation) Name() string {
+func (u UserRegisterOperation) ContractName() string {
 	return "UserRegisterOperation"
 }
 

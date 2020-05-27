@@ -3,10 +3,10 @@ package sdk
 import (
 	"fmt"
 	binary_proto "framework-go/binary-proto"
-	"framework-go/binary-proto/ledger_model"
 	"framework-go/crypto"
 	"framework-go/crypto/classic"
 	"framework-go/crypto/framework"
+	"framework-go/ledger_model"
 	"framework-go/utils/base58"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/require"

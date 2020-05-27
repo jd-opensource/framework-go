@@ -20,15 +20,15 @@ func init() {
 
 var _ binary_proto.EnumContract = (*RefEnum)(nil)
 
-func (J RefEnum) Code() int32 {
+func (J RefEnum) ContractCode() int32 {
 	return 0x02
 }
 
-func (J RefEnum) Type() string {
+func (J RefEnum) ContractType() string {
 	return binary_proto.PRIMITIVETYPE_INT8
 }
 
-func (J RefEnum) Name() string {
+func (J RefEnum) ContractName() string {
 	return ""
 }
 
@@ -36,7 +36,7 @@ func (J RefEnum) Description() string {
 	return ""
 }
 
-func (J RefEnum) Version() int64 {
+func (J RefEnum) ContractVersion() int64 {
 	return 0
 }
 

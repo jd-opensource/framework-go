@@ -15,16 +15,16 @@ func init() {
 
 type TransactionRequest struct {
 	TransactionContent TransactionContent `refContract:"528"`
-	EndpointSignatures []DigitalSignature `refContract:"2864" repeatable:"true"`
-	NodeSignatures     []DigitalSignature `refContract:"2864" repeatable:"true"`
+	EndpointSignatures []DigitalSignature `refContract:"2864" list:"true"`
+	NodeSignatures     []DigitalSignature `refContract:"2864" list:"true"`
 	Hash               []byte             `primitiveType:"BYTES"`
 }
 
-func (t TransactionRequest) Code() int32 {
+func (t TransactionRequest) ContractCode() int32 {
 	return binary_proto.REQUEST
 }
 
-func (t TransactionRequest) Name() string {
+func (t TransactionRequest) ContractName() string {
 	return "TransactionRequest"
 }
 

@@ -21,11 +21,11 @@ func NewRefContract() RefContract {
 	return RefContract{NewRefContractInner()}
 }
 
-func (J RefContract) Code() int32 {
+func (J RefContract) ContractCode() int32 {
 	return 0x03
 }
 
-func (J RefContract) Name() string {
+func (J RefContract) ContractName() string {
 	return ""
 }
 
@@ -41,11 +41,11 @@ type RefContractInner struct {
 	I8 int8 `primitiveType:"INT8"`
 }
 
-func (r RefContractInner) Code() int32 {
+func (r RefContractInner) ContractCode() int32 {
 	return 0x05
 }
 
-func (r RefContractInner) Name() string {
+func (r RefContractInner) ContractName() string {
 	return ""
 }
 

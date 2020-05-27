@@ -18,11 +18,11 @@ type DigitalSignature struct {
 	Digest []byte `primitiveType:"BYTES"`
 }
 
-func (d DigitalSignature) Code() int32 {
+func (d DigitalSignature) ContractCode() int32 {
 	return binary_proto.DIGITALSIGNATURE
 }
 
-func (d DigitalSignature) Name() string {
+func (d DigitalSignature) ContractName() string {
 	return "DigitalSignature"
 }
 

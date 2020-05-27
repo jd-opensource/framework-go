@@ -16,11 +16,11 @@ func init() {
 type Operation struct {
 }
 
-func (o Operation) Code() int32 {
+func (o Operation) ContractCode() int32 {
 	return binary_proto.TX_OP
 }
 
-func (o Operation) Name() string {
+func (o Operation) ContractName() string {
 	return "Operation"
 }
 

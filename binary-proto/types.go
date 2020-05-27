@@ -15,7 +15,7 @@ const (
 	TAG_GENERICCONTRACT = "genericContract" // 是否泛型字段,true/false
 	TAG_MAXSIZE         = "maxSize"         // 最大长度，int
 	TAG_NUMBERENCODING  = "numberEncoding"  // 动态数值字段，true/false
-	TAG_REPEATABLE      = "repeatable"      // 是否列表，true/false
+	TAG_REPEATABLE      = "list"            // 是否列表，true/false
 
 	HEAD_BYTES = 12 // 头信息长度
 )

@@ -15,15 +15,15 @@ func init() {
 
 type TransactionContentBody struct {
 	LedgerHash []byte                      `primitiveType:"BYTES"`
-	Operations []binary_proto.DataContract `refContract:"768" genericContract:"true" repeatable:"true"`
+	Operations []binary_proto.DataContract `refContract:"768" genericContract:"true" list:"true"`
 	Timestamp  int64                       `primitiveType:"INT64"`
 }
 
-func (t TransactionContentBody) Code() int32 {
+func (t TransactionContentBody) ContractCode() int32 {
 	return binary_proto.TX_CONTENT_BODY
 }
 
-func (t TransactionContentBody) Name() string {
+func (t TransactionContentBody) ContractName() string {
 	return "TransactionContent"
 }
 

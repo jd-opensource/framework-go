@@ -18,11 +18,11 @@ type TransactionContent struct {
 	Hash []byte `primitiveType:"BYTES"`
 }
 
-func (t TransactionContent) Code() int32 {
+func (t TransactionContent) ContractCode() int32 {
 	return binary_proto.TX_CONTENT
 }
 
-func (t TransactionContent) Name() string {
+func (t TransactionContent) ContractName() string {
 	return "TransactionContent"
 }
 

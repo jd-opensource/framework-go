@@ -2,6 +2,7 @@ package framework
 
 import (
 	"fmt"
+	binary_proto "framework-go/binary-proto"
 	"framework-go/utils/bytes"
 )
 
@@ -41,9 +42,27 @@ var (
 	CODE_SIZE = 2
 )
 
+var _ binary_proto.DataContract = (*CryptoAlgorithm)(nil)
+
+func init() {
+	binary_proto.Cdc.RegisterContract(CryptoAlgorithm{})
+}
+
 type CryptoAlgorithm struct {
-	Code int16
-	Name string
+	Code int16  `primitiveType:"INT16"`
+	Name string `primitiveType:"TEXT"`
+}
+
+func (ca CryptoAlgorithm) ContractCode() int32 {
+	return binary_proto.CRYPTO_ALGORITHM
+}
+
+func (ca CryptoAlgorithm) ContractName() string {
+	return "CryptoAlgorithm"
+}
+
+func (ca CryptoAlgorithm) Description() string {
+	return ""
 }
 
 func (ca CryptoAlgorithm) ToString() string {

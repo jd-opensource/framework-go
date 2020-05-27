@@ -35,7 +35,7 @@ func NewCodec() *Codec {
 注册契约
 */
 func (c *Codec) RegisterContract(contract DataContract) {
-	c.ContractMap[contract.Code()] = contract
+	c.ContractMap[contract.ContractCode()] = contract
 }
 
 // 计算契约版本号`
@@ -45,7 +45,7 @@ func (c *Codec) CalculateVersion(contract DataContract) error {
 	if err != nil {
 		return err
 	}
-	c.VersionMap[contract.Code()] = bytes.ToInt64(sha.Sha256(buf))
+	c.VersionMap[contract.ContractCode()] = bytes.ToInt64(sha.Sha256(buf))
 	return nil
 }
 
@@ -73,14 +73,14 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 				bs[0] = array
 				bs[1] = byte(3)
 				refCon := (c.ContractMap[int32(refContract)]).(DataContract)
-				copy(bs[2:6], bytes.Int32ToBytes(refCon.Code()))
-				ver, ok := c.VersionMap[refCon.Code()]
+				copy(bs[2:6], bytes.Int32ToBytes(refCon.ContractCode()))
+				ver, ok := c.VersionMap[refCon.ContractCode()]
 				if !ok {
 					err = c.CalculateVersion(refCon)
 					if err != nil {
 						return nil, err
 					}
-					ver = c.VersionMap[refCon.Code()]
+					ver = c.VersionMap[refCon.ContractCode()]
 				}
 				copy(bs[6:], bytes.Int64ToBytes(ver))
 				buf = append(buf, bs...)
@@ -89,14 +89,14 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 				bs[0] = array
 				bs[1] = byte(2)
 				refCon := (c.ContractMap[int32(refContract)]).(DataContract)
-				copy(bs[2:6], bytes.Int32ToBytes(refCon.Code()))
-				ver, ok := c.VersionMap[refCon.Code()]
+				copy(bs[2:6], bytes.Int32ToBytes(refCon.ContractCode()))
+				ver, ok := c.VersionMap[refCon.ContractCode()]
 				if !ok {
 					err = c.CalculateVersion(refCon)
 					if err != nil {
 						return nil, err
 					}
-					ver = c.VersionMap[refCon.Code()]
+					ver = c.VersionMap[refCon.ContractCode()]
 				}
 				copy(bs[6:], bytes.Int64ToBytes(ver))
 				buf = append(buf, bs...)
@@ -105,8 +105,8 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 				bs[0] = array
 				bs[1] = byte(1)
 				enumCon := (c.EnumMap[int32(refEnum)]).(EnumContract)
-				copy(bs[2:6], bytes.Int32ToBytes(enumCon.Code()))
-				copy(bs[6:], bytes.Int64ToBytes(enumCon.Version()))
+				copy(bs[2:6], bytes.Int32ToBytes(enumCon.ContractCode()))
+				copy(bs[6:], bytes.Int64ToBytes(enumCon.ContractVersion()))
 				buf = append(buf, bs...)
 			} else { // 基础类型字段
 				bs := make([]byte, 6)
@@ -125,7 +125,7 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 注册枚举
 */
 func (c *Codec) RegisterEnum(enum EnumContract) {
-	c.EnumMap[enum.Code()] = enum
+	c.EnumMap[enum.ContractCode()] = enum
 }
 
 func (c *Codec) Encode(contract DataContract) ([]byte, error) {
@@ -137,7 +137,7 @@ func (c *Codec) Encode(contract DataContract) ([]byte, error) {
 */
 func (c *Codec) encode(contract DataContract, withHead bool) ([]byte, error) {
 	var err error
-	_, ok := c.VersionMap[contract.Code()]
+	_, ok := c.VersionMap[contract.ContractCode()]
 	if !ok {
 		err = c.CalculateVersion(contract)
 		if err != nil {
@@ -158,7 +158,7 @@ func (c *Codec) encode(contract DataContract, withHead bool) ([]byte, error) {
 	var buf []byte
 	// 编码头信息
 	if withHead {
-		buf = append(bytes.Int32ToBytes(contract.Code()), bytes.Int64ToBytes(c.VersionMap[contract.Code()])...)
+		buf = append(bytes.Int32ToBytes(contract.ContractCode()), bytes.Int64ToBytes(c.VersionMap[contract.ContractCode()])...)
 	}
 
 	// 编码字段信息

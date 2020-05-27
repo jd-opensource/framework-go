@@ -20,19 +20,19 @@ type StructWithAllTypes struct {
 	Bool  bool          `primitiveType:"BOOLEAN"`
 	Text  string        `primitiveType:"TEXT"`
 	Bytes []byte        `primitiveType:"BYTES"`
-	I8s   []int8        `primitiveType:"INT8" repeatable:"true"`
-	I16s  []int16       `primitiveType:"INT16" repeatable:"true"`
-	I32s  []int32       `primitiveType:"INT32" repeatable:"true"`
-	I64s  []int64       `primitiveType:"INT64" repeatable:"true"`
-	I64ms []int64       `primitiveType:"INT64" numberEncoding:"LONG" repeatable:"true" numberEncoding:"LONG"`
-	Bools []bool        `primitiveType:"BOOLEAN" repeatable:"true"`
-	Texts []string      `primitiveType:"TEXT" repeatable:"true"`
+	I8s   []int8        `primitiveType:"INT8" list:"true"`
+	I16s  []int16       `primitiveType:"INT16" list:"true"`
+	I32s  []int32       `primitiveType:"INT32" list:"true"`
+	I64s  []int64       `primitiveType:"INT64" list:"true"`
+	I64ms []int64       `primitiveType:"INT64" numberEncoding:"LONG" list:"true" numberEncoding:"LONG"`
+	Bools []bool        `primitiveType:"BOOLEAN" list:"true"`
+	Texts []string      `primitiveType:"TEXT" list:"true"`
 	Enum  RefEnum       `refEnum:"2"`
-	Enums []RefEnum     `refEnum:"2" repeatable:"true"`
+	Enums []RefEnum     `refEnum:"2" list:"true"`
 	JP    *RefContract  `refContract:"3"`
-	JPs   []RefContract `refContract:"3" repeatable:"true"`
+	JPs   []RefContract `refContract:"3" list:"true"`
 	JG    binary_proto.DataContract   `refContract:"4" genericContract:"true"`
-	JGs   []RefContract `refContract:"4" genericContract:"true" repeatable:"true"`
+	JGs   []RefContract `refContract:"4" genericContract:"true" list:"true"`
 }
 
 func NewStructWithAllTypes() StructWithAllTypes {
@@ -54,11 +54,11 @@ func NewStructWithAllTypes() StructWithAllTypes {
 	}
 }
 
-func (p StructWithAllTypes) Code() int32 {
+func (p StructWithAllTypes) ContractCode() int32 {
 	return 0x01
 }
 
-func (p StructWithAllTypes) Name() string {
+func (p StructWithAllTypes) ContractName() string {
 	return ""
 }
 

@@ -17,11 +17,11 @@ type RefGeneric struct {
 
 }
 
-func (r RefGeneric) Code() int32 {
+func (r RefGeneric) ContractCode() int32 {
 	return 0x04
 }
 
-func (r RefGeneric) Name() string {
+func (r RefGeneric) ContractName() string {
 	return ""
 }
 

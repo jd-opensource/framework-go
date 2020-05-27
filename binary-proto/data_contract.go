@@ -10,9 +10,9 @@ package binary_proto
 */
 type DataContract interface {
 	// 唯一标识
-	Code() int32
+	ContractCode() int32
 	// 标识名称
-	Name() string
+	ContractName() string
 	// 描述信息
 	Description() string
 }

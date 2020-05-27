@@ -11,15 +11,15 @@ package binary_proto
 type EnumContract interface {
 
 	// 唯一标识
-	Code() int32
+	ContractCode() int32
 	// 字段基础类型信息，只支持INT8,INT16,INT32
-	Type() string
+	ContractType() string
 	// 标识名称
-	Name() string
+	ContractName() string
 	// 描述信息
 	Description() string
 	// 版本
-	Version() int64
+	ContractVersion() int64
 
 	GetValue(CODE int32) EnumContract
 }

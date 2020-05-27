@@ -14,17 +14,16 @@ func init() {
 }
 
 type NodeRequest struct {
-	Hash               []byte             `primitiveType:"BYTES"`
-	TransactionContent TransactionContent `refContract:"528"`
-	EndpointSignatures []DigitalSignature `refContract:"2864" repeatable:"true"`
-	NodeSignatures     []DigitalSignature `refContract:"2864" repeatable:"true"`
+	EndpointRequest
+	// 接入交易的节点的签名
+	NodeSignatures []DigitalSignature `refContract:"2864" list:"true"`
 }
 
-func (n NodeRequest) Code() int32 {
+func (n NodeRequest) ContractCode() int32 {
 	return binary_proto.REQUEST_NODE
 }
 
-func (n NodeRequest) Name() string {
+func (n NodeRequest) ContractName() string {
 	return "NodeRequest"
 }
 

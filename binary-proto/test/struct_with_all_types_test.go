@@ -30,17 +30,17 @@ func TestVersion(t *testing.T) {
 	contract1 := RefContract{}
 	cdc.RegisterContract(contract1)
 	cdc.CalculateVersion(contract1)
-	require.Equal(t, int64(-4451409565821993051), cdc.VersionMap[contract1.Code()])
+	require.Equal(t, int64(-4451409565821993051), cdc.VersionMap[contract1.ContractCode()])
 
 	contract2 := RefGeneric{}
 	cdc.RegisterContract(contract2)
 	cdc.CalculateVersion(contract2)
-	require.Equal(t, int64(-2039914840885289964), cdc.VersionMap[contract2.Code()])
+	require.Equal(t, int64(-2039914840885289964), cdc.VersionMap[contract2.ContractCode()])
 
 	cdc.RegisterEnum(ONE)
 
 	contract3 := StructWithAllTypes{}
 	cdc.RegisterContract(contract3)
 	cdc.CalculateVersion(contract3)
-	require.Equal(t, int64(-4218456988248628983), cdc.VersionMap[contract3.Code()])
+	require.Equal(t, int64(-4218456988248628983), cdc.VersionMap[contract3.ContractCode()])
 }
