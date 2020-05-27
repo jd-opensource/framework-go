@@ -41,7 +41,7 @@ TAG_REPEATABLE      = "repeatable"      // 是否列表，true/false
 ```
 
 - `TAG_ORDER`序号字段暂时没处理（TODO），使用字段定义顺序顺序编解码
-- `TAG_DESCRIPTION`可使用值：
+- `TAG_PRIMITIVETYPE`可使用值：
 `NIL`     // 空
 `BOOLEAN` // 布尔
 `INT8`    // int8
