@@ -50,3 +50,14 @@ func (J RefEnum) GetValue(CODE int32) binary_proto.EnumContract {
 
 	panic("no enum value founded")
 }
+
+func (J RefEnum) GetValueByName(name string) binary_proto.EnumContract {
+	if name == "ONE" {
+		return ONE
+	}
+	if name == "TWO" {
+		return TWO
+	}
+
+	panic("no enum value founded")
+}

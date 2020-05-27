@@ -51,3 +51,13 @@ func (r RolesPolicy) GetValue(CODE int32) binary_proto.EnumContract {
 
 	panic("no enum value founded")
 }
+
+func (r RolesPolicy) GetValueByName(name string) binary_proto.EnumContract {
+	if name == "UNION" {
+		return UNION
+	} else if name == "INTERSECT" {
+		return INTERSECT
+	}
+
+	panic("no enum value founded")
+}

@@ -22,4 +22,5 @@ type EnumContract interface {
 	ContractVersion() int64
 
 	GetValue(CODE int32) EnumContract
+	GetValueByName(name string) EnumContract
 }

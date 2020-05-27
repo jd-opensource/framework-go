@@ -14,8 +14,7 @@ func init() {
 }
 
 type DigitalSignature struct {
-	PubKey []byte `primitiveType:"BYTES"`
-	Digest []byte `primitiveType:"BYTES"`
+	DigitalSignatureBody
 }
 
 func (d DigitalSignature) ContractCode() int32 {

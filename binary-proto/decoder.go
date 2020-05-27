@@ -74,6 +74,10 @@ func decodePrimitiveType(data []byte, v reflect.Value, primitiveType string, num
 		s, size := decodeString(data)
 		v.SetString(s)
 		return size
+	case PRIMITIVETYPE_BYTES: // 字节数组
+		bs, size := decodeBytes(data)
+		v.SetBytes(bs)
+		return size
 	default:
 		panic("un support primitive type")
 	}

@@ -1,6 +1,9 @@
 package ledger_model
 
-import binary_proto "framework-go/binary-proto"
+import (
+	binary_proto "framework-go/binary-proto"
+	"framework-go/crypto/framework"
+)
 
 /*
  * Author: imuge
@@ -16,6 +19,16 @@ func init() {
 type TransactionContent struct {
 	TransactionContentBody
 	Hash []byte `primitiveType:"BYTES"`
+}
+
+func NewTransactionContent(ledgerHash framework.HashDigest, operations []binary_proto.DataContract, time int64) TransactionContent {
+	return TransactionContent{
+		TransactionContentBody: TransactionContentBody{
+			LedgerHash: ledgerHash.ToBytes(),
+			Operations: operations,
+			Timestamp:  time,
+		},
+	}
 }
 
 func (t TransactionContent) ContractCode() int32 {

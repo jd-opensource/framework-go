@@ -24,8 +24,10 @@ func NewGatewayServiceFactory(userKey ledger_model.BlockchainKeypair, blockchain
 	}
 }
 
-func Connect(gatewayHost string, gatewayPort int32, secure bool, userKey ledger_model.BlockchainKeypair) GatewayServiceFactory {
-	service := NewGatewayBlockchainService(NewRestyBlockchainService(gatewayHost, gatewayPort, secure))
+func Connect(gatewayHost string, gatewayPort int, secure bool, userKey ledger_model.BlockchainKeypair) GatewayServiceFactory {
+	queryService := NewRestyQueryService(gatewayHost, gatewayPort, secure)
+	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort, secure))
+	service := NewGatewayBlockchainService(txService, queryService)
 	return NewGatewayServiceFactory(userKey, service)
 }
 

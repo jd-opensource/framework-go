@@ -8,7 +8,7 @@ import binary_proto "framework-go/binary-proto"
  */
 
 // 交易（事务）执行状态
-type TransactionState uint8
+type TransactionState int8
 
 const (
 	// 成功
@@ -40,11 +40,11 @@ const (
 	// 共识阶段加入新区块哈希预计算功能, 如果来自其他Peer的新区块哈希值不一致，本批次整体回滚
 	IGNORED_BY_CONSENSUS_PHASE_PRECOMPUTE_ROLLBACK = TransactionState(0x45)
 	// 系统错误
-	SYSTEM_ERROR = TransactionState(0x80)
+	SYSTEM_ERROR = TransactionState(-128)
 	// 超时
-	TIMEOUT = TransactionState(0x81)
+	TIMEOUT = TransactionState(-127)
 	// 共识错误
-	CONSENSUS_ERROR = TransactionState(0x82)
+	CONSENSUS_ERROR = TransactionState(-126)
 )
 
 func init() {
@@ -108,6 +108,47 @@ func (t TransactionState) GetValue(CODE int32) binary_proto.EnumContract {
 	case int32(byte(0x81)):
 		return TIMEOUT
 	case int32(byte(0x82)):
+		return CONSENSUS_ERROR
+	}
+
+	panic("no enum value founded")
+}
+
+func (t TransactionState) GetValueByName(name string) binary_proto.EnumContract {
+	switch name {
+	case "SUCCESS":
+		return SUCCESS
+	case "LEDGER_ERROR":
+		return LEDGER_ERROR
+	case "DATA_ACCOUNT_DOES_NOT_EXIST":
+		return DATA_ACCOUNT_DOES_NOT_EXIST
+	case "USER_DOES_NOT_EXIST":
+		return USER_DOES_NOT_EXIST
+	case "CONTRACT_DOES_NOT_EXIST":
+		return CONTRACT_DOES_NOT_EXIST
+	case "DATA_VERSION_CONFLICT":
+		return DATA_VERSION_CONFLICT
+	case "PARTICIPANT_DOES_NOT_EXIST":
+		return PARTICIPANT_DOES_NOT_EXIST
+	case "REJECTED_BY_SECURITY_POLICY":
+		return REJECTED_BY_SECURITY_POLICY
+	case "IGNORED_BY_WRONG_LEDGER":
+		return IGNORED_BY_WRONG_LEDGER
+	case "IGNORED_BY_WRONG_CONTENT_SIGNATURE":
+		return IGNORED_BY_WRONG_CONTENT_SIGNATURE
+	case "IGNORED_BY_CONFLICTING_STATE":
+		return IGNORED_BY_CONFLICTING_STATE
+	case "IGNORED_BY_TX_FULL_ROLLBACK":
+		return IGNORED_BY_TX_FULL_ROLLBACK
+	case "IGNORED_BY_BLOCK_FULL_ROLLBACK":
+		return IGNORED_BY_BLOCK_FULL_ROLLBACK
+	case "IGNORED_BY_CONSENSUS_PHASE_PRECOMPUTE_ROLLBACK":
+		return IGNORED_BY_CONSENSUS_PHASE_PRECOMPUTE_ROLLBACK
+	case "SYSTEM_ERROR":
+		return SYSTEM_ERROR
+	case "TIMEOUT":
+		return TIMEOUT
+	case "CONSENSUS_ERROR":
 		return CONSENSUS_ERROR
 	}
 

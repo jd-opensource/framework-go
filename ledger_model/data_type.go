@@ -8,7 +8,7 @@ import binary_proto "framework-go/binary-proto"
  */
 
 // 键值操作的数据类型
-type DataType uint8
+type DataType int8
 
 const (
 	NIL              = DataType(binary_proto.NIL)
@@ -99,7 +99,54 @@ func (d DataType) GetValue(CODE int32) binary_proto.EnumContract {
 		return HASH_DIGEST
 	case int32(binary_proto.BASE_TYPE_BYTES | 0x08):
 		return ENCRYPTED_DATA
-	case int32((byte)(binary_proto.BASE_TYPE_EXT | 0x01)):
+	case int32(binary_proto.BASE_TYPE_EXT | 0x01):
+		return DATA_CONTRACT
+	}
+
+	panic("no enum value founded")
+}
+
+func (d DataType) GetValueByName(name string) binary_proto.EnumContract {
+	switch name {
+	case "NIL":
+		return NIL
+	case "BOOLEAN":
+		return BOOLEAN
+	case "INT8":
+		return INT8
+	case "INT16":
+		return INT16
+	case "INT32":
+		return INT32
+	case "INT64":
+		return INT64
+	case "TEXT":
+		return TEXT
+	case "BYTES":
+		return BYTES
+	case "TIMESTAMP":
+		return TIMESTAMP
+	case "JSON":
+		return JSON
+	case "XML":
+		return XML
+	case "BIG_INT":
+		return BIG_INT
+	case "IMG":
+		return IMG
+	case "VIDEO":
+		return VIDEO
+	case "LOCATION":
+		return LOCATION
+	case "PUB_KEY":
+		return PUB_KEY
+	case "SIGNATURE_DIGEST":
+		return SIGNATURE_DIGEST
+	case "HASH_DIGEST":
+		return HASH_DIGEST
+	case "ENCRYPTED_DATA":
+		return ENCRYPTED_DATA
+	case "DATA_CONTRACT":
 		return DATA_CONTRACT
 	}
 

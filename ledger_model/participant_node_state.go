@@ -53,3 +53,14 @@ func (p ParticipantNodeState) GetValue(CODE int32) binary_proto.EnumContract {
 
 	panic("no enum value founded")
 }
+
+func (p ParticipantNodeState) GetValueByName(name string) binary_proto.EnumContract {
+	if name == "REGISTERED" {
+		return REGISTERED
+	}
+	if name == "ACTIVED" {
+		return ACTIVED
+	}
+
+	panic("no enum value founded")
+}

@@ -50,6 +50,9 @@ func (c *Codec) CalculateVersion(contract DataContract) error {
 }
 
 func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
+	if rt.Kind() == reflect.Ptr {
+		rt = rt.Elem()
+	}
 	var buf []byte
 	for i := 0; i < rt.NumField(); i++ {
 		tField := rt.Field(i)
@@ -190,32 +193,29 @@ func (c *Codec) encodeField(tField reflect.StructField, vField reflect.Value) ([
 		return nil, err
 	}
 	var buf []byte
-	if primitiveType == PRIMITIVETYPE_BYTES { // 字节数组
-		buf = encodeBytes(vField.Bytes())
-	} else {
-		repeat := 1
-		if repeatable {
-			repeat = vField.Len()
-			// 编码数组头信息
-			buf = append(buf, encodeArrayHeader(repeat)...)
-		}
 
-		for j := 0; j < repeat; j++ {
-			var value reflect.Value
-			if !repeatable {
-				value = vField
-			} else {
-				value = vField.Index(j)
-			}
-			if genericContract { // 泛型编码
-				buf = append(buf, encodeGeneric(c, refContract, value.Interface())...)
-			} else if refContract != 0 { // 引用其他契约
-				buf = append(buf, encodeContract(c, refContract, value.Interface())...)
-			} else if refEnum != 0 { // 引用枚举
-				buf = append(buf, encodeEnum(c, value.Int(), refEnum)...)
-			} else { // 基础类型字段
-				buf = append(buf, encodePrimitiveType(value, primitiveType, numberMask)...)
-			}
+	repeat := 1
+	if repeatable {
+		repeat = vField.Len()
+		// 编码数组头信息
+		buf = append(buf, encodeArrayHeader(repeat)...)
+	}
+
+	for j := 0; j < repeat; j++ {
+		var value reflect.Value
+		if !repeatable {
+			value = vField
+		} else {
+			value = vField.Index(j)
+		}
+		if genericContract { // 泛型编码
+			buf = append(buf, encodeGeneric(c, refContract, value.Interface())...)
+		} else if refContract != 0 { // 引用其他契约
+			buf = append(buf, encodeContract(c, refContract, value.Interface())...)
+		} else if refEnum != 0 { // 引用枚举
+			buf = append(buf, encodeEnum(c, value.Int(), refEnum)...)
+		} else { // 基础类型字段
+			buf = append(buf, encodePrimitiveType(value, primitiveType, numberMask)...)
 		}
 	}
 
@@ -278,53 +278,47 @@ func (c *Codec) decodeField(tField reflect.StructField, vField reflect.Value, da
 
 	vFieldOrigin := vField
 
-	if primitiveType == PRIMITIVETYPE_BYTES { // 字节数组
-		bs, size := decodeBytes(data[offset:])
-		vField.SetBytes(bs)
+	repeat := 1
+	size := int64(0)
+	if repeatable {
+		// 编码数组头信息
+		repeat, size = decodeArrayHeader(data[offset:])
 		offset += size
-	} else {
-		repeat := 1
-		size := int64(0)
-		if repeatable {
-			// 编码数组头信息
-			repeat, size = decodeArrayHeader(data[offset:])
-			offset += size
-			// 初始化数组
-			if repeat > 0 {
-				vField = reflect.MakeSlice(tField.Type, repeat, repeat)
-			}
+		// 初始化数组
+		if repeat > 0 {
+			vField = reflect.MakeSlice(tField.Type, repeat, repeat)
 		}
+	}
 
-		for j := 0; j < repeat; j++ {
-			var value reflect.Value
-			if !repeatable {
-				value = vField
-			} else {
-				value = vField.Index(j)
-			}
-			if genericContract || refContract != 0 { // 泛型/引用其他契约
-				contract, size := decodeContract(c, data[offset:])
-				if contract != nil {
-					if value.Kind() == reflect.Ptr {
-						value.Set(reflect.New(vField.Type().Elem()))
-						value.Elem().Set(reflect.ValueOf(contract))
-					} else {
-						value.Set(reflect.ValueOf(contract))
-					}
+	for j := 0; j < repeat; j++ {
+		var value reflect.Value
+		if !repeatable {
+			value = vField
+		} else {
+			value = vField.Index(j)
+		}
+		if genericContract || refContract != 0 { // 泛型/引用其他契约
+			contract, size := decodeContract(c, data[offset:])
+			if contract != nil {
+				if value.Kind() == reflect.Ptr {
+					value.Set(reflect.New(vField.Type().Elem()))
+					value.Elem().Set(reflect.ValueOf(contract))
+				} else {
+					value.Set(reflect.ValueOf(contract))
 				}
-				offset += size
-			} else if refEnum != 0 { // 引用枚举
-				enum, size := decodeEnum(c, data[offset:], refEnum)
-				value.Set(reflect.ValueOf(enum))
-				offset += size
-			} else { // 基础类型字段
-				size = decodePrimitiveType(data[offset:], value, primitiveType, numberMask)
-				offset += size
 			}
+			offset += size
+		} else if refEnum != 0 { // 引用枚举
+			enum, size := decodeEnum(c, data[offset:], refEnum)
+			value.Set(reflect.ValueOf(enum))
+			offset += size
+		} else { // 基础类型字段
+			size = decodePrimitiveType(data[offset:], value, primitiveType, numberMask)
+			offset += size
 		}
-		if repeatable {
-			vFieldOrigin.Set(vField)
-		}
+	}
+	if repeatable {
+		vFieldOrigin.Set(vField)
 	}
 
 	return offset, nil

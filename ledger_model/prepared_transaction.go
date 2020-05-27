@@ -1,0 +1,20 @@
+package ledger_model
+
+import "framework-go/crypto/framework"
+
+/*
+ * Author: imuge
+ * Date: 2020/5/28 下午6:20
+ */
+
+type PreparedTransaction interface {
+	GetHash() framework.HashDigest
+
+	GetTransactionContent() TransactionContent
+
+	Sign(keyPair framework.AsymmetricKeypair) DigitalSignature
+
+	AddSignature(signature DigitalSignature)
+
+	Commit() (TransactionResponse, error)
+}

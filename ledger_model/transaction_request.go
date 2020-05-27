@@ -14,10 +14,18 @@ func init() {
 }
 
 type TransactionRequest struct {
-	TransactionContent TransactionContent `refContract:"528"`
-	EndpointSignatures []DigitalSignature `refContract:"2864" list:"true"`
-	NodeSignatures     []DigitalSignature `refContract:"2864" list:"true"`
-	Hash               []byte             `primitiveType:"BYTES"`
+	NodeRequest
+	Hash []byte `primitiveType:"BYTES"`
+}
+
+func NewTransactionRequest(content TransactionContent) TransactionRequest {
+	return TransactionRequest{
+		NodeRequest: NodeRequest{
+			EndpointRequest: EndpointRequest{
+				TransactionContent: content,
+			},
+		},
+	}
 }
 
 func (t TransactionRequest) ContractCode() int32 {

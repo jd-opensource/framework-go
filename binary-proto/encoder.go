@@ -43,6 +43,8 @@ func encodePrimitiveType(v reflect.Value, primitiveType string, numberMask bytes
 		}
 	case PRIMITIVETYPE_TEXT:
 		return encodeString(v.String())
+	case PRIMITIVETYPE_BYTES: // 字节数组
+		return encodeBytes(v.Bytes())
 	default:
 		panic("un support primitive type")
 	}

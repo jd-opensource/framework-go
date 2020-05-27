@@ -1,6 +1,9 @@
 package ledger_model
 
-import binary_proto "framework-go/binary-proto"
+import (
+	binary_proto "framework-go/binary-proto"
+	"framework-go/utils/bytes"
+)
 
 /*
  * Author: imuge
@@ -14,7 +17,7 @@ func init() {
 }
 
 type EndpointRequest struct {
-	Hash []byte `primitiveType:"BYTES"`
+	//Hash []byte `primitiveType:"BYTES"`
 	// 交易内容
 	TransactionContent TransactionContent `refContract:"528"`
 	// 终端用户的签名列表
@@ -31,4 +34,18 @@ func (e EndpointRequest) ContractName() string {
 
 func (e EndpointRequest) Description() string {
 	return ""
+}
+
+func (e *EndpointRequest) ContainsEndpointSignature(pubKey []byte) bool {
+	for _, s := range e.EndpointSignatures {
+		if bytes.Equals(s.PubKey, pubKey) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (e *EndpointRequest) AddEndpointSignatures(signature DigitalSignature) {
+	e.EndpointSignatures = append(e.EndpointSignatures, signature)
 }

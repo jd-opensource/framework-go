@@ -8,5 +8,6 @@ import "framework-go/ledger_model"
  */
 
 type BlockchainService interface {
-	ledger_model.BlockChainLedgerQueryService
+	ledger_model.BlockchainQueryService
+	BlockchainTransactionService
 }
