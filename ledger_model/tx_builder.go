@@ -26,6 +26,10 @@ func NewTxBuilder(ledgerHash framework.HashDigest) *TxBuilder {
 	}
 }
 
+func (t *TxBuilder) Contracts() *ContractCodeDeployOperationBuilder {
+	return t.opFactory.Contracts()
+}
+
 func (t *TxBuilder) Security() *SecurityOperationBuilder {
 	return t.opFactory.Security()
 }

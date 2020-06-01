@@ -27,6 +27,11 @@ func NewTxTemplate(ledgerHash framework.HashDigest, txService TransactionService
 	}
 }
 
+func (t *TxTemplate) Contracts() *ContractCodeDeployOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.Contracts()
+}
+
 func (t *TxTemplate) Security() *SecurityOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.Security()

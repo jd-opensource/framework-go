@@ -9,4 +9,5 @@ type ClientOperator interface {
 	UserOperator
 	DataAccountOperator
 	SecurityOperator
+	ContractOperator
 }

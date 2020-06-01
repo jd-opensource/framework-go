@@ -5,6 +5,8 @@ import (
 	"framework-go/ledger_model"
 	"framework-go/sdk"
 	"github.com/stretchr/testify/require"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -63,6 +65,39 @@ func TestDataAccount(t *testing.T) {
 	txTemp.DataAccounts().Register(user.GetIdentity())
 	txTemp.DataAccount(user.GetAddress()).SetText("imuge", "nice", -1).SetText("xiuxiu", "nice", -1)
 	txTemp.DataAccount(user.GetAddress()).SetText("wang", "nice", -1)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+}
+
+func TestContract(t *testing.T) {
+	// 交易内容
+	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+	// 在本地定义注册账号的 TX；
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 部署合约
+	file, err := os.Open("contract.car")
+	defer file.Close()
+	require.Nil(t, err)
+	contract, err := ioutil.ReadAll(file)
+	require.Nil(t, err)
+	txTemp.Contracts().Deploy(user.GetIdentity(), contract)
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
