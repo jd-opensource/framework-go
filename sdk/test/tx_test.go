@@ -4,6 +4,7 @@ import (
 	"framework-go/crypto/classic"
 	"framework-go/ledger_model"
 	"framework-go/sdk"
+	"framework-go/utils/network"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -98,6 +99,40 @@ func TestContract(t *testing.T) {
 	contract, err := ioutil.ReadAll(file)
 	require.Nil(t, err)
 	txTemp.Contracts().Deploy(user.GetIdentity(), contract)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+}
+
+func TestParticipant(t *testing.T) {
+	// 交易内容
+	participant := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+	// 新建TX；
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	name := "PARTICIPANT"
+	identity := participant.GetIdentity()
+	networkAddress := network.NewAddress("127.0.0.1", 20000, false).ToBytes()
+
+	// 注册
+	txTemp.Participants().Register(name, identity, networkAddress)
+	// 激活
+	txTemp.States().Update(identity, networkAddress, ledger_model.ACTIVED)
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()

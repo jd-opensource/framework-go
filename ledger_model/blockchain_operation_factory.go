@@ -13,6 +13,14 @@ type BlockchainOperationFactory struct {
 	operationList []binary_proto.DataContract
 }
 
+func (b *BlockchainOperationFactory) Participants() *ParticipantRegisterOperationBuilder {
+	return NewParticipantRegisterOperationBuilder(b)
+}
+
+func (b *BlockchainOperationFactory) States() *ParticipantStateUpdateOperationBuilder {
+	return NewParticipantStateUpdateOperationBuilder(b)
+}
+
 func (b *BlockchainOperationFactory) Contracts() *ContractCodeDeployOperationBuilder {
 	return NewContractCodeDeployOperationBuilder(b)
 }

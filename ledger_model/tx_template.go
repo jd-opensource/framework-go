@@ -19,6 +19,16 @@ type TxTemplate struct {
 	stateManager *TxStateManager
 }
 
+func (t *TxTemplate) Participants() *ParticipantRegisterOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.Participants()
+}
+
+func (t *TxTemplate) States() *ParticipantStateUpdateOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.States()
+}
+
 func NewTxTemplate(ledgerHash framework.HashDigest, txService TransactionService) *TxTemplate {
 	return &TxTemplate{
 		txBuilder:    NewTxBuilder(ledgerHash),

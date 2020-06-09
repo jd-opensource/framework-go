@@ -19,6 +19,14 @@ type TxBuilder struct {
 	opFactory  BlockchainOperationFactory
 }
 
+func (t *TxBuilder) Participants() *ParticipantRegisterOperationBuilder {
+	return t.opFactory.Participants()
+}
+
+func (t *TxBuilder) States() *ParticipantStateUpdateOperationBuilder {
+	return t.opFactory.States()
+}
+
 func NewTxBuilder(ledgerHash framework.HashDigest) *TxBuilder {
 	return &TxBuilder{
 		ledgerHash: ledgerHash,
