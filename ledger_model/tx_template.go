@@ -19,6 +19,16 @@ type TxTemplate struct {
 	stateManager *TxStateManager
 }
 
+func (t *TxTemplate) EventAccounts() *EventAccountRegisterOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.EventAccounts()
+}
+
+func (t *TxTemplate) EventAccount(accountAddress []byte) *EventPublishOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.EventAccount(accountAddress)
+}
+
 func (t *TxTemplate) Participants() *ParticipantRegisterOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.Participants()

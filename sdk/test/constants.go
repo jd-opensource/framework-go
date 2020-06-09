@@ -16,7 +16,7 @@ var (
 	GATEWAY_PORT = 8081
 	SECURE       = false
 
-	NODE_PRIVITE_KEY = crypto.DecodePrivKey("177gjtFXNyXXGZFfHii2kJn4HEfk6KKtGHr9iEAYZUZpCdKrNBZjsjzGbzXVoB2Sohd4x7A", base58.MustDecode("8EjkXVSTxMFjCvNNsTo8RBMDEVQmk7gYkW4SCDuvdsBG"))
-	NODE_PUBLIC_KEY  = crypto.DecodePubKey("3snPdw7i7Pm3vaGUsyBe5Vkce8jMFjcu4dJFSQY3A81P6VJh7iC1d8")
+	NODE_PRIVITE_KEY = crypto.DecodePrivKey("177gk12oswoAho4tK9JXeG3u7hUMWCTBCdtyLKTgJYZF3xCUm7AcJaW7Uc11S3w68hVzecw", base58.MustDecode("8EjkXVSTxMFjCvNNsTo8RBMDEVQmk7gYkW4SCDuvdsBG"))
+	NODE_PUBLIC_KEY  = crypto.DecodePubKey("3snPdw7i7PjQyiXHaaeCwmksSka9DmSrLVJFTWfEqaQAYAA8iMpNDD")
 	NODE_KEY         = ledger_model.NewBlockchainKeypair(NODE_PUBLIC_KEY, NODE_PRIVITE_KEY)
 )

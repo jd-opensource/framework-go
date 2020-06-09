@@ -11,4 +11,5 @@ type ClientOperator interface {
 	SecurityOperator
 	ContractOperator
 	ParticipantOperator
+	EventOperator
 }

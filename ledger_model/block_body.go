@@ -15,6 +15,7 @@ func init() {
 
 type BlockBody struct {
 	LedgerDataSnapshot
+	LedgerEventSnapshot
 	PreviousHash       []byte `primitiveType:"BYTES"`
 	LedgerHash         []byte `primitiveType:"BYTES"`
 	Height             []byte `primitiveType:"INT64"`
