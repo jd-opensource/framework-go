@@ -153,4 +153,127 @@ type BlockChainLedgerQueryService interface {
 
 	// return user's roles
 	GetUserRoles(ledgerHash framework.HashDigest, userAddress string) (RoleSet, error)
+
+	/**
+	 * 返回系统事件；
+	 *
+	 * @param ledgerHash   账本哈希；
+	 * @param eventName    事件名；
+	 * @param fromSequence 开始的事件序列号；
+	 * @param maxCount     最大数量；
+	 * @return
+	 */
+	GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int32) ([]Event, error)
+
+	/**
+	 * 返回自定义事件账户；
+	 * @param ledgerHash
+	 * @param fromIndex
+	 * @param count
+	 * @return
+	 */
+	GetUserEventAccounts(ledgerHash framework.HashDigest, fromSequence int64, maxCount int32) ([]BlockchainIdentity, error)
+
+	/**
+	 * 返回自定义事件；
+	 *
+	 * @param ledgerHash   账本哈希；
+	 * @param address      事件账户地址；
+	 * @param eventName    事件名；
+	 * @param fromSequence 开始的事件序列号；
+	 * @param maxCount     最大数量；
+	 * @return
+	 */
+	GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int32) ([]Event, error)
+
+	/**
+	 * 返回系统事件名称总数； <br>
+	 *
+	 * @param ledgerHash
+	 * @return
+	 */
+	GetSystemEventNameTotalCount(digest framework.HashDigest) (int64, error)
+
+	/**
+	 * 返回系统事件名称列表； <br>
+	 *
+	 * @param ledgerHash
+	 * @param fromIndex
+	 * @param count
+	 * @return
+	 */
+	GetSystemEventNames(digest framework.HashDigest, fromIndex, count int) ([]string, error)
+
+	/**
+	 * 返回指定系统事件名称下事件总数； <br>
+	 *
+	 * @param ledgerHash
+	 * @param eventName
+	 * @return
+	 */
+	GetSystemEventsTotalCount(digest framework.HashDigest, eventName string) (int64, error)
+
+	/**
+	 * 返回事件账户信息；
+	 *
+	 * @param ledgerHash
+	 * @param address
+	 * @return
+	 */
+	GetUserEventAccount(digist framework.HashDigest, address string) (BlockchainIdentity, error)
+
+	/**
+	 * 返回事件账户总数； <br>
+	 *
+	 * @param ledgerHash
+	 * @return
+	 */
+	GetUserEventAccountTotalCount(digest framework.HashDigest) (int64, error)
+
+	/**
+	 * 返回指定事件账户事件名称列表； <br>
+	 *
+	 * @param ledgerHash
+	 * @param address
+	 * @return
+	 */
+	GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int) ([]string, error)
+
+	/**
+	 * 返回指定事件账户事件名称总数； <br>
+	 *
+	 * @param ledgerHash
+	 * @param address
+	 * @return
+	 */
+	GetUserEventNameTotalCount(digest framework.HashDigest, address string) (int64, error)
+
+	/**
+	 * 返回指定事件账户，指定事件名称下事件总数； <br>
+	 *
+	 * @param ledgerHash
+	 * @param address
+	 * @param eventName
+	 * @return
+	 */
+	GetUserEventsTotalCount(digest framework.HashDigest, address, eventName string) (int64, error)
+
+	/**
+	 * 返回最新系统事件； <br>
+	 *
+	 * @param ledgerHash
+	 * @param eventName
+	 * @return
+	 */
+	GetLatestSystemEvent(ledgerHash framework.HashDigest, eventName string) (Event, error)
+
+	/**
+	 * 返回最新用户自定义事件； <br>
+	 *
+	 * @param ledgerHash
+	 * @param address
+	 * @param eventName
+	 * @return
+	 */
+	GetLatestUserEvent(ledgerHash framework.HashDigest, address string, eventName string) (Event, error)
 }

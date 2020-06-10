@@ -3,9 +3,12 @@ package sdk
 import (
 	"errors"
 	"fmt"
+	binary_proto "framework-go/binary-proto"
 	"framework-go/crypto/framework"
 	"framework-go/ledger_model"
 	"framework-go/utils/base58"
+	"framework-go/utils/bytes"
+	"framework-go/utils/network"
 	"github.com/go-resty/resty/v2"
 	"net/url"
 )
@@ -252,30 +255,6 @@ func (r RestyQueryService) GetBlockByHeight(ledgerHash framework.HashDigest, hei
 
 	block := wrp.(map[string]interface{})
 
-	var adminAccountHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
-	var userAccountSetHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
-	var dataAccountSetHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
-	var contractAccountSetHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
 	var PreviousHash []byte
 	if PreviousHashI, ok := block["previousHash"]; ok {
 		PreviousHash = base58.MustDecode(PreviousHashI.(map[string]interface{})["value"].(string))
@@ -285,19 +264,18 @@ func (r RestyQueryService) GetBlockByHeight(ledgerHash framework.HashDigest, hei
 
 	info = ledger_model.LedgerBlock{
 		BlockBody: ledger_model.BlockBody{
-			LedgerDataSnapshot: ledger_model.LedgerDataSnapshot{
-				AdminAccountHash:       adminAccountHash,
-				UserAccountSetHash:     userAccountSetHash,
-				DataAccountSetHash:     dataAccountSetHash,
-				ContractAccountSetHash: contractAccountSetHash,
-			},
+			LedgerDataSnapshot: parseLedgerDataSnapshot(block),
 			PreviousHash:       PreviousHash,
-			LedgerHash:         base58.MustDecode(block["ledgerHash"].(map[string]interface{})["value"].(string)),
-			Height:             nil,
+			Height:             int64(block["height"].(float64)),
 			TransactionSetHash: base58.MustDecode(block["transactionSetHash"].(map[string]interface{})["value"].(string)),
-			Timestamp:          nil,
 		},
 		Hash: base58.MustDecode(block["hash"].(map[string]interface{})["value"].(string)),
+	}
+
+	if height > 0 {
+		info.BlockBody.LedgerHash = base58.MustDecode(block["ledgerHash"].(map[string]interface{})["value"].(string))
+	} else {
+		info.BlockBody.LedgerHash = ledgerHash.ToBytes()
 	}
 
 	return
@@ -311,30 +289,6 @@ func (r RestyQueryService) GetBlockByHash(ledgerHash, blockHash framework.HashDi
 
 	block := wrp.(map[string]interface{})
 
-	var adminAccountHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
-	var userAccountSetHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
-	var dataAccountSetHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
-	var contractAccountSetHash []byte
-	if adminAccountHashI, ok := block["adminAccountHash"]; ok {
-		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
-	} else {
-		adminAccountHash = nil
-	}
 	var PreviousHash []byte
 	if PreviousHashI, ok := block["previousHash"]; ok {
 		PreviousHash = base58.MustDecode(PreviousHashI.(map[string]interface{})["value"].(string))
@@ -344,19 +298,18 @@ func (r RestyQueryService) GetBlockByHash(ledgerHash, blockHash framework.HashDi
 
 	info = ledger_model.LedgerBlock{
 		BlockBody: ledger_model.BlockBody{
-			LedgerDataSnapshot: ledger_model.LedgerDataSnapshot{
-				AdminAccountHash:       adminAccountHash,
-				UserAccountSetHash:     userAccountSetHash,
-				DataAccountSetHash:     dataAccountSetHash,
-				ContractAccountSetHash: contractAccountSetHash,
-			},
+			LedgerDataSnapshot: parseLedgerDataSnapshot(block),
 			PreviousHash:       PreviousHash,
-			LedgerHash:         base58.MustDecode(block["ledgerHash"].(map[string]interface{})["value"].(string)),
-			Height:             nil,
+			Height:             int64(block["height"].(float64)),
 			TransactionSetHash: base58.MustDecode(block["transactionSetHash"].(map[string]interface{})["value"].(string)),
-			Timestamp:          nil,
 		},
 		Hash: base58.MustDecode(block["hash"].(map[string]interface{})["value"].(string)),
+	}
+
+	if info.BlockBody.Height > 0 {
+		info.BlockBody.LedgerHash = base58.MustDecode(block["ledgerHash"].(map[string]interface{})["value"].(string))
+	} else {
+		info.BlockBody.LedgerHash = ledgerHash.ToBytes()
 	}
 
 	return
@@ -458,31 +411,6 @@ func (r RestyQueryService) GetContractTotalCount(ledgerHash framework.HashDigest
 	return int64(wrp.(float64)), nil
 }
 
-func (r RestyQueryService) GetTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int32) ([]ledger_model.LedgerTransaction, error) {
-	panic("implement me")
-}
-
-func (r RestyQueryService) GetTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int32) ([]ledger_model.LedgerTransaction, error) {
-	panic("implement me")
-}
-
-func (r RestyQueryService) GetTransactionByContentHash(ledgerHash, contentHash framework.HashDigest) (ledger_model.LedgerTransaction, error) {
-	panic("implement me")
-}
-
-func (r RestyQueryService) GetTransactionStateByContentHash(ledgerHash, contentHash framework.HashDigest) (info ledger_model.TransactionState, err error) {
-	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/txs/state/%s", ledgerHash.ToBase58(), contentHash.ToBase58()))
-	if err != nil {
-		return info, err
-	}
-	if wrp == nil {
-		return info, errors.New("not exists")
-	}
-	info = ledger_model.SUCCESS.GetValueByName(wrp.(string)).(ledger_model.TransactionState)
-
-	return
-}
-
 func (r RestyQueryService) GetUser(ledgerHash framework.HashDigest, address string) (info ledger_model.UserInfo, err error) {
 	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/users/address/%s", ledgerHash.ToBase58(), address))
 	if err != nil {
@@ -494,10 +422,7 @@ func (r RestyQueryService) GetUser(ledgerHash framework.HashDigest, address stri
 	user := wrp.(map[string]interface{})
 	info = ledger_model.UserInfo{
 		UserAccountHeader: ledger_model.UserAccountHeader{
-			BlockchainIdentity: ledger_model.BlockchainIdentity{
-				Address: base58.MustDecode(user["address"].(map[string]interface{})["value"].(string)),
-				PubKey:  base58.MustDecode(user["pubKey"].(map[string]interface{})["value"].(string)),
-			},
+			BlockchainIdentity: parseBlockchainIdentity(user),
 		},
 	}
 	return
@@ -512,10 +437,7 @@ func (r RestyQueryService) GetDataAccount(ledgerHash framework.HashDigest, addre
 		return info, errors.New("not exists")
 	}
 	id := wrp.(map[string]interface{})
-	info = ledger_model.BlockchainIdentity{
-		Address: base58.MustDecode(id["address"].(map[string]interface{})["value"].(string)),
-		PubKey:  base58.MustDecode(id["pubKey"].(map[string]interface{})["value"].(string)),
-	}
+	info = parseBlockchainIdentity(id)
 	return
 }
 
@@ -595,20 +517,22 @@ func (r RestyQueryService) GetLatestDataEntriesByRange(ledgerHash framework.Hash
 }
 
 func (r RestyQueryService) GetContract(ledgerHash framework.HashDigest, address string) (info ledger_model.ContractInfo, err error) {
-	wrp, err := r.query(fmt.Sprintf("ledgers/%s/contracts/address/%s", ledgerHash.ToBase58(), address))
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/contracts/address/%s", ledgerHash.ToBase58(), address))
 	if err != nil {
 		return
 	}
 	if wrp == nil {
 		return info, errors.New("not exists")
 	}
-	//_ := wrp.(map[string]interface{})
+	contract := wrp.(map[string]interface{})
 	info = ledger_model.ContractInfo{
-		BlockchainIdentity: ledger_model.BlockchainIdentity{},
-		MerkleSnapshot:     ledger_model.MerkleSnapshot{},
-		ChainCode:          nil,
+		BlockchainIdentity: parseBlockchainIdentity(contract),
+		MerkleSnapshot: ledger_model.MerkleSnapshot{
+			RootHash: base58.MustDecode(contract["rootHash"].(map[string]interface{})["value"].(string)),
+		},
+		ChainCode: bytes.StringToBytes(contract["chainCode"].(string)),
 	}
-	//TODO
+
 	return
 }
 
@@ -625,10 +549,7 @@ func (r RestyQueryService) GetUsers(ledgerHash framework.HashDigest, fromIndex, 
 	info = make([]ledger_model.BlockchainIdentity, len(idArray))
 	for i, item := range idArray {
 		id := item.(map[string]interface{})
-		info[i] = ledger_model.BlockchainIdentity{
-			Address: base58.MustDecode(id["address"].(map[string]interface{})["value"].(string)),
-			PubKey:  base58.MustDecode(id["pubKey"].(map[string]interface{})["value"].(string)),
-		}
+		info[i] = parseBlockchainIdentity(id)
 	}
 
 	return
@@ -647,10 +568,7 @@ func (r RestyQueryService) GetDataAccounts(ledgerHash framework.HashDigest, from
 	info = make([]ledger_model.BlockchainIdentity, len(idArray))
 	for i, item := range idArray {
 		id := item.(map[string]interface{})
-		info[i] = ledger_model.BlockchainIdentity{
-			Address: base58.MustDecode(id["address"].(map[string]interface{})["value"].(string)),
-			PubKey:  base58.MustDecode(id["pubKey"].(map[string]interface{})["value"].(string)),
-		}
+		info[i] = parseBlockchainIdentity(id)
 	}
 
 	return
@@ -669,10 +587,7 @@ func (r RestyQueryService) GetContractAccounts(ledgerHash framework.HashDigest, 
 	info = make([]ledger_model.BlockchainIdentity, len(idArray))
 	for i, item := range idArray {
 		id := item.(map[string]interface{})
-		info[i] = ledger_model.BlockchainIdentity{
-			Address: base58.MustDecode(id["address"].(map[string]interface{})["value"].(string)),
-			PubKey:  base58.MustDecode(id["pubKey"].(map[string]interface{})["value"].(string)),
-		}
+		info[i] = parseBlockchainIdentity(id)
 	}
 
 	return
@@ -695,4 +610,535 @@ func (r RestyQueryService) GetUserRoles(ledgerHash framework.HashDigest, userAdd
 	}
 
 	return
+}
+
+func (r RestyQueryService) GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int32) (info []ledger_model.Event, err error) {
+	params := map[string]string{
+		"fromSequence": string(fromSequence),
+		"maxCount":     string(maxCount),
+	}
+	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/system/%s", ledgerHash.ToBase58(), eventName), params)
+	if err != nil {
+		return info, err
+	}
+	idArray := wrp.([]interface{})
+	info = make([]ledger_model.Event, len(idArray))
+	for i, item := range idArray {
+		info[i] = parseEvent(item.(map[string]interface{}))
+	}
+
+	return
+}
+
+func parseBytesValue(info map[string]interface{}) ledger_model.BytesValue {
+	return ledger_model.BytesValue{
+		Type:  ledger_model.NIL.GetValueByName(info["type"].(string)).(ledger_model.DataType),
+		Bytes: base58.MustDecode(info["bytes"].(map[string]interface{})["value"].(string)),
+	}
+}
+
+func (r RestyQueryService) GetUserEventAccounts(ledgerHash framework.HashDigest, fromIndex int64, maxCount int32) (info []ledger_model.BlockchainIdentity, err error) {
+	params := map[string]string{
+		"fromIndex": string(fromIndex),
+		"count":     string(maxCount),
+	}
+	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/user/accounts", ledgerHash.ToBase58()), params)
+	if err != nil {
+		return info, err
+	}
+	idArray := wrp.([]interface{})
+	info = make([]ledger_model.BlockchainIdentity, len(idArray))
+	for i, item := range idArray {
+		id := item.(map[string]interface{})
+		info[i] = parseBlockchainIdentity(id)
+	}
+
+	return
+}
+
+func (r RestyQueryService) GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int32) (info []ledger_model.Event, err error) {
+	params := map[string]string{
+		"fromSequence": string(fromSequence),
+		"maxCount":     string(maxCount),
+	}
+	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names/%s", ledgerHash.ToBase58(), address, eventName), params)
+	if err != nil {
+		return info, err
+	}
+	idArray := wrp.([]interface{})
+	info = make([]ledger_model.Event, len(idArray))
+	for i, item := range idArray {
+		info[i] = parseEvent(item.(map[string]interface{}))
+	}
+
+	return
+}
+
+func parseEvent(event map[string]interface{}) ledger_model.Event {
+	info := ledger_model.Event{
+		Name:        event["name"].(string),
+		BlockHeight: int64(event["blockHeight"].(float64)),
+		Sequence:    int64(event["sequence"].(float64)),
+	}
+	transactionSource, ok := event["transactionSource"]
+	if ok {
+		info.TransactionSource = base58.MustDecode(transactionSource.(map[string]interface{})["value"].(string))
+	}
+	contractSource, ok := event["contractSource"]
+	if ok {
+		info.ContractSource = contractSource.(string)
+	}
+	eventAccount, ok := event["eventAccount"]
+	if ok {
+		info.EventAccount = base58.MustDecode(eventAccount.(map[string]interface{})["value"].(string))
+	}
+	content := event["content"].(map[string]interface{})
+	if !content["nil"].(bool) {
+		info.Content = parseBytesValue(content)
+	}
+
+	return info
+}
+
+func (r RestyQueryService) GetTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int32) (info []ledger_model.LedgerTransaction, err error) {
+	params := map[string]string{
+		"fromIndex": string(fromIndex),
+		"count":     string(count),
+	}
+	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/blocks/height/%d/txs", ledgerHash.ToBase58(), height), params)
+	if err != nil {
+		return info, err
+	}
+	txArray := wrp.([]interface{})
+	info = make([]ledger_model.LedgerTransaction, len(txArray))
+	for i, item := range txArray {
+		tx := item.(map[string]interface{})
+
+		info[i] = ledger_model.LedgerTransaction{
+			LedgerDataSnapshot: parseLedgerDataSnapshot(tx),
+			Transaction:        parseTransaction(tx),
+		}
+	}
+
+	return
+}
+
+func (r RestyQueryService) GetTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int32) (info []ledger_model.LedgerTransaction, err error) {
+	params := map[string]string{
+		"fromIndex": string(fromIndex),
+		"count":     string(count),
+	}
+	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/blocks/hash/%s/txs", ledgerHash.ToBase58(), blockHash.ToBase58()), params)
+	if err != nil {
+		return info, err
+	}
+	txArray := wrp.([]interface{})
+	info = make([]ledger_model.LedgerTransaction, len(txArray))
+	for i, item := range txArray {
+		tx := item.(map[string]interface{})
+
+		info[i] = ledger_model.LedgerTransaction{
+			LedgerDataSnapshot: parseLedgerDataSnapshot(tx),
+			Transaction:        parseTransaction(tx),
+		}
+	}
+
+	return
+}
+
+func (r RestyQueryService) GetTransactionByContentHash(ledgerHash, contentHash framework.HashDigest) (info ledger_model.LedgerTransaction, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/txs/hash/%s", ledgerHash.ToBase58(), contentHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+	tx := wrp.(map[string]interface{})
+	return ledger_model.LedgerTransaction{
+		LedgerDataSnapshot: parseLedgerDataSnapshot(tx),
+		Transaction:        parseTransaction(tx),
+	}, nil
+}
+
+func (r RestyQueryService) GetTransactionStateByContentHash(ledgerHash, contentHash framework.HashDigest) (info ledger_model.TransactionState, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/txs/state/%s", ledgerHash.ToBase58(), contentHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+	if wrp == nil {
+		return info, errors.New("not exists")
+	}
+	info = ledger_model.SUCCESS.GetValueByName(wrp.(string)).(ledger_model.TransactionState)
+
+	return
+}
+
+func parseLedgerDataSnapshot(info map[string]interface{}) ledger_model.LedgerDataSnapshot {
+	var adminAccountHash []byte
+	if adminAccountHashI, ok := info["adminAccountHash"]; ok {
+		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
+	} else {
+		adminAccountHash = nil
+	}
+	var userAccountSetHash []byte
+	if adminAccountHashI, ok := info["adminAccountHash"]; ok {
+		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
+	} else {
+		adminAccountHash = nil
+	}
+	var dataAccountSetHash []byte
+	if adminAccountHashI, ok := info["adminAccountHash"]; ok {
+		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
+	} else {
+		adminAccountHash = nil
+	}
+	var contractAccountSetHash []byte
+	if adminAccountHashI, ok := info["adminAccountHash"]; ok {
+		adminAccountHash = base58.MustDecode(adminAccountHashI.(map[string]interface{})["value"].(string))
+	} else {
+		adminAccountHash = nil
+	}
+
+	return ledger_model.LedgerDataSnapshot{
+		AdminAccountHash:       adminAccountHash,
+		UserAccountSetHash:     userAccountSetHash,
+		DataAccountSetHash:     dataAccountSetHash,
+		ContractAccountSetHash: contractAccountSetHash,
+	}
+}
+
+func parseTransaction(info map[string]interface{}) ledger_model.Transaction {
+	// TODO OperationResults
+
+	return ledger_model.Transaction{
+		NodeRequest: ledger_model.NodeRequest{
+			NodeSignatures: parseNodeSignatures(info["nodeSignatures"].([]interface{})),
+			EndpointRequest: ledger_model.EndpointRequest{
+				TransactionContent: parseTransactionContent(info["transactionContent"].(map[string]interface{})),
+			},
+		},
+		BlockHeight:    int64(info["blockHeight"].(float64)),
+		ExecutionState: ledger_model.SUCCESS.GetValueByName(info["executionState"].(string)).(ledger_model.TransactionState),
+	}
+}
+
+func parseTransactionContent(info map[string]interface{}) ledger_model.TransactionContent {
+	return ledger_model.TransactionContent{
+		TransactionContentBody: ledger_model.TransactionContentBody{
+			Operations: parseOperations(info["operations"].([]interface{})),
+		},
+		Hash: base58.MustDecode(info["hash"].(map[string]interface{})["value"].(string)),
+	}
+}
+
+func parseNodeSignatures(info []interface{}) []ledger_model.DigitalSignature {
+	signatures := make([]ledger_model.DigitalSignature, len(info))
+	for i, item := range info {
+		sign := item.(map[string]interface{})
+		signatures[i] = ledger_model.DigitalSignature{
+			DigitalSignatureBody: ledger_model.DigitalSignatureBody{
+				PubKey: base58.MustDecode(sign["pubKey"].(map[string]interface{})["value"].(string)),
+				Digest: base58.MustDecode(sign["digest"].(map[string]interface{})["value"].(string)),
+			},
+		}
+	}
+
+	return signatures
+}
+
+func parseOperations(info []interface{}) []binary_proto.DataContract {
+	operations := make([]binary_proto.DataContract, len(info))
+	for i, item := range info {
+		var dc binary_proto.DataContract
+		operation := item.(map[string]interface{})
+		if _, ok := operation["userID"]; ok {
+			// 注册用户
+			dc = parseUserRegisterOperation(operation["userID"].(map[string]interface{}))
+		} else if _, ok := operation["accountID"]; ok {
+			// 注册数据账户
+			dc = parseDataAccountRegisterOperation(operation["accountID"].(map[string]interface{}))
+		} else if _, ok := operation["writeSet"]; ok {
+			// KV写入
+			dc = parseDataAccountKVSetOperation(operation)
+		} else if _, ok := operation["eventAccountID"]; ok {
+			// 事件账户注册
+			dc = parseEventAccountRegisterOperation(operation["eventAccountID"].(map[string]interface{}))
+		} else if _, ok := operation["events"]; ok {
+			// 发布事件
+			dc = parseEventPublishOperation(operation)
+		} else if _, ok := operation["participantRegisterIdentity"]; ok {
+			// 注册参与方
+			dc = parseParticipantRegisterOperation(operation)
+		} else if _, ok := operation["stateUpdateIdentity"]; ok {
+			// 参与方状态变更
+			dc = parseParticipantStateUpdateOperation(operation)
+		} else if _, ok := operation["chainCode"]; ok {
+			// 合约部署
+			dc = parseContractCodeDeployOperation(operation)
+		} else if _, ok := operation["roles"]; ok {
+			// 角色配置
+			dc = parseRolesConfigureOperation(operation)
+		} else if _, ok := operation["userRolesAuthorizations"]; ok {
+			dc = parseUserAuthorizeOperation(operation["userRolesAuthorizations"].([]interface{}))
+		}
+		operations[i] = dc
+	}
+
+	return operations
+}
+
+func parseUserRegisterOperation(info map[string]interface{}) binary_proto.DataContract {
+	return &ledger_model.UserRegisterOperation{
+		UserID: parseBlockchainIdentity(info),
+	}
+}
+
+func parseDataAccountRegisterOperation(info map[string]interface{}) binary_proto.DataContract {
+	return &ledger_model.DataAccountRegisterOperation{
+		AccountID: parseBlockchainIdentity(info),
+	}
+}
+
+func parseEventAccountRegisterOperation(info map[string]interface{}) binary_proto.DataContract {
+	return &ledger_model.EventAccountRegisterOperation{
+		EventAccountID: parseBlockchainIdentity(info),
+	}
+}
+
+func parseParticipantRegisterOperation(info map[string]interface{}) binary_proto.DataContract {
+	networkAddress := info["networkAddress"].(map[string]interface{})
+	address := network.NewAddress(networkAddress["host"].(string), int32(networkAddress["port"].(float64)), networkAddress["secure"].(bool))
+	return &ledger_model.ParticipantRegisterOperation{
+		ParticipantName:             info["participantName"].(string),
+		ParticipantRegisterIdentity: parseBlockchainIdentity(info["participantRegisterIdentity"].(map[string]interface{})),
+		NetworkAddress:              address.ToBytes(),
+	}
+}
+
+func parseParticipantStateUpdateOperation(info map[string]interface{}) binary_proto.DataContract {
+	networkAddress := info["networkAddress"].(map[string]interface{})
+	address := network.NewAddress(networkAddress["host"].(string), int32(networkAddress["port"].(float64)), networkAddress["secure"].(bool))
+	return &ledger_model.ParticipantStateUpdateOperation{
+		State:               ledger_model.REGISTERED.GetValueByName(info["state"].(string)).(ledger_model.ParticipantNodeState),
+		StateUpdateIdentity: parseBlockchainIdentity(info["stateUpdateIdentity"].(map[string]interface{})),
+		NetworkAddress:      address.ToBytes(),
+	}
+}
+
+func parseContractCodeDeployOperation(info map[string]interface{}) binary_proto.DataContract {
+	return &ledger_model.ContractCodeDeployOperation{
+		ContractID: parseBlockchainIdentity(info["contractID"].(map[string]interface{})),
+		ChainCode:  bytes.StringToBytes(info["chainCode"].(string)),
+	}
+}
+
+func parseRolesConfigureOperation(info map[string]interface{}) binary_proto.DataContract {
+	empty := info["empty"].(bool)
+	var roles []ledger_model.RolePrivilegeEntry
+	if !empty {
+		array := info["roles"].([]interface{})
+		roles = make([]ledger_model.RolePrivilegeEntry, len(array))
+		for i, item := range array {
+			role := item.(map[string]interface{})
+			roleName := role["roleName"].(string)
+			roles[i] = ledger_model.RolePrivilegeEntry{
+				RoleName:                      roleName,
+				EnableLedgerPermissions:       parseLedgerPermissions(role["enableLedgerPermissions"].([]interface{})),
+				DisableLedgerPermissions:      parseLedgerPermissions(role["disableLedgerPermissions"].([]interface{})),
+				EnableTransactionPermissions:  parseTransactionPermissions(role["enableTransactionPermissions"].([]interface{})),
+				DisableTransactionPermissions: parseTransactionPermissions(role["disableTransactionPermissions"].([]interface{})),
+			}
+		}
+	}
+	return &ledger_model.RolesConfigureOperation{
+		Roles: roles,
+	}
+}
+
+func parseUserAuthorizeOperation(array []interface{}) binary_proto.DataContract {
+	userAuthor := make([]ledger_model.UserRolesEntry, len(array))
+	for i, item := range array {
+		author := item.(map[string]interface{})
+		addressArray := author["userAddresses"].([]interface{})
+		address := make([][]byte, len(addressArray))
+		for j, addr := range addressArray {
+			address[j] = base58.MustDecode(addr.(map[string]interface{})["value"].(string))
+		}
+		userAuthor[i] = ledger_model.UserRolesEntry{
+			Policy:            ledger_model.UNION.GetValueByName(author["policy"].(string)).(ledger_model.RolesPolicy),
+			Addresses:         address,
+			UnauthorizedRoles: parseStringArray(author["unauthorizedRoles"].([]interface{})),
+			AuthorizedRoles:   parseStringArray(author["authorizedRoles"].([]interface{})),
+		}
+	}
+	return &ledger_model.UserAuthorizeOperation{
+		UserRolesAuthorizations: userAuthor,
+	}
+}
+
+func parseStringArray(info []interface{}) []string {
+	array := make([]string, len(info))
+	for i, item := range info {
+		array[i] = item.(string)
+	}
+
+	return array
+}
+
+func parseLedgerPermissions(array []interface{}) []ledger_model.LedgerPermission {
+	lps := make([]ledger_model.LedgerPermission, len(array))
+	for i, item := range array {
+		lps[i] = ledger_model.CONFIGURE_ROLES.GetValueByName(item.(string)).(ledger_model.LedgerPermission)
+	}
+
+	return lps
+}
+
+func parseTransactionPermissions(array []interface{}) []ledger_model.TransactionPermission {
+	tps := make([]ledger_model.TransactionPermission, len(array))
+	for i, item := range array {
+		tps[i] = ledger_model.DIRECT_OPERATION.GetValueByName(item.(string)).(ledger_model.TransactionPermission)
+	}
+
+	return tps
+}
+
+func parseDataAccountKVSetOperation(info map[string]interface{}) binary_proto.DataContract {
+	kvs := info["writeSet"].([]interface{})
+	writeSet := make([]ledger_model.KVWriteEntry, len(kvs))
+	for i, item := range kvs {
+		kv := item.(map[string]interface{})
+		kvSet := ledger_model.KVWriteEntry{
+			Key:             kv["key"].(string),
+			Value:           parseBytesValue(kv["value"].(map[string]interface{})),
+			ExpectedVersion: int64(kv["expectedVersion"].(float64)),
+		}
+		writeSet[i] = kvSet
+	}
+	return &ledger_model.DataAccountKVSetOperation{
+		AccountAddress: base58.MustDecode(info["accountAddress"].(map[string]interface{})["value"].(string)),
+		WriteSet:       writeSet,
+	}
+}
+
+func parseEventPublishOperation(info map[string]interface{}) binary_proto.DataContract {
+	kvs := info["events"].([]interface{})
+	writeSet := make([]ledger_model.EventEntry, len(kvs))
+	for i, item := range kvs {
+		kv := item.(map[string]interface{})
+		kvSet := ledger_model.EventEntry{
+			Name:     kv["name"].(string),
+			Content:  parseBytesValue(kv["content"].(map[string]interface{})),
+			Sequence: int64(kv["sequence"].(float64)),
+		}
+		writeSet[i] = kvSet
+	}
+	return &ledger_model.EventPublishOperation{
+		EventAddress: base58.MustDecode(info["eventAddress"].(map[string]interface{})["value"].(string)),
+		Events:       writeSet,
+	}
+}
+
+func parseBlockchainIdentity(id map[string]interface{}) ledger_model.BlockchainIdentity {
+	return ledger_model.BlockchainIdentity{
+		Address: base58.MustDecode(id["address"].(map[string]interface{})["value"].(string)),
+		PubKey:  base58.MustDecode(id["pubKey"].(map[string]interface{})["value"].(string)),
+	}
+}
+
+func (r RestyQueryService) GetSystemEventNameTotalCount(ledgerHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/system/names/count", ledgerHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetSystemEventNames(ledgerHash framework.HashDigest, fromIndex, count int) (info []string, err error) {
+	params := map[string]string{
+		"fromIndex": string(fromIndex),
+		"count":     string(count),
+	}
+	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/system/names", ledgerHash.ToBase58()), params)
+	if err != nil {
+		return info, err
+	}
+
+	return parseStringArray(wrp.([]interface{})), nil
+}
+
+func (r RestyQueryService) GetSystemEventsTotalCount(ledgerHash framework.HashDigest, eventName string) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/system/names/%s/count", ledgerHash.ToBase58(), eventName))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetUserEventAccount(ledgerHash framework.HashDigest, address string) (info ledger_model.BlockchainIdentity, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s", ledgerHash.ToBase58(), address))
+	if err != nil {
+		return info, err
+	}
+
+	return parseBlockchainIdentity(wrp.(map[string]interface{})), nil
+}
+
+func (r RestyQueryService) GetUserEventAccountTotalCount(ledgerHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/user/accounts/count", ledgerHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int) (info []string, err error) {
+	params := map[string]string{
+		"fromIndex": string(fromIndex),
+		"count":     string(count),
+	}
+	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names", ledgerHash.ToBase58(), address), params)
+	if err != nil {
+		return info, err
+	}
+
+	return parseStringArray(wrp.([]interface{})), nil
+
+}
+
+func (r RestyQueryService) GetUserEventNameTotalCount(ledgerHash framework.HashDigest, address string) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names/count", ledgerHash.ToBase58(), address))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetUserEventsTotalCount(ledgerHash framework.HashDigest, address, eventName string) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names/%s/count", ledgerHash.ToBase58(), address, eventName))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetLatestSystemEvent(ledgerHash framework.HashDigest, eventName string) (info ledger_model.Event, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/system/names/%s/latest", ledgerHash.ToBase58(), eventName))
+	if err != nil {
+		return info, err
+	}
+
+	return parseEvent(wrp.(map[string]interface{})), nil
+}
+
+func (r RestyQueryService) GetLatestUserEvent(ledgerHash framework.HashDigest, address string, eventName string) (info ledger_model.Event, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names/%s/latest", ledgerHash.ToBase58(), address, eventName))
+	if err != nil {
+		return info, err
+	}
+
+	return parseEvent(wrp.(map[string]interface{})), nil
 }

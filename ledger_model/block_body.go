@@ -18,9 +18,9 @@ type BlockBody struct {
 	LedgerEventSnapshot
 	PreviousHash       []byte `primitiveType:"BYTES"`
 	LedgerHash         []byte `primitiveType:"BYTES"`
-	Height             []byte `primitiveType:"INT64"`
+	Height             int64  `primitiveType:"INT64"`
 	TransactionSetHash []byte `primitiveType:"BYTES"`
-	Timestamp          []byte `primitiveType:"INT64"`
+	Timestamp          int64  `primitiveType:"INT64"`
 }
 
 func (b BlockBody) ContractCode() int32 {

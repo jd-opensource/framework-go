@@ -168,3 +168,55 @@ func (b *GatewayBlockchainService) GetContractAccounts(ledgerHash framework.Hash
 func (b *GatewayBlockchainService) GetUserRoles(ledgerHash framework.HashDigest, userAddress string) (ledger_model.RoleSet, error) {
 	return b.QueryService.GetUserRoles(ledgerHash, userAddress)
 }
+
+func (b *GatewayBlockchainService) GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int32) ([]ledger_model.Event, error) {
+	return b.QueryService.GetSystemEvents(ledgerHash, eventName, fromSequence, maxCount)
+}
+
+func (b *GatewayBlockchainService) GetUserEventAccounts(ledgerHash framework.HashDigest, fromIndex int64, maxCount int32) ([]ledger_model.BlockchainIdentity, error) {
+	return b.QueryService.GetUserEventAccounts(ledgerHash, fromIndex, maxCount)
+}
+
+func (b *GatewayBlockchainService) GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int32) ([]ledger_model.Event, error) {
+	return b.QueryService.GetUserEvents(ledgerHash, address, eventName, fromSequence, maxCount)
+}
+
+func (b *GatewayBlockchainService) GetSystemEventNameTotalCount(digest framework.HashDigest) (int64, error) {
+	return b.QueryService.GetSystemEventNameTotalCount(digest)
+}
+
+func (b *GatewayBlockchainService) GetSystemEventNames(digest framework.HashDigest, fromIndex, count int) ([]string, error) {
+	return b.QueryService.GetSystemEventNames(digest, fromIndex, count)
+}
+
+func (b *GatewayBlockchainService) GetSystemEventsTotalCount(digest framework.HashDigest, eventName string) (int64, error) {
+	return b.QueryService.GetSystemEventsTotalCount(digest, eventName)
+}
+
+func (b *GatewayBlockchainService) GetUserEventAccount(digist framework.HashDigest, address string) (ledger_model.BlockchainIdentity, error) {
+	return b.QueryService.GetUserEventAccount(digist, address)
+}
+
+func (b *GatewayBlockchainService) GetUserEventAccountTotalCount(digest framework.HashDigest) (int64, error) {
+	return b.QueryService.GetUserEventAccountTotalCount(digest)
+}
+
+func (b *GatewayBlockchainService) GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int) ([]string, error) {
+	return b.QueryService.GetUserEventNames(ledgerHash, address, fromIndex, count)
+}
+
+func (b *GatewayBlockchainService) GetUserEventNameTotalCount(digest framework.HashDigest, address string) (int64, error) {
+	return b.QueryService.GetUserEventNameTotalCount(digest, address)
+}
+
+func (b *GatewayBlockchainService) GetUserEventsTotalCount(digest framework.HashDigest, address, eventName string) (int64, error) {
+	return b.QueryService.GetUserEventsTotalCount(digest, address, eventName)
+}
+
+func (b *GatewayBlockchainService) GetLatestSystemEvent(ledgerHash framework.HashDigest, eventName string) (ledger_model.Event, error) {
+	return b.QueryService.GetLatestSystemEvent(ledgerHash, eventName)
+}
+
+func (b *GatewayBlockchainService) GetLatestUserEvent(ledgerHash framework.HashDigest, address string, eventName string) (ledger_model.Event, error) {
+	return b.QueryService.GetLatestUserEvent(ledgerHash, address, eventName)
+}

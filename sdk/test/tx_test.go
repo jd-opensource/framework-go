@@ -36,7 +36,11 @@ func TestRegisterUser(t *testing.T) {
 	// 注册用户
 	txTemp.Users().Register(user1.GetIdentity())
 	txTemp.Users().Register(user2.GetIdentity())
-	txTemp.Security().Roles().Configure("MANAGER").EnableLedgerPermission(ledger_model.REGISTER_USER).EnableTransactionPermission(ledger_model.CONTRACT_OPERATION)
+	txTemp.Security().Roles().Configure("MANAGER").
+		EnableLedgerPermission(ledger_model.REGISTER_USER).
+		EnableTransactionPermission(ledger_model.CONTRACT_OPERATION).
+		DisableLedgerPermission(ledger_model.WRITE_DATA_ACCOUNT).
+		DisableTransactionPermission(ledger_model.DIRECT_OPERATION)
 	txTemp.Security().Authorziations().ForUser([][]byte{user1.GetAddress(), user2.GetAddress()}).Authorize("MANAGER")
 
 	// TX 准备就绪；

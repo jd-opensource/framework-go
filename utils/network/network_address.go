@@ -33,3 +33,13 @@ func (a *Address) ToBytes() []byte {
 
 	return bf
 }
+
+func FromBytes(bs []byte) *Address {
+	address := &Address{
+		Secure: bytes.ToBoolean(bs[0]),
+		Port: bytes.ToInt32(bs[1:5]),
+		Host: bytes.ToString(bs[5:]),
+	}
+
+	return address
+}

@@ -4,6 +4,8 @@ import (
 	"framework-go/crypto"
 	"framework-go/ledger_model"
 	"framework-go/utils/base58"
+	"io/ioutil"
+	"os"
 )
 
 /*
@@ -16,7 +18,25 @@ var (
 	GATEWAY_PORT = 8081
 	SECURE       = false
 
-	NODE_PRIVITE_KEY = crypto.DecodePrivKey("177gk12oswoAho4tK9JXeG3u7hUMWCTBCdtyLKTgJYZF3xCUm7AcJaW7Uc11S3w68hVzecw", base58.MustDecode("8EjkXVSTxMFjCvNNsTo8RBMDEVQmk7gYkW4SCDuvdsBG"))
-	NODE_PUBLIC_KEY  = crypto.DecodePubKey("3snPdw7i7PjQyiXHaaeCwmksSka9DmSrLVJFTWfEqaQAYAA8iMpNDD")
+	NODE_PRIVITE_KEY = crypto.DecodePrivKey(string(MustLoadFile("nodes/peer0/config/keys/jd.priv")), base58.MustDecode(string(MustLoadFile("nodes/peer0/config/keys/jd.pwd"))))
+	NODE_PUBLIC_KEY  = crypto.DecodePubKey(string(MustLoadFile("nodes/peer0/config/keys/jd.pub")))
 	NODE_KEY         = ledger_model.NewBlockchainKeypair(NODE_PUBLIC_KEY, NODE_PRIVITE_KEY)
 )
+
+
+func MustLoadFile(fileName string) []byte {
+	file, _ := os.Open(fileName)
+	bytes, _ := ioutil.ReadAll(file)
+
+	return bytes
+}
+
+func LoadFile(fileName string) ([]byte, error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	bytes, err := ioutil.ReadAll(file)
+
+	return bytes, err
+}

@@ -39,6 +39,10 @@ const (
 	// 参与方共识交易
 	// 如果不具备此项权限，则无法作为共识节点接入并对交易进行共识
 	CONSENSUS_TX = LedgerPermission(0x0C)
+	// 注册事件账户
+	REGISTER_EVENT_ACCOUNT = LedgerPermission(0x0D)
+	// 发布事件
+	WRITE_EVENT_ACCOUNT = LedgerPermission(0x0E)
 )
 
 func init() {
@@ -107,6 +111,12 @@ func (l LedgerPermission) GetValue(CODE int32) binary_proto.EnumContract {
 	if CODE == int32(CONSENSUS_TX) {
 		return CONSENSUS_TX
 	}
+	if CODE == int32(REGISTER_EVENT_ACCOUNT) {
+		return REGISTER_EVENT_ACCOUNT
+	}
+	if CODE == int32(WRITE_EVENT_ACCOUNT) {
+		return WRITE_EVENT_ACCOUNT
+	}
 
 	panic("no enum value founded")
 }
@@ -150,6 +160,12 @@ func (l LedgerPermission) GetValueByName(name string) binary_proto.EnumContract 
 	}
 	if name == "CONSENSUS_TX" {
 		return CONSENSUS_TX
+	}
+	if name == "REGISTER_EVENT_ACCOUNT" {
+		return REGISTER_EVENT_ACCOUNT
+	}
+	if name == "WRITE_EVENT_ACCOUNT" {
+		return WRITE_EVENT_ACCOUNT
 	}
 
 	panic("no enum value founded")

@@ -90,6 +90,9 @@ const (
 	SECURITY_ROLE_INIT_SETTING = 0x421
 	SECURITY_USER_AUTH_INIT_SETTING = 0x422
 
+	// event types;
+	EVENT_MESSAGE = 0x501
+
 	// contract types of metadata;
 	METADATA    = 0x600
 	METADATA_V2 = 0x601
