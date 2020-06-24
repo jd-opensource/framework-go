@@ -287,8 +287,10 @@ func (r RestyQueryService) GetBlockByHash(ledgerHash, blockHash framework.HashDi
 		return info, err
 	}
 
-	block := wrp.(map[string]interface{})
+	return parseBlock(ledgerHash, wrp.(map[string]interface{}))
+}
 
+func parseBlock(ledgerHash framework.HashDigest, block map[string]interface{}) (info ledger_model.LedgerBlock, err error) {
 	var PreviousHash []byte
 	if PreviousHashI, ok := block["previousHash"]; ok {
 		PreviousHash = base58.MustDecode(PreviousHashI.(map[string]interface{})["value"].(string))
@@ -1141,4 +1143,130 @@ func (r RestyQueryService) GetLatestUserEvent(ledgerHash framework.HashDigest, a
 	}
 
 	return parseEvent(wrp.(map[string]interface{})), nil
+}
+
+func (r RestyQueryService) GetLatestBlock(ledgerHash framework.HashDigest) (info ledger_model.LedgerBlock, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/latest", ledgerHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return parseBlock(ledgerHash, wrp.(map[string]interface{}))
+}
+
+func (r RestyQueryService) GetAdditionalTransactionCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/height/%d/txs/additional-count", ledgerHash.ToBase58(), blockHeight))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalTransactionCountByHash(ledgerHash, blockHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/hash/%s/txs/additional-count", ledgerHash.ToBase58(), blockHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalTransactionCount(ledgerHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/txs/additional-count", ledgerHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalDataAccountCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/height/%d/accounts/additional-count", ledgerHash.ToBase58(), blockHeight))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalDataAccountCountByHash(ledgerHash, blockHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/hash/%s/accounts/additional-count", ledgerHash.ToBase58(), blockHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalDataAccountCount(ledgerHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/accounts/additional-count", ledgerHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalUserCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/height/%d/users/additional-count", ledgerHash.ToBase58(), blockHeight))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalUserCountByHash(ledgerHash, blockHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/hash/%d/users/additional-count", ledgerHash.ToBase58(), blockHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalUserCount(ledgerHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/users/additional-coun", ledgerHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalContractCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/height/%d/contracts/additional-count", ledgerHash.ToBase58(), blockHeight))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalContractCountByHash(blockHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/blocks/hash/%d/contracts/additional-count", blockHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetAdditionalContractCount(ledgerHash framework.HashDigest) (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/%s/contracts/additional-count", ledgerHash.ToBase58()))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetLedgersCount() (info int64, err error) {
+	wrp, err := r.query(fmt.Sprintf("ledgers/count"))
+	if err != nil {
+		return info, err
+	}
+
+	return int64(wrp.(float64)), nil
 }

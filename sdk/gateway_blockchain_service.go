@@ -220,3 +220,59 @@ func (b *GatewayBlockchainService) GetLatestSystemEvent(ledgerHash framework.Has
 func (b *GatewayBlockchainService) GetLatestUserEvent(ledgerHash framework.HashDigest, address string, eventName string) (ledger_model.Event, error) {
 	return b.QueryService.GetLatestUserEvent(ledgerHash, address, eventName)
 }
+
+func (b *GatewayBlockchainService) GetLatestBlock(ledgerHash framework.HashDigest) (ledger_model.LedgerBlock, error) {
+	return b.QueryService.GetLatestBlock(ledgerHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalTransactionCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error) {
+	return b.QueryService.GetAdditionalTransactionCountByHeight(ledgerHash, blockHeight)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalTransactionCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalTransactionCountByHash(ledgerHash, blockHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalTransactionCount(ledgerHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalTransactionCount(ledgerHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalDataAccountCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error) {
+	return b.QueryService.GetAdditionalDataAccountCountByHeight(ledgerHash, blockHeight)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalDataAccountCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalDataAccountCountByHash(ledgerHash, blockHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalDataAccountCount(ledgerHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalDataAccountCount(ledgerHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalUserCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error) {
+	return b.QueryService.GetAdditionalUserCountByHeight(ledgerHash, blockHeight)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalUserCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalUserCountByHash(ledgerHash, blockHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalUserCount(ledgerHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalUserCount(ledgerHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalContractCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error) {
+	return b.QueryService.GetAdditionalContractCountByHeight(ledgerHash, blockHeight)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalContractCountByHash(blockHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalContractCountByHash(blockHash)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalContractCount(ledgerHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalContractCount(ledgerHash)
+}
+
+func (b *GatewayBlockchainService) GetLedgersCount() (int64, error) {
+	return b.QueryService.GetLedgersCount()
+}

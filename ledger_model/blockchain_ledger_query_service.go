@@ -276,4 +276,141 @@ type BlockChainLedgerQueryService interface {
 	 * @return
 	 */
 	GetLatestUserEvent(ledgerHash framework.HashDigest, address string, eventName string) (Event, error)
+
+	/**
+	 * 获取最新区块
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @return
+	 */
+	GetLatestBlock(ledgerHash framework.HashDigest) (LedgerBlock, error)
+
+	/**
+	 * 获取指定区块高度中新增的交易总数（即该区块中交易集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHeight
+	 *         区块高度
+	 * @return
+	 */
+	GetAdditionalTransactionCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error)
+
+	/**
+	 * 获取指定区块Hash中新增的交易总数（即该区块中交易集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHash
+	 *         区块Hash
+	 * @return
+	 */
+	GetAdditionalTransactionCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error)
+
+	/**
+	 * 获取指定账本最新区块附加的交易数量
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @return
+	 */
+	GetAdditionalTransactionCount(ledgerHash framework.HashDigest) (int64, error)
+
+	/**
+	 * 获取指定区块高度中新增的数据账户总数（即该区块中数据账户集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHeight
+	 *         区块高度
+	 * @return
+	 */
+	GetAdditionalDataAccountCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error)
+
+	/**
+	 * 获取指定区块Hash中新增的数据账户总数（即该区块中数据账户集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHash
+	 *         区块Hash
+	 * @return
+	 */
+	GetAdditionalDataAccountCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error)
+
+	/**
+	 * 获取指定账本中附加的数据账户数量
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @return
+	 */
+	GetAdditionalDataAccountCount(ledgerHash framework.HashDigest) (int64, error)
+	/**
+	 * 获取指定区块高度中新增的用户总数（即该区块中用户集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHeight
+	 *         区块高度
+	 * @return
+	 */
+	GetAdditionalUserCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error)
+
+	/**
+	 * 获取指定区块Hash中新增的用户总数（即该区块中用户集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHash
+	 *         区块Hash
+	 * @return
+	 */
+	GetAdditionalUserCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error)
+
+	/**
+	 * 获取指定账本中新增的用户数量
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @return
+	 */
+	GetAdditionalUserCount(ledgerHash framework.HashDigest) (int64, error)
+
+	/**
+	 * 获取指定区块高度中新增的合约总数（即该区块中合约集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHeight
+	 *         区块高度
+	 * @return
+	 */
+	GetAdditionalContractCountByHeight(ledgerHash framework.HashDigest, blockHeight int64) (int64, error)
+
+	/**
+	 * 获取指定区块Hash中新增的合约总数（即该区块中合约集合的数量）
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHash
+	 *         区块Hash
+	 * @return
+	 */
+	GetAdditionalContractCountByHash(blockHash framework.HashDigest) (int64, error)
+
+	/**
+	 * 获取指定账本中新增的合约数量
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @return
+	 */
+	GetAdditionalContractCount(ledgerHash framework.HashDigest) (int64, error)
+
+	/**
+	 *  get all ledgers count;
+	 */
+	GetLedgersCount() (int64, error)
 }
