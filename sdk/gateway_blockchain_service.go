@@ -109,11 +109,11 @@ func (b *GatewayBlockchainService) GetContractTotalCount(ledgerHash framework.Ha
 	return b.QueryService.GetContractTotalCount(ledgerHash)
 }
 
-func (b *GatewayBlockchainService) GetTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int32) ([]ledger_model.LedgerTransaction, error) {
+func (b *GatewayBlockchainService) GetTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int64) ([]ledger_model.LedgerTransaction, error) {
 	return b.QueryService.GetTransactionsByHeight(ledgerHash, height, fromIndex, count)
 }
 
-func (b *GatewayBlockchainService) GetTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int32) ([]ledger_model.LedgerTransaction, error) {
+func (b *GatewayBlockchainService) GetTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int64) ([]ledger_model.LedgerTransaction, error) {
 	return b.QueryService.GetTransactionsByHash(ledgerHash, blockHash, fromIndex, count)
 }
 
@@ -145,7 +145,7 @@ func (b *GatewayBlockchainService) GetDataEntriesTotalCount(ledgerHash framework
 	return b.QueryService.GetDataEntriesTotalCount(ledgerHash, address)
 }
 
-func (b *GatewayBlockchainService) GetLatestDataEntriesByRange(ledgerHash framework.HashDigest, address string, fromIndex, count int32) ([]ledger_model.TypedKVEntry, error) {
+func (b *GatewayBlockchainService) GetLatestDataEntriesByRange(ledgerHash framework.HashDigest, address string, fromIndex, count int64) ([]ledger_model.TypedKVEntry, error) {
 	return b.QueryService.GetLatestDataEntriesByRange(ledgerHash, address, fromIndex, count)
 }
 
@@ -153,15 +153,15 @@ func (b *GatewayBlockchainService) GetContract(ledgerHash framework.HashDigest, 
 	return b.QueryService.GetContract(ledgerHash, address)
 }
 
-func (b *GatewayBlockchainService) GetUsers(ledgerHash framework.HashDigest, fromIndex, count int32) ([]ledger_model.BlockchainIdentity, error) {
+func (b *GatewayBlockchainService) GetUsers(ledgerHash framework.HashDigest, fromIndex, count int64) ([]ledger_model.BlockchainIdentity, error) {
 	return b.QueryService.GetUsers(ledgerHash, fromIndex, count)
 }
 
-func (b *GatewayBlockchainService) GetDataAccounts(ledgerHash framework.HashDigest, fromIndex, count int) ([]ledger_model.BlockchainIdentity, error) {
+func (b *GatewayBlockchainService) GetDataAccounts(ledgerHash framework.HashDigest, fromIndex, count int64) ([]ledger_model.BlockchainIdentity, error) {
 	return b.QueryService.GetDataAccounts(ledgerHash, fromIndex, count)
 }
 
-func (b *GatewayBlockchainService) GetContractAccounts(ledgerHash framework.HashDigest, fromIndex, count int) ([]ledger_model.BlockchainIdentity, error) {
+func (b *GatewayBlockchainService) GetContractAccounts(ledgerHash framework.HashDigest, fromIndex, count int64) ([]ledger_model.BlockchainIdentity, error) {
 	return b.QueryService.GetContractAccounts(ledgerHash, fromIndex, count)
 }
 
@@ -169,15 +169,15 @@ func (b *GatewayBlockchainService) GetUserRoles(ledgerHash framework.HashDigest,
 	return b.QueryService.GetUserRoles(ledgerHash, userAddress)
 }
 
-func (b *GatewayBlockchainService) GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int32) ([]ledger_model.Event, error) {
+func (b *GatewayBlockchainService) GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int64) ([]ledger_model.Event, error) {
 	return b.QueryService.GetSystemEvents(ledgerHash, eventName, fromSequence, maxCount)
 }
 
-func (b *GatewayBlockchainService) GetUserEventAccounts(ledgerHash framework.HashDigest, fromIndex int64, maxCount int32) ([]ledger_model.BlockchainIdentity, error) {
+func (b *GatewayBlockchainService) GetUserEventAccounts(ledgerHash framework.HashDigest, fromIndex int64, maxCount int64) ([]ledger_model.BlockchainIdentity, error) {
 	return b.QueryService.GetUserEventAccounts(ledgerHash, fromIndex, maxCount)
 }
 
-func (b *GatewayBlockchainService) GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int32) ([]ledger_model.Event, error) {
+func (b *GatewayBlockchainService) GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int64) ([]ledger_model.Event, error) {
 	return b.QueryService.GetUserEvents(ledgerHash, address, eventName, fromSequence, maxCount)
 }
 
@@ -185,7 +185,7 @@ func (b *GatewayBlockchainService) GetSystemEventNameTotalCount(digest framework
 	return b.QueryService.GetSystemEventNameTotalCount(digest)
 }
 
-func (b *GatewayBlockchainService) GetSystemEventNames(digest framework.HashDigest, fromIndex, count int) ([]string, error) {
+func (b *GatewayBlockchainService) GetSystemEventNames(digest framework.HashDigest, fromIndex, count int64) ([]string, error) {
 	return b.QueryService.GetSystemEventNames(digest, fromIndex, count)
 }
 
@@ -201,7 +201,7 @@ func (b *GatewayBlockchainService) GetUserEventAccountTotalCount(digest framewor
 	return b.QueryService.GetUserEventAccountTotalCount(digest)
 }
 
-func (b *GatewayBlockchainService) GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int) ([]string, error) {
+func (b *GatewayBlockchainService) GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int64) ([]string, error) {
 	return b.QueryService.GetUserEventNames(ledgerHash, address, fromIndex, count)
 }
 
@@ -265,8 +265,8 @@ func (b *GatewayBlockchainService) GetAdditionalContractCountByHeight(ledgerHash
 	return b.QueryService.GetAdditionalContractCountByHeight(ledgerHash, blockHeight)
 }
 
-func (b *GatewayBlockchainService) GetAdditionalContractCountByHash(blockHash framework.HashDigest) (int64, error) {
-	return b.QueryService.GetAdditionalContractCountByHash(blockHash)
+func (b *GatewayBlockchainService) GetAdditionalContractCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error) {
+	return b.QueryService.GetAdditionalContractCountByHash(ledgerHash, blockHash)
 }
 
 func (b *GatewayBlockchainService) GetAdditionalContractCount(ledgerHash framework.HashDigest) (int64, error) {

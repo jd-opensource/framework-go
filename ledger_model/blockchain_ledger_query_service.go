@@ -76,7 +76,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param fromIndex  开始的记录数；
 	 * @param count      本次返回的记录数；
 	 */
-	GetTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int32) ([]LedgerTransaction, error)
+	GetTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int64) ([]LedgerTransaction, error)
 
 	/**
 	 * 分页返回指定账本序号的区块中的交易列表；
@@ -87,7 +87,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param count      本次返回的记录数；
 	 * @return
 	 */
-	GetTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int32) ([]LedgerTransaction, error)
+	GetTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int64) ([]LedgerTransaction, error)
 
 	/**
 	 * 根据交易内容的哈希获取对应的交易记录；
@@ -137,19 +137,19 @@ type BlockChainLedgerQueryService interface {
 	 * @param count      本次返回的记录数；
 	 *                   如果参数值为 -1，则返回全部的记录；
 	 */
-	GetLatestDataEntriesByRange(ledgerHash framework.HashDigest, address string, fromIndex, count int32) ([]TypedKVEntry, error)
+	GetLatestDataEntriesByRange(ledgerHash framework.HashDigest, address string, fromIndex, count int64) ([]TypedKVEntry, error)
 
 	// 返回合约账户信息
 	GetContract(ledgerHash framework.HashDigest, address string) (ContractInfo, error)
 
 	// get users by ledgerHash and its range
-	GetUsers(ledgerHash framework.HashDigest, fromIndex, count int32) ([]BlockchainIdentity, error)
+	GetUsers(ledgerHash framework.HashDigest, fromIndex, count int64) ([]BlockchainIdentity, error)
 
 	// get data accounts by ledgerHash and its range
-	GetDataAccounts(ledgerHash framework.HashDigest, fromIndex, count int) ([]BlockchainIdentity, error)
+	GetDataAccounts(ledgerHash framework.HashDigest, fromIndex, count int64) ([]BlockchainIdentity, error)
 
 	// get contract accounts by ledgerHash and its range
-	GetContractAccounts(ledgerHash framework.HashDigest, fromIndex, count int) ([]BlockchainIdentity, error)
+	GetContractAccounts(ledgerHash framework.HashDigest, fromIndex, count int64) ([]BlockchainIdentity, error)
 
 	// return user's roles
 	GetUserRoles(ledgerHash framework.HashDigest, userAddress string) (RoleSet, error)
@@ -163,7 +163,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param maxCount     最大数量；
 	 * @return
 	 */
-	GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int32) ([]Event, error)
+	GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int64) ([]Event, error)
 
 	/**
 	 * 返回自定义事件账户；
@@ -172,7 +172,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param count
 	 * @return
 	 */
-	GetUserEventAccounts(ledgerHash framework.HashDigest, fromSequence int64, maxCount int32) ([]BlockchainIdentity, error)
+	GetUserEventAccounts(ledgerHash framework.HashDigest, fromSequence int64, maxCount int64) ([]BlockchainIdentity, error)
 
 	/**
 	 * 返回自定义事件；
@@ -184,7 +184,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param maxCount     最大数量；
 	 * @return
 	 */
-	GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int32) ([]Event, error)
+	GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int64) ([]Event, error)
 
 	/**
 	 * 返回系统事件名称总数； <br>
@@ -202,7 +202,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param count
 	 * @return
 	 */
-	GetSystemEventNames(digest framework.HashDigest, fromIndex, count int) ([]string, error)
+	GetSystemEventNames(digest framework.HashDigest, fromIndex, count int64) ([]string, error)
 
 	/**
 	 * 返回指定系统事件名称下事件总数； <br>
@@ -237,7 +237,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param address
 	 * @return
 	 */
-	GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int) ([]string, error)
+	GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int64) ([]string, error)
 
 	/**
 	 * 返回指定事件账户事件名称总数； <br>
@@ -398,7 +398,7 @@ type BlockChainLedgerQueryService interface {
 	 *         区块Hash
 	 * @return
 	 */
-	GetAdditionalContractCountByHash(blockHash framework.HashDigest) (int64, error)
+	GetAdditionalContractCountByHash(ledgerHash, blockHash framework.HashDigest) (int64, error)
 
 	/**
 	 * 获取指定账本中新增的合约数量
