@@ -413,4 +413,20 @@ type BlockChainLedgerQueryService interface {
 	 *  get all ledgers count;
 	 */
 	GetLedgersCount() (int64, error)
+
+	/**
+	 * return role's privileges;
+	 * @param ledgerHash
+	 * @param roleName
+	 * @return
+	 */
+	GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (PrivilegeSetVO, error)
+
+	/**
+	 * 返回user's priveleges;
+	 *
+	 * @param userAddress
+	 * @return
+	 */
+	GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (UserPrivilege, error)
 }

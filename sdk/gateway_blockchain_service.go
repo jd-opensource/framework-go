@@ -276,3 +276,11 @@ func (b *GatewayBlockchainService) GetAdditionalContractCount(ledgerHash framewo
 func (b *GatewayBlockchainService) GetLedgersCount() (int64, error) {
 	return b.QueryService.GetLedgersCount()
 }
+
+func (b *GatewayBlockchainService) GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (ledger_model.PrivilegeSetVO, error) {
+	return b.QueryService.GetRolePrivileges(ledgerHash, roleName)
+}
+
+func (b *GatewayBlockchainService) GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (ledger_model.UserPrivilege, error) {
+	return b.QueryService.GetUserPrivileges(ledgerHash, userAddress)
+}

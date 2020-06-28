@@ -596,11 +596,15 @@ func (r RestyQueryService) GetContractAccounts(ledgerHash framework.HashDigest, 
 }
 
 func (r RestyQueryService) GetUserRoles(ledgerHash framework.HashDigest, userAddress string) (info ledger_model.RoleSet, err error) {
-	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/userrole/%s", ledgerHash.ToBase58(), userAddress))
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/user-role/%s", ledgerHash.ToBase58(), userAddress))
 	if err != nil {
 		return info, err
 	}
-	roleSet := wrp.(map[string]interface{})
+
+	return parseRoleSet(wrp.(map[string]interface{}))
+}
+
+func parseRoleSet(roleSet map[string]interface{}) (info ledger_model.RoleSet, err error) {
 	rolesArray := roleSet["roleSet"].([]interface{})
 	roles := make([]string, len(rolesArray))
 	for i, role := range rolesArray {
@@ -617,7 +621,7 @@ func (r RestyQueryService) GetUserRoles(ledgerHash framework.HashDigest, userAdd
 func (r RestyQueryService) GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int64) (info []ledger_model.Event, err error) {
 	params := map[string]string{
 		"fromSequence": string(fromSequence),
-		"maxCount":     string(maxCount),
+		"count":        string(maxCount),
 	}
 	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/system/%s", ledgerHash.ToBase58(), eventName), params)
 	if err != nil {
@@ -661,7 +665,7 @@ func (r RestyQueryService) GetUserEventAccounts(ledgerHash framework.HashDigest,
 func (r RestyQueryService) GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int64) (info []ledger_model.Event, err error) {
 	params := map[string]string{
 		"fromSequence": string(fromSequence),
-		"maxCount":     string(maxCount),
+		"count":        string(maxCount),
 	}
 	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names/%s", ledgerHash.ToBase58(), address, eventName), params)
 	if err != nil {
@@ -1269,4 +1273,80 @@ func (r RestyQueryService) GetLedgersCount() (info int64, err error) {
 	}
 
 	return int64(wrp.(float64)), nil
+}
+
+func (r RestyQueryService) GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (info ledger_model.PrivilegeSetVO, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/role-privilege/%s", ledgerHash.ToBase58(), roleName))
+	if err != nil {
+		return info, err
+	}
+
+	return parsePrivilegeSet(wrp.(map[string]interface{}))
+}
+
+func parsePrivilegeSet(rolePrivileges map[string]interface{}) (info ledger_model.PrivilegeSetVO, err error) {
+	info = ledger_model.PrivilegeSetVO{
+		RoleName: rolePrivileges["roleName"].(string),
+	}
+
+	transactionPrivilegeMap, ok := rolePrivileges["transactionPrivilege"].(map[string]interface{})
+	if ok {
+		transactionPrivilege := ledger_model.TransactionPrivilegeVO{
+			PermissionCount: int32(transactionPrivilegeMap["permissionCount"].(float64)),
+		}
+		transactionPermissions := make([]ledger_model.TransactionPermission, transactionPrivilege.PermissionCount)
+		permissions := transactionPrivilegeMap["privilege"].([]interface{})
+		for i := int32(0); i < transactionPrivilege.PermissionCount; i++ {
+			transactionPermissions[i] = ledger_model.DIRECT_OPERATION.GetValueByName(permissions[i].(string)).(ledger_model.TransactionPermission)
+		}
+		transactionPrivilege.Privilege = transactionPermissions
+
+		info.TransactionPrivilege = transactionPrivilege
+	}
+	ledgerPrivilegeMap, ok := rolePrivileges["ledgerPrivilege"].(map[string]interface{})
+	if ok {
+		ledgerPrivilege := ledger_model.LedgerPrivilegeVO{
+			PermissionCount: int32(ledgerPrivilegeMap["permissionCount"].(float64)),
+		}
+		ledgerPermissions := make([]ledger_model.LedgerPermission, ledgerPrivilege.PermissionCount)
+		permissions := ledgerPrivilegeMap["privilege"].([]interface{})
+		for i := int32(0); i < ledgerPrivilege.PermissionCount; i++ {
+			ledgerPermissions[i] = ledger_model.CONFIGURE_ROLES.GetValueByName(permissions[i].(string)).(ledger_model.LedgerPermission)
+		}
+		ledgerPrivilege.Privilege = ledgerPermissions
+
+		info.LedgerPrivilege = ledgerPrivilege
+	}
+
+	return
+}
+
+func (r RestyQueryService) GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (info ledger_model.UserPrivilege, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/user-privilege/%s", ledgerHash.ToBase58(), userAddress))
+	if err != nil {
+		return info, err
+	}
+
+	userPrivilegeMap := wrp.(map[string]interface{})
+	rolePrivilegeArray := userPrivilegeMap["rolePrivilege"].([]interface{})
+	rolePrivilege := make([]ledger_model.PrivilegeSetVO, len(rolePrivilegeArray))
+	for i := 0; i < len(rolePrivilegeArray); i++ {
+		rp, err := parsePrivilegeSet(rolePrivilegeArray[i].(map[string]interface{}))
+		if err != nil {
+			return info, err
+		}
+		rolePrivilege[i] = rp
+	}
+
+	roleSet, err := parseRoleSet(userPrivilegeMap["roleSet"].(map[string]interface{}))
+	if err != nil {
+		return
+	}
+
+	info = ledger_model.UserPrivilege{
+		RoleSet:       roleSet,
+		RolePrivilege: rolePrivilege,
+	}
+
+	return
 }

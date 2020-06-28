@@ -5,7 +5,6 @@ import (
 	"framework-go/crypto/classic"
 	"framework-go/ledger_model"
 	"framework-go/sdk"
-	"framework-go/utils/network"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -148,42 +147,42 @@ func TestContract(t *testing.T) {
 
 }
 
-func TestParticipant(t *testing.T) {
-	// 生成公私钥对
-	participant := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
-
-	// 连接网关，获取节点服务
-	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
-	service := serviceFactory.GetBlockchainService()
-
-	// 获取账本信息
-	ledgerHashs, err := service.GetLedgerHashs()
-	require.Nil(t, err)
-
-	// 创建交易
-	txTemp := service.NewTransaction(ledgerHashs[0])
-
-	name := "PARTICIPANT"
-	identity := participant.GetIdentity()
-	networkAddress := network.NewAddress("127.0.0.1", 20000, false).ToBytes()
-
-	// 注册
-	txTemp.Participants().Register(name, identity, networkAddress)
-	// 激活
-	txTemp.States().Update(identity, networkAddress, ledger_model.ACTIVED)
-
-	// TX 准备就绪；
-	prepTx := txTemp.Prepare()
-
-	// 使用网络中已存在用户私钥进行签名；
-	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
-
-	// 提交交易；
-	resp, err := prepTx.Commit()
-	require.Nil(t, err)
-	require.True(t, resp.Success)
-
-}
+//func TestParticipant(t *testing.T) {
+//	// 生成公私钥对
+//	participant := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+//
+//	// 连接网关，获取节点服务
+//	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+//	service := serviceFactory.GetBlockchainService()
+//
+//	// 获取账本信息
+//	ledgerHashs, err := service.GetLedgerHashs()
+//	require.Nil(t, err)
+//
+//	// 创建交易
+//	txTemp := service.NewTransaction(ledgerHashs[0])
+//
+//	name := "PARTICIPANT"
+//	identity := participant.GetIdentity()
+//	networkAddress := network.NewAddress("127.0.0.1", 20000, false).ToBytes()
+//
+//	// 注册
+//	txTemp.Participants().Register(name, identity, networkAddress)
+//	// 激活
+//	txTemp.States().Update(identity, networkAddress, ledger_model.ACTIVED)
+//
+//	// TX 准备就绪；
+//	prepTx := txTemp.Prepare()
+//
+//	// 使用网络中已存在用户私钥进行签名；
+//	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+//
+//	// 提交交易；
+//	resp, err := prepTx.Commit()
+//	require.Nil(t, err)
+//	require.True(t, resp.Success)
+//
+//}
 
 func TestUserEvent(t *testing.T) {
 
