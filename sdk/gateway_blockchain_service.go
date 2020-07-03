@@ -17,6 +17,18 @@ type GatewayBlockchainService struct {
 	TxService    ledger_model.TransactionService
 }
 
+func (b *GatewayBlockchainService) MonitorSystemEvent(ledgerHash framework.HashDigest, eventPoint SystemEventPoint, listener SystemEventListener) SystemEventListenerHandle {
+	return NewSystemEventListenerHandle(b.QueryService, ledgerHash, eventPoint, listener)
+}
+
+func (b *GatewayBlockchainService) MonitorUserEvent(ledgerHash framework.HashDigest, eventAccount, eventName string, startSequence int64, listener UserEventListener) UserEventListenerHandle {
+	return NewUserEventListenerHandle(b.QueryService, ledgerHash, []UserEventPoint{NewUserEventPoint(eventAccount, eventName, startSequence)}, listener)
+}
+
+func (b *GatewayBlockchainService) MonitorUserEvents(ledgerHash framework.HashDigest, startingEventPoints []UserEventPoint, listener UserEventListener) UserEventListenerHandle {
+	return NewUserEventListenerHandle(b.QueryService, ledgerHash, startingEventPoints, listener)
+}
+
 func (b *GatewayBlockchainService) NewTransaction(ledgerHash framework.HashDigest) ledger_model.TransactionTemplate {
 	return ledger_model.NewTxTemplate(ledgerHash, b.TxService)
 }

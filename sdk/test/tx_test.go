@@ -5,6 +5,7 @@ import (
 	"framework-go/crypto/classic"
 	"framework-go/ledger_model"
 	"framework-go/sdk"
+	"framework-go/utils/base58"
 	"framework-go/utils/network"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -41,7 +42,7 @@ func TestRegisterUser(t *testing.T) {
 		EnableTransactionPermission(ledger_model.CONTRACT_OPERATION).
 		DisableLedgerPermission(ledger_model.WRITE_DATA_ACCOUNT).
 		DisableTransactionPermission(ledger_model.DIRECT_OPERATION)
-	txTemp.Security().Authorziations().ForUser([][]byte{user.GetAddress()}).Authorize("MANAGER")
+	txTemp.Security().Authorziations().ForUser([][]byte{user.GetAddress()}).Authorize("MANAGER").Authorize("IMUGE")
 
 	// 注册更多用户
 	for i := 0; i < 20; i++ {
@@ -148,7 +149,7 @@ func TestContract(t *testing.T) {
 
 }
 
-func TestRequestParticipant(t *testing.T) {
+func TestRegisterParticipant(t *testing.T) {
 	// 生成公私钥对
 	participant := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 
@@ -249,4 +250,94 @@ func TestUserEvent(t *testing.T) {
 	require.Nil(t, err)
 	require.True(t, resp.Success)
 
+}
+
+func TestUserEventListener(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	handler := service.MonitorUserEvent(ledgerHashs[0], base58.Encode(user.GetAddress()), "e", 0, EUserEventListener{})
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	txTemp.EventAccounts().Register(user.GetIdentity())
+	e := "e"
+	for j := 0; j < 20; j++ {
+		c := fmt.Sprintf("c%d", j)
+		txTemp.EventAccount(user.GetAddress()).PublishString(e, c, int64(j-1))
+	}
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+	time.Sleep(time.Minute)
+
+	handler.Cancel()
+
+}
+
+var _ sdk.UserEventListener = (*EUserEventListener)(nil)
+
+type EUserEventListener struct {
+}
+
+func (E EUserEventListener) OnEvent(event ledger_model.Event, context sdk.UserEventContext) {
+	fmt.Print(event.Name + " ")
+	fmt.Println(event.Sequence)
+}
+
+func TestSystemEventListener(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	handler := service.MonitorSystemEvent(ledgerHashs[0], sdk.NewSystemEventPoint("new_block", 0), ESystemEventListener{})
+
+	// 提交交易
+	for i := 0; i < 20; i++ {
+		txTemp := service.NewTransaction(ledgerHashs[0])
+		user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+		txTemp.EventAccounts().Register(user.GetIdentity())
+		prepTx := txTemp.Prepare()
+		prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+		resp, err := prepTx.Commit()
+		require.Nil(t, err)
+		require.True(t, resp.Success)
+	}
+
+	time.Sleep(time.Minute)
+
+	handler.Cancel()
+
+}
+
+var _ sdk.SystemEventListener = (*ESystemEventListener)(nil)
+
+type ESystemEventListener struct {
+}
+
+func (E ESystemEventListener) OnEvents(events []ledger_model.Event, context sdk.SystemEventContext) {
+	for _, event := range events {
+		fmt.Print(event.Name + " ")
+		fmt.Println(event.Sequence)
+	}
 }

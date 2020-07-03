@@ -624,7 +624,7 @@ func (r RestyQueryService) GetSystemEvents(ledgerHash framework.HashDigest, even
 		"fromSequence": strconv.FormatInt(fromSequence, 10),
 		"count":        strconv.FormatInt(maxCount, 10),
 	}
-	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/events/system/%s", ledgerHash.ToBase58(), eventName), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/events/system/names/%s", ledgerHash.ToBase58(), eventName), params)
 	if err != nil {
 		return info, err
 	}
