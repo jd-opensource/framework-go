@@ -11,6 +11,7 @@ import (
 	"framework-go/utils/network"
 	"github.com/go-resty/resty/v2"
 	"net/url"
+	"strconv"
 )
 
 /*
@@ -63,8 +64,8 @@ func (r RestyQueryService) query(url string) (interface{}, error) {
 	return wrp.Data, nil
 }
 
-func (r RestyQueryService) queryWithFormData(url string, params map[string]string) (interface{}, error) {
-	resp, err := r.client.R().SetFormData(params).SetResult(WebResponse{}).Get(r.baseUrl + url)
+func (r RestyQueryService) queryWithParams(url string, params map[string]string) (interface{}, error) {
+	resp, err := r.client.R().SetQueryParams(params).SetResult(WebResponse{}).Get(r.baseUrl + url)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +83,7 @@ func (r RestyQueryService) queryWithFormData(url string, params map[string]strin
 	return wrp.Data, nil
 }
 
-func (r RestyQueryService) queryWithFormDataFromValues(url string, params url.Values) (interface{}, error) {
+func (r RestyQueryService) queryWithParamsFromValues(url string, params url.Values) (interface{}, error) {
 	resp, err := r.client.R().SetQueryParamsFromValues(params).SetResult(WebResponse{}).Get(r.baseUrl + url)
 	if err != nil {
 		return nil, err
@@ -447,7 +448,7 @@ func (r RestyQueryService) GetLatestDataEntries(ledgerHash framework.HashDigest,
 	params := url.Values{
 		"keys": keys,
 	}
-	wrp, err := r.queryWithFormDataFromValues(fmt.Sprintf("/ledgers/%s/accounts/%s/entries", ledgerHash.ToBase58(), address), params)
+	wrp, err := r.queryWithParamsFromValues(fmt.Sprintf("/ledgers/%s/accounts/%s/entries", ledgerHash.ToBase58(), address), params)
 	if err != nil {
 		return info, err
 	}
@@ -496,10 +497,10 @@ func (r RestyQueryService) GetDataEntriesTotalCount(ledgerHash framework.HashDig
 
 func (r RestyQueryService) GetLatestDataEntriesByRange(ledgerHash framework.HashDigest, address string, fromIndex, count int64) (info []ledger_model.TypedKVEntry, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/accounts/address/%s/entries", ledgerHash.ToBase58(), address), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/accounts/address/%s/entries", ledgerHash.ToBase58(), address), params)
 	if err != nil {
 		return info, err
 	}
@@ -540,10 +541,10 @@ func (r RestyQueryService) GetContract(ledgerHash framework.HashDigest, address 
 
 func (r RestyQueryService) GetUsers(ledgerHash framework.HashDigest, fromIndex, count int64) (info []ledger_model.BlockchainIdentity, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/users", ledgerHash.ToBase58()), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/users", ledgerHash.ToBase58()), params)
 	if err != nil {
 		return info, err
 	}
@@ -559,10 +560,10 @@ func (r RestyQueryService) GetUsers(ledgerHash framework.HashDigest, fromIndex, 
 
 func (r RestyQueryService) GetDataAccounts(ledgerHash framework.HashDigest, fromIndex, count int64) (info []ledger_model.BlockchainIdentity, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/accounts", ledgerHash.ToBase58()), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/accounts", ledgerHash.ToBase58()), params)
 	if err != nil {
 		return info, err
 	}
@@ -578,10 +579,10 @@ func (r RestyQueryService) GetDataAccounts(ledgerHash framework.HashDigest, from
 
 func (r RestyQueryService) GetContractAccounts(ledgerHash framework.HashDigest, fromIndex, count int64) (info []ledger_model.BlockchainIdentity, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/contracts", ledgerHash.ToBase58()), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/contracts", ledgerHash.ToBase58()), params)
 	if err != nil {
 		return info, err
 	}
@@ -620,10 +621,10 @@ func parseRoleSet(roleSet map[string]interface{}) (info ledger_model.RoleSet, er
 
 func (r RestyQueryService) GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int64) (info []ledger_model.Event, err error) {
 	params := map[string]string{
-		"fromSequence": string(fromSequence),
-		"count":        string(maxCount),
+		"fromSequence": strconv.FormatInt(fromSequence, 10),
+		"count":        strconv.FormatInt(maxCount, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/system/%s", ledgerHash.ToBase58(), eventName), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/events/system/%s", ledgerHash.ToBase58(), eventName), params)
 	if err != nil {
 		return info, err
 	}
@@ -645,10 +646,10 @@ func parseBytesValue(info map[string]interface{}) ledger_model.BytesValue {
 
 func (r RestyQueryService) GetUserEventAccounts(ledgerHash framework.HashDigest, fromIndex int64, maxCount int64) (info []ledger_model.BlockchainIdentity, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(maxCount),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(maxCount, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/user/accounts", ledgerHash.ToBase58()), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/events/user/accounts", ledgerHash.ToBase58()), params)
 	if err != nil {
 		return info, err
 	}
@@ -664,10 +665,10 @@ func (r RestyQueryService) GetUserEventAccounts(ledgerHash framework.HashDigest,
 
 func (r RestyQueryService) GetUserEvents(ledgerHash framework.HashDigest, address string, eventName string, fromSequence int64, maxCount int64) (info []ledger_model.Event, err error) {
 	params := map[string]string{
-		"fromSequence": string(fromSequence),
-		"count":        string(maxCount),
+		"fromSequence": strconv.FormatInt(fromSequence, 10),
+		"count":        strconv.FormatInt(maxCount, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names/%s", ledgerHash.ToBase58(), address, eventName), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names/%s", ledgerHash.ToBase58(), address, eventName), params)
 	if err != nil {
 		return info, err
 	}
@@ -708,10 +709,10 @@ func parseEvent(event map[string]interface{}) ledger_model.Event {
 
 func (r RestyQueryService) GetTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int64) (info []ledger_model.LedgerTransaction, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/blocks/height/%d/txs", ledgerHash.ToBase58(), height), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/blocks/height/%d/txs", ledgerHash.ToBase58(), height), params)
 	if err != nil {
 		return info, err
 	}
@@ -731,10 +732,10 @@ func (r RestyQueryService) GetTransactionsByHeight(ledgerHash framework.HashDige
 
 func (r RestyQueryService) GetTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int64) (info []ledger_model.LedgerTransaction, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/blocks/hash/%s/txs", ledgerHash.ToBase58(), blockHash.ToBase58()), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/blocks/hash/%s/txs", ledgerHash.ToBase58(), blockHash.ToBase58()), params)
 	if err != nil {
 		return info, err
 	}
@@ -1061,10 +1062,10 @@ func (r RestyQueryService) GetSystemEventNameTotalCount(ledgerHash framework.Has
 
 func (r RestyQueryService) GetSystemEventNames(ledgerHash framework.HashDigest, fromIndex, count int64) (info []string, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/system/names", ledgerHash.ToBase58()), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/events/system/names", ledgerHash.ToBase58()), params)
 	if err != nil {
 		return info, err
 	}
@@ -1101,10 +1102,10 @@ func (r RestyQueryService) GetUserEventAccountTotalCount(ledgerHash framework.Ha
 
 func (r RestyQueryService) GetUserEventNames(ledgerHash framework.HashDigest, address string, fromIndex, count int64) (info []string, err error) {
 	params := map[string]string{
-		"fromIndex": string(fromIndex),
-		"count":     string(count),
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
 	}
-	wrp, err := r.queryWithFormData(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names", ledgerHash.ToBase58(), address), params)
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s/names", ledgerHash.ToBase58(), address), params)
 	if err != nil {
 		return info, err
 	}
