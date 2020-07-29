@@ -6,6 +6,7 @@ import (
 	"framework-go/ledger_model"
 	"framework-go/utils/base58"
 	"github.com/go-resty/resty/v2"
+	"strconv"
 )
 
 /*
@@ -39,10 +40,12 @@ func NewRestyConsensusService(host string, port int, secure bool) *RestyConsensu
 	}
 }
 
-func (r RestyConsensusService) ActivateParticipant(ledgerHash string) (info ledger_model.TransactionResponse, err error) {
+func (r RestyConsensusService) ActivateParticipant(ledgerHash, host string, port int) (info ledger_model.TransactionResponse, err error) {
 	url := "/management/delegate/activeparticipant"
 	params := map[string]string{
 		"ledgerHash": ledgerHash,
+		"consensusHost": host,
+		"consensusPort": strconv.Itoa(port),
 	}
 	resp, err := r.client.R().SetFormData(params).SetResult(ActivateParticipantResponse{}).Post(r.baseUrl + url)
 	if err != nil {

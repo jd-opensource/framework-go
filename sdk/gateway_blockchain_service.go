@@ -177,10 +177,6 @@ func (b *GatewayBlockchainService) GetContractAccounts(ledgerHash framework.Hash
 	return b.QueryService.GetContractAccounts(ledgerHash, fromIndex, count)
 }
 
-func (b *GatewayBlockchainService) GetUserRoles(ledgerHash framework.HashDigest, userAddress string) (ledger_model.RoleSet, error) {
-	return b.QueryService.GetUserRoles(ledgerHash, userAddress)
-}
-
 func (b *GatewayBlockchainService) GetSystemEvents(ledgerHash framework.HashDigest, eventName string, fromSequence int64, maxCount int64) ([]ledger_model.Event, error) {
 	return b.QueryService.GetSystemEvents(ledgerHash, eventName, fromSequence, maxCount)
 }
@@ -289,10 +285,10 @@ func (b *GatewayBlockchainService) GetLedgersCount() (int64, error) {
 	return b.QueryService.GetLedgersCount()
 }
 
-func (b *GatewayBlockchainService) GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (ledger_model.PrivilegeSetVO, error) {
+func (b *GatewayBlockchainService) GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (ledger_model.RolePrivileges, error) {
 	return b.QueryService.GetRolePrivileges(ledgerHash, roleName)
 }
 
-func (b *GatewayBlockchainService) GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (ledger_model.UserPrivilege, error) {
+func (b *GatewayBlockchainService) GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (ledger_model.UserRolesPrivileges, error) {
 	return b.QueryService.GetUserPrivileges(ledgerHash, userAddress)
 }

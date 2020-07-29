@@ -13,11 +13,10 @@ func NewParticipantRegisterOperationBuilder(factory *BlockchainOperationFactory)
 	return &ParticipantRegisterOperationBuilder{factory: factory}
 }
 
-func (prob *ParticipantRegisterOperationBuilder) Register(participantName string, participantPubKey BlockchainIdentity, networkAddress []byte) ParticipantRegisterOperation {
+func (prob *ParticipantRegisterOperationBuilder) Register(participantName string, participantPubKey BlockchainIdentity) ParticipantRegisterOperation {
 	operation := ParticipantRegisterOperation{
 		ParticipantName:             participantName,
 		ParticipantRegisterIdentity: participantPubKey,
-		NetworkAddress:              networkAddress,
 	}
 	if prob.factory != nil {
 		prob.factory.addOperation(operation)

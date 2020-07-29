@@ -151,9 +151,6 @@ type BlockChainLedgerQueryService interface {
 	// get contract accounts by ledgerHash and its range
 	GetContractAccounts(ledgerHash framework.HashDigest, fromIndex, count int64) ([]BlockchainIdentity, error)
 
-	// return user's roles
-	GetUserRoles(ledgerHash framework.HashDigest, userAddress string) (RoleSet, error)
-
 	/**
 	 * 返回系统事件；
 	 *
@@ -420,7 +417,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param roleName
 	 * @return
 	 */
-	GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (PrivilegeSetVO, error)
+	GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (RolePrivileges, error)
 
 	/**
 	 * 返回user's priveleges;
@@ -428,5 +425,5 @@ type BlockChainLedgerQueryService interface {
 	 * @param userAddress
 	 * @return
 	 */
-	GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (UserPrivilege, error)
+	GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (UserRolesPrivileges, error)
 }

@@ -12,13 +12,13 @@ type ParticipantNodeState int8
 
 const (
 	// 已注册
-	REGISTERED ParticipantNodeState = iota
+	READY ParticipantNodeState = iota
 	// 已激活
-	ACTIVED
+	CONSENSUS
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(REGISTERED)
+	binary_proto.Cdc.RegisterEnum(READY)
 }
 
 var _ binary_proto.EnumContract = (*ParticipantNodeState)(nil)
@@ -45,21 +45,21 @@ func (p ParticipantNodeState) ContractVersion() int64 {
 
 func (p ParticipantNodeState) GetValue(CODE int32) binary_proto.EnumContract {
 	if CODE == 0 {
-		return REGISTERED
+		return READY
 	}
 	if CODE == 1 {
-		return ACTIVED
+		return CONSENSUS
 	}
 
 	panic("no enum value founded")
 }
 
 func (p ParticipantNodeState) GetValueByName(name string) binary_proto.EnumContract {
-	if name == "REGISTERED" {
-		return REGISTERED
+	if name == "READY" {
+		return READY
 	}
-	if name == "ACTIVED" {
-		return ACTIVED
+	if name == "CONSENSUS" {
+		return CONSENSUS
 	}
 
 	panic("no enum value founded")

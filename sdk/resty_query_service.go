@@ -173,7 +173,7 @@ func (r RestyQueryService) GetLedgerAdminInfo(ledgerHash framework.HashDigest) (
 			Name:                 node["name"].(string),
 			Address:              base58.MustDecode(node["address"].(map[string]interface{})["value"].(string)),
 			PubKey:               base58.MustDecode(node["pubKey"].(map[string]interface{})["value"].(string)),
-			ParticipantNodeState: ledger_model.REGISTERED.GetValueByName(node["participantNodeState"].(string)).(ledger_model.ParticipantNodeState),
+			ParticipantNodeState: ledger_model.READY.GetValueByName(node["participantNodeState"].(string)).(ledger_model.ParticipantNodeState),
 		}
 	}
 	info.Participants = pNodes
@@ -227,7 +227,7 @@ func (r RestyQueryService) GetConsensusParticipants(ledgerHash framework.HashDig
 			Name:                 node["name"].(string),
 			Address:              base58.MustDecode(node["address"].(map[string]interface{})["value"].(string)),
 			PubKey:               base58.MustDecode(node["pubKey"].(map[string]interface{})["value"].(string)),
-			ParticipantNodeState: ledger_model.REGISTERED.GetValueByName(node["participantNodeState"].(string)).(ledger_model.ParticipantNodeState),
+			ParticipantNodeState: ledger_model.READY.GetValueByName(node["participantNodeState"].(string)).(ledger_model.ParticipantNodeState),
 		}
 	}
 	return
@@ -911,12 +911,9 @@ func parseEventAccountRegisterOperation(info map[string]interface{}) binary_prot
 }
 
 func parseParticipantRegisterOperation(info map[string]interface{}) binary_proto.DataContract {
-	networkAddress := info["networkAddress"].(map[string]interface{})
-	address := network.NewAddress(networkAddress["host"].(string), int32(networkAddress["port"].(float64)), networkAddress["secure"].(bool))
 	return &ledger_model.ParticipantRegisterOperation{
 		ParticipantName:             info["participantName"].(string),
 		ParticipantRegisterIdentity: parseBlockchainIdentity(info["participantRegisterIdentity"].(map[string]interface{})),
-		NetworkAddress:              address.ToBytes(),
 	}
 }
 
@@ -924,7 +921,7 @@ func parseParticipantStateUpdateOperation(info map[string]interface{}) binary_pr
 	networkAddress := info["networkAddress"].(map[string]interface{})
 	address := network.NewAddress(networkAddress["host"].(string), int32(networkAddress["port"].(float64)), networkAddress["secure"].(bool))
 	return &ledger_model.ParticipantStateUpdateOperation{
-		State:               ledger_model.REGISTERED.GetValueByName(info["state"].(string)).(ledger_model.ParticipantNodeState),
+		State:               ledger_model.READY.GetValueByName(info["state"].(string)).(ledger_model.ParticipantNodeState),
 		StateUpdateIdentity: parseBlockchainIdentity(info["stateUpdateIdentity"].(map[string]interface{})),
 		NetworkAddress:      address.ToBytes(),
 	}
@@ -1276,8 +1273,8 @@ func (r RestyQueryService) GetLedgersCount() (info int64, err error) {
 	return int64(wrp.(float64)), nil
 }
 
-func (r RestyQueryService) GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (info ledger_model.PrivilegeSetVO, err error) {
-	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/role-privilege/%s", ledgerHash.ToBase58(), roleName))
+func (r RestyQueryService) GetRolePrivileges(ledgerHash framework.HashDigest, roleName string) (info ledger_model.RolePrivileges, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/authorization/role/%s", ledgerHash.ToBase58(), roleName))
 	if err != nil {
 		return info, err
 	}
@@ -1285,14 +1282,15 @@ func (r RestyQueryService) GetRolePrivileges(ledgerHash framework.HashDigest, ro
 	return parsePrivilegeSet(wrp.(map[string]interface{}))
 }
 
-func parsePrivilegeSet(rolePrivileges map[string]interface{}) (info ledger_model.PrivilegeSetVO, err error) {
-	info = ledger_model.PrivilegeSetVO{
+func parsePrivilegeSet(rolePrivileges map[string]interface{}) (info ledger_model.RolePrivileges, err error) {
+	info = ledger_model.RolePrivileges{
 		RoleName: rolePrivileges["roleName"].(string),
+		Version:  int64(rolePrivileges["version"].(float64)),
 	}
 
 	transactionPrivilegeMap, ok := rolePrivileges["transactionPrivilege"].(map[string]interface{})
 	if ok {
-		transactionPrivilege := ledger_model.TransactionPrivilegeVO{
+		transactionPrivilege := ledger_model.TransactionPrivilegeBitset{
 			PermissionCount: int32(transactionPrivilegeMap["permissionCount"].(float64)),
 		}
 		transactionPermissions := make([]ledger_model.TransactionPermission, transactionPrivilege.PermissionCount)
@@ -1306,7 +1304,7 @@ func parsePrivilegeSet(rolePrivileges map[string]interface{}) (info ledger_model
 	}
 	ledgerPrivilegeMap, ok := rolePrivileges["ledgerPrivilege"].(map[string]interface{})
 	if ok {
-		ledgerPrivilege := ledger_model.LedgerPrivilegeVO{
+		ledgerPrivilege := ledger_model.LedgerPrivilegeBitset{
 			PermissionCount: int32(ledgerPrivilegeMap["permissionCount"].(float64)),
 		}
 		ledgerPermissions := make([]ledger_model.LedgerPermission, ledgerPrivilege.PermissionCount)
@@ -1322,31 +1320,35 @@ func parsePrivilegeSet(rolePrivileges map[string]interface{}) (info ledger_model
 	return
 }
 
-func (r RestyQueryService) GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (info ledger_model.UserPrivilege, err error) {
-	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/user-privilege/%s", ledgerHash.ToBase58(), userAddress))
+func (r RestyQueryService) GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (info ledger_model.UserRolesPrivileges, err error) {
+	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/authorization/user/%s", ledgerHash.ToBase58(), userAddress))
 	if err != nil {
 		return info, err
 	}
 
 	userPrivilegeMap := wrp.(map[string]interface{})
-	rolePrivilegeArray := userPrivilegeMap["rolePrivilege"].([]interface{})
-	rolePrivilege := make([]ledger_model.PrivilegeSetVO, len(rolePrivilegeArray))
-	for i := 0; i < len(rolePrivilegeArray); i++ {
-		rp, err := parsePrivilegeSet(rolePrivilegeArray[i].(map[string]interface{}))
-		if err != nil {
-			return info, err
+	userRoles := parseStringArray(userPrivilegeMap["userRole"].([]interface{}))
+	info = ledger_model.UserRolesPrivileges{
+		UserAddress: base58.MustDecode(userAddress),
+		UserRoles:   userRoles,
+	}
+	ledgerPrivilegesBitsetMap, ok := userPrivilegeMap["ledgerPrivilegesBitset"]
+	if ok {
+		ledgerPrivilegesInfo := ledgerPrivilegesBitsetMap.(map[string]interface{})
+		ledgerPrivilegesBitset := ledger_model.LedgerPrivilegeBitset{
+			PermissionCount: int32(ledgerPrivilegesInfo["permissionCount"].(float64)),
+			Privilege:       parseLedgerPermissions(ledgerPrivilegesInfo["privilege"].([]interface{})),
 		}
-		rolePrivilege[i] = rp
+		info.LedgerPrivilegesBitset = ledgerPrivilegesBitset
 	}
-
-	roleSet, err := parseRoleSet(userPrivilegeMap["roleSet"].(map[string]interface{}))
-	if err != nil {
-		return
-	}
-
-	info = ledger_model.UserPrivilege{
-		RoleSet:       roleSet,
-		RolePrivilege: rolePrivilege,
+	transactionPrivilegesBitsetMap, ok := userPrivilegeMap["transactionPrivilegesBitset"]
+	if ok {
+		transactionPrivilegesBitsetInfo := transactionPrivilegesBitsetMap.(map[string]interface{})
+		transactionPrivilegeBitset := ledger_model.TransactionPrivilegeBitset{
+			PermissionCount: int32(transactionPrivilegesBitsetInfo["permissionCount"].(float64)),
+			Privilege:       parseTransactionPermissions(transactionPrivilegesBitsetInfo["privilege"].([]interface{})),
+		}
+		info.TransactionPrivilegesBitset = transactionPrivilegeBitset
 	}
 
 	return

@@ -21,6 +21,8 @@ type ContractCodeDeployOperation struct {
 	// 这是合约账户身份 使用对应的私钥对地址做出的签名
 	// 在注册时将校验此签名与账户地址、公钥是否相匹配，以此保证只有私钥的持有者才能注册相应的合约账户，确保合约账户的唯一性
 	AddressSignature DigitalSignature `refContract:"2864"`
+
+	ChainCodeVersion int64 `primitiveType:"INT64"`
 }
 
 func (c ContractCodeDeployOperation) ContractCode() int32 {

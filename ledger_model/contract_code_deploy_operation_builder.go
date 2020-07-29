@@ -13,10 +13,11 @@ func NewContractCodeDeployOperationBuilder(factory *BlockchainOperationFactory) 
 	return &ContractCodeDeployOperationBuilder{factory: factory}
 }
 
-func (cdob *ContractCodeDeployOperationBuilder) Deploy(id BlockchainIdentity, chainCode []byte) ContractCodeDeployOperation {
+func (cdob *ContractCodeDeployOperationBuilder) Deploy(id BlockchainIdentity, chainCode []byte, version int64) ContractCodeDeployOperation {
 	operation := ContractCodeDeployOperation{
-		ContractID: id,
-		ChainCode:  chainCode,
+		ContractID:       id,
+		ChainCode:        chainCode,
+		ChainCodeVersion: version,
 	}
 	if cdob.factory != nil {
 		cdob.factory.addOperation(operation)

@@ -15,7 +15,7 @@ import (
 
 var (
 	GATEWAY_HOST = "localhost"
-	GATEWAY_PORT = 8081
+	GATEWAY_PORT = 8080
 	SECURE       = false
 
 	NODE_PRIVITE_KEY = crypto.DecodePrivKey(string(MustLoadFile("nodes/peer0/config/keys/jd.priv")), base58.MustDecode(string(MustLoadFile("nodes/peer0/config/keys/jd.pwd"))))

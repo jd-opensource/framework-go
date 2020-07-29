@@ -6,5 +6,5 @@ package ledger_model
  */
 
 type ActiveParticipantService interface {
-	ActivateParticipant(ledgerHash string) (TransactionResponse, error)
+	ActivateParticipant(ledgerHash, ip string, port int) (TransactionResponse, error)
 }

@@ -211,21 +211,15 @@ func TestQuery(t *testing.T) {
 			_, err = blockchainService.GetUser(ledger, u)
 			require.Nil(t, err)
 
-			// return user's roles
-			roles, err := blockchainService.GetUserRoles(ledger, u)
+			// 返回user's priveleges;
+			userPrivilege, err := blockchainService.GetUserPrivileges(ledger, u)
 			require.Nil(t, err)
-
 			// return role's privileges;
-			for _, role := range roles.Roles {
+			for _, role := range userPrivilege.UserRoles {
 				rolePrivilegeSet, err := blockchainService.GetRolePrivileges(ledger, role)
 				require.Nil(t, err)
 				require.Equal(t, role, rolePrivilegeSet.RoleName)
 			}
-
-			// 返回user's priveleges;
-			userPrivilege, err := blockchainService.GetUserPrivileges(ledger, u)
-			require.Nil(t, err)
-			require.Equal(t, roles, userPrivilege.RoleSet)
 		}
 
 		// get data accounts by ledgerHash and its range

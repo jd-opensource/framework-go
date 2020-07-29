@@ -17,8 +17,6 @@ type ParticipantRegisterOperation struct {
 	ParticipantName string `primitiveType:"TEXT"`
 
 	ParticipantRegisterIdentity BlockchainIdentity `refContract:"144"`
-
-	NetworkAddress []byte `primitiveType:"BYTES"`
 }
 
 func (p ParticipantRegisterOperation) ContractCode() int32 {

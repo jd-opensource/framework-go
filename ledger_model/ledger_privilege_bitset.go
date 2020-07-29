@@ -5,7 +5,7 @@ package ledger_model
  * Date: 2020/6/28 下午2:24
  */
 
-type LedgerPrivilegeVO struct {
+type LedgerPrivilegeBitset struct {
 	Privilege       []LedgerPermission
 	PermissionCount int32
 }

@@ -2,11 +2,11 @@ package test
 
 import (
 	"fmt"
+	"framework-go/crypto"
 	"framework-go/crypto/classic"
 	"framework-go/ledger_model"
 	"framework-go/sdk"
 	"framework-go/utils/base58"
-	"framework-go/utils/network"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -134,7 +134,9 @@ func TestContract(t *testing.T) {
 	require.Nil(t, err)
 	contract, err := ioutil.ReadAll(file)
 	require.Nil(t, err)
-	txTemp.Contracts().Deploy(user.GetIdentity(), contract)
+	txTemp.Contracts().Deploy(user.GetIdentity(), contract, -1)
+
+	txTemp.Contracts().Deploy(user.GetIdentity(), contract, 0)
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
@@ -151,7 +153,9 @@ func TestContract(t *testing.T) {
 
 func TestRegisterParticipant(t *testing.T) {
 	// 生成公私钥对
-	participant := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	participantPriviteKey := crypto.DecodePrivKey(string(MustLoadFile("nodes/peer4/config/keys/jd.priv")), base58.MustDecode(string(MustLoadFile("nodes/peer4/config/keys/jd.pwd"))))
+	participantPublicKey := crypto.DecodePubKey(string(MustLoadFile("nodes/peer4/config/keys/jd.pub")))
+	participant := ledger_model.NewBlockchainKeypair(participantPublicKey, participantPriviteKey)
 
 	// 连接网关，获取节点服务
 	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
@@ -166,12 +170,9 @@ func TestRegisterParticipant(t *testing.T) {
 
 	name := "PARTICIPANT"
 	identity := participant.GetIdentity()
-	networkAddress := network.NewAddress("127.0.0.1", 20000, false).ToBytes()
 
 	// 注册
-	txTemp.Participants().Register(name, identity, networkAddress)
-	// 激活
-	//txTemp.States().Update(identity, networkAddress, ledger_model.ACTIVED)
+	txTemp.Participants().Register(name, identity)
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
@@ -187,24 +188,26 @@ func TestRegisterParticipant(t *testing.T) {
 }
 
 func TestActiveParticipant(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+
+	// 激活
 	consensusAService := sdk.NewRestyConsensusService("127.0.0.1", 7084, false)
-	resp, err := consensusAService.ActivateParticipant("j5mxY9Prpr96bWsivNQ6pTPh4MVugvycKTPkxapz4bEMaR")
+	resp, err := consensusAService.ActivateParticipant(ledgerHashs[0].ToBase58(), "127.0.0.1", 20000)
 	require.Nil(t, err)
 	require.True(t, resp.Success)
-}
 
-func TestQueryParticipant(t *testing.T) {
-	blockchainService := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY).GetBlockchainService()
-
-	// 返回所有的账本的 hash 列表
-	ledgers, err := blockchainService.GetLedgerHashs()
-	require.Nil(t, err)
-
-	participantNodes, err := blockchainService.GetConsensusParticipants(ledgers[0])
+	// 验证
+	participantNodes, err := service.GetConsensusParticipants(ledgerHashs[0])
 	require.Nil(t, err)
 	for _, participant := range participantNodes {
-		require.Equal(t, ledger_model.ACTIVED, participant.ParticipantNodeState)
+		require.Equal(t, ledger_model.CONSENSUS, participant.ParticipantNodeState)
 	}
+
 }
 
 func TestUserEvent(t *testing.T) {

@@ -1,272 +1,38 @@
 {
-  "data": [
-    {
-      "blockHeight": 0,
-      "userAccountSetHash": {
-        "value": "j5kFmwjbZEWtkHtVowSqmE91Bkm7CByqLJzF8k42sDhzg2"
-      },
-      "executionState": "SUCCESS",
-      "transactionContent": {
-        "operations": [
-          {
-            "initSetting": {
-              "ledgerSeed": "3prhick4k0v3SD7DS5kK6toYPZFCW6Xxa6r/FUejNWQ=",
-              "consensusProvider": "com.jd.blockchain.consensus.bftsmart.BftsmartConsensusProvider",
-              "cryptoSetting": {
-                "supportedProviders": [
-                  {
-                    "algorithms": [
-                      {
-                        "code": -32230,
-                        "name": "AES"
-                      },
-                      null,
-                      null,
-                      null,
-                      null,
-                      null,
-                      null
-                    ],
-                    "name": "com.jd.blockchain.crypto.service.classic.ClassicCryptoService"
-                  },
-                  {
-                    "algorithms": [
-                      null,
-                      {
-                        "code": 8195,
-                        "name": "SM3"
-                      },
-                      null
-                    ],
-                    "name": "com.jd.blockchain.crypto.service.sm.SMCryptoService"
-                  }
-                ],
-                "autoVerifyHash": false,
-                "hashAlgorithm": 8216
-              },
-              "createdTime": 1591873384000,
-              "consensusSettings": {
-                "value": "11H6beqGaSB7TzE9u8Dw8N7YsHcNTHFAwK6jkvVq5pihLQdRN5fNytJLuyR5r2sFNnd1ykHnyEj9XczmMPza42mjy4WbHLyCrsLLKYUmfpz1Dz9pDT6CSNcq9W4DPFMKpbfmXs2p6FJ5wYtyqdPSmgqTnw2uW8kP5jg2zRqrFptF7JExVrw6gozTZLdPhEj15HmiamPthxN2yfkYPpqXWgmNbZ2BX8kKTkS9iUrwg2dyREk7bu7wdUAHmpKnwpB6gdCa4Z2EcezZPyEEdqPN28h4nTTgRj5sQqPbZMTWS3TKCezjRksR1JNuNAqDxu24sfpA6iPKuqkMq4tHuYHSd4i8X8Zi36GozQEPHozJUZqWgkWMCS9GLAys2aG6JsknFvETtiKNXTjF8BSzg56YspVWqwEBw1ojuNHehVMCdRAb2Ap6qGJxYtCb17Tp2byiFQdKqzCCBZr9zmo4fAn2BDyneNPeHaUiyVuMwAQTorsUrkJYhNtrdjS6Rj6fMBwsL9m6uGSuUeyPq3KS7ACMYiZ87jXmFnj5m6EcMy3kti7SSmn4HQuDr9L4QP7ExVVuSf8yzvJ89avqGZWBtm9jdRwvKBVcaz6dnYocC78TuTFStrQ8fokz5zcnbZfRAf1d4xYsUm1ZoMm2F8NWBBQWyFv6J22LGtjeutiCPcMEp7qzsYLxC6rmGPXk3W9VhizqoMtVLABLTCDbKZYLUMv2F7HAZq57oqfgpXjgBuiaoEB4jV1PfufGraU9hsx89eq6o4Q3yxhfQRNd7EFFa9uvMzhAC2Wf8NmPF6eaNa9rBYGSTgEV1hyexFHQRUEyRhzf6oSYRMS46fFKvTzgZEuAxsBVGYS4paxqXLLs49fZAyKZk4bbfvx4SL2dxMewtCveTXK6K1jeQbmyZj4m8cyvaJeVcwoQaoGQ5BW5VnWvP9DuuCG7eLw4fQCACWdqJxaZ5AuPppkQisHrJKQi18DFN4iQVPqMNTDLizqCCbQZQrG3MKSHC9yixTo7gZ6GsvpuCff3wPG7Ao4rkrh1CAKdAWDsQgiNNWmzdBuGKD2njmDkD8o4gJCpS3FyeiwDfSovgctJycYDw8G5ysyuGx574PgFVUha6E4KRL1SQsmbnAeiV9F7RxhdWR9dEC7A8eRvFdwamMPNUMwwtByf1d7PpzgZKEGKEcU7AJskgv2kqryHceNVsVYD86GsoSd4Y3yLNQHx3QdHsXkofFgVG6M4MagCoEfk6cZw3EtRVSr5BFurHsrHkwaCocvV4sn9t2TTr8WwsvnWG31u4FjrEUsqXMyvpj6v4ZNLnfNvB9bDNgZvxRow7aw8AceNQ7pyW5VCLKLF8hcomSPv9qxMA3seaqDY7n9Ra6PLDku1wtDiSGcMdRDg6cJB1UZRhfNLdw8aEyhN5UAt2NtXAdJTwN3EJdtxQYocHeo4js4C1q4LipQPVXALGLrYgnC8LCCKqrhqaejdruWsW9HmPYYFpCCBUh7d63k4QEuTJKNep458Knfo9jkU5CLpdz8RLhFHj6AxkbuRJCyyLXt1qA8NgbbVwCkzZySJKb4bkg91KoSvgxrAQk1w7YTnGmEUgbDrVnKZvuebiZg2xjyDQ28E9gqcHMqVsJ4nRmPv6y6wJtaZDjdQ5sPic7uefLEfnww46f6ANNv1RL49vBonbmWjS1V7thUZB9it5gZwh1n17mQfFrMNsPjJMtgX4a81dfJh5f2JfEXSc2yAgVmwAPkdZyNJPXgfMzVzMUGs5ULqFRfmNAEx5gFnqHyi2rbJyi5fovFtg4qVgB6sDjvQaW41t2sJK1MW6UPFtLhW2UyKViu1ev5VSqZpvNL4mWbivKN27KuEkVNTxPWpnazLFgSGBcSJi2sejKDZuGvZsNic5bh1xu6QQdvnjdR8VQK9QfXUFZYZTbYAVJBFQPLowE5ioyvELHyMGNmPNnfJqjwiiVQPJtEBBhhEi57nijma94JsE5Y5W7uTparJcxcNzVfXXXPatK2pPfm81rPWmCBTKTiQzVyErsjSdDvhHRNyyuyWABCMDDYiESiN5mRdssUmzWxRdhPV9XToYmyEAKKF4B3PCEtkh8FVC89aQVkmYoSJ9jY51vKFFXgwhU5wVAzZga5kAaVLfE3dPYu"
-              },
-              "consensusParticipants": [
-                {
-                  "participantNodeState": "ACTIVED",
-                  "address": {
-                    "value": "LdeP2CgeJANj3na4MoH7WmcYgmw8Sss7ZFYSc"
-                  },
-                  "name": "0",
-                  "id": 0,
-                  "pubKey": {
-                    "value": "7VeRLAf1MwnbCwJ9GeWUbESSrtTLSm5784SpC8JwKTzUjYRj"
-                  }
-                },
-                {
-                  "participantNodeState": "ACTIVED",
-                  "address": {
-                    "value": "LdeP3NBGSqtkHTLKwJUg6PHSKLtrDdDAAVe4U"
-                  },
-                  "name": "1",
-                  "id": 1,
-                  "pubKey": {
-                    "value": "7VeRNp8XqScLRTTK3jaMZuxq5QqDiNXm3AsryBXX73RhPFy4"
-                  }
-                },
-                {
-                  "participantNodeState": "ACTIVED",
-                  "address": {
-                    "value": "LdeNpEbRG3urzut64t8SviL7VeiUeqptPeLbF"
-                  },
-                  "name": "2",
-                  "id": 2,
-                  "pubKey": {
-                    "value": "7VeRJ5CXPQKymmH64yPpESreBv5LX3hpC6SdL2vKDhmG5xXc"
-                  }
-                },
-                {
-                  "participantNodeState": "ACTIVED",
-                  "address": {
-                    "value": "LdeNu6k6p9nUZG1HziyLRvvZgupnvzSNVneV7"
-                  },
-                  "name": "3",
-                  "id": 3,
-                  "pubKey": {
-                    "value": "7VeRBfNN89ecJHbkqjvJTAo3CbmmuBq7xEYthdJexdmcJHWu"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "userID": {
-              "address": {
-                "value": "LdeP2CgeJANj3na4MoH7WmcYgmw8Sss7ZFYSc"
-              },
-              "pubKey": {
-                "value": "7VeRLAf1MwnbCwJ9GeWUbESSrtTLSm5784SpC8JwKTzUjYRj"
-              }
-            }
-          },
-          {
-            "userID": {
-              "address": {
-                "value": "LdeP3NBGSqtkHTLKwJUg6PHSKLtrDdDAAVe4U"
-              },
-              "pubKey": {
-                "value": "7VeRNp8XqScLRTTK3jaMZuxq5QqDiNXm3AsryBXX73RhPFy4"
-              }
-            }
-          },
-          {
-            "userID": {
-              "address": {
-                "value": "LdeNpEbRG3urzut64t8SviL7VeiUeqptPeLbF"
-              },
-              "pubKey": {
-                "value": "7VeRJ5CXPQKymmH64yPpESreBv5LX3hpC6SdL2vKDhmG5xXc"
-              }
-            }
-          },
-          {
-            "userID": {
-              "address": {
-                "value": "LdeNu6k6p9nUZG1HziyLRvvZgupnvzSNVneV7"
-              },
-              "pubKey": {
-                "value": "7VeRBfNN89ecJHbkqjvJTAo3CbmmuBq7xEYthdJexdmcJHWu"
-              }
-            }
-          },
-          {
-            "roles": [
-              {
-                "disableLedgerPermissions": [],
-                "disableTransactionPermissions": [],
-                "roleName": "DEFAULT",
-                "enableLedgerPermissions": [
-                  "CONFIGURE_ROLES",
-                  "AUTHORIZE_USER_ROLES",
-                  "SET_CONSENSUS",
-                  "SET_CRYPTO",
-                  "REGISTER_PARTICIPANT",
-                  "REGISTER_USER",
-                  "REGISTER_DATA_ACCOUNT",
-                  "REGISTER_CONTRACT",
-                  "UPGRADE_CONTRACT",
-                  "SET_USER_ATTRIBUTES",
-                  "WRITE_DATA_ACCOUNT",
-                  "APPROVE_TX",
-                  "CONSENSUS_TX",
-                  "REGISTER_EVENT_ACCOUNT",
-                  "WRITE_EVENT_ACCOUNT"
-                ],
-                "enableTransactionPermissions": [
-                  "DIRECT_OPERATION",
-                  "CONTRACT_OPERATION"
-                ]
-              }
-            ],
-            "empty": false
-          },
-          {
-            "userRolesAuthorizations": [
-              {
-                "unauthorizedRoles": [],
-                "userAddresses": [
-                  {
-                    "value": "LdeP2CgeJANj3na4MoH7WmcYgmw8Sss7ZFYSc"
-                  }
-                ],
-                "authorizedRoles": [],
-                "policy": "UNION"
-              }
-            ]
-          },
-          {
-            "userRolesAuthorizations": [
-              {
-                "unauthorizedRoles": [],
-                "userAddresses": [
-                  {
-                    "value": "LdeP3NBGSqtkHTLKwJUg6PHSKLtrDdDAAVe4U"
-                  }
-                ],
-                "authorizedRoles": [],
-                "policy": "UNION"
-              }
-            ]
-          },
-          {
-            "userRolesAuthorizations": [
-              {
-                "unauthorizedRoles": [],
-                "userAddresses": [
-                  {
-                    "value": "LdeNpEbRG3urzut64t8SviL7VeiUeqptPeLbF"
-                  }
-                ],
-                "authorizedRoles": [],
-                "policy": "UNION"
-              }
-            ]
-          },
-          {
-            "userRolesAuthorizations": [
-              {
-                "unauthorizedRoles": [],
-                "userAddresses": [
-                  {
-                    "value": "LdeNu6k6p9nUZG1HziyLRvvZgupnvzSNVneV7"
-                  }
-                ],
-                "authorizedRoles": [],
-                "policy": "UNION"
-              }
-            ]
-          }
-        ],
-        "hash": {
-          "value": "j5gbFs4VCK31VTTfrQyaxbcycDAfiqjjGKtmTYH7pu9Fos"
-        },
-        "timestamp": 1591873384000
-      },
-      "adminAccountHash": {
-        "value": "j5w4PQg7Dozk5LKFshpGcYFH8so9c3LFxKirMDXrvRJzpr"
-      },
-      "nodeSignatures": [
-        {
-          "digest": {
-            "value": "SMLLUee6Enp4NMjhRAv2SWfBGJADpW1rCd1boU6q35eS6rjNk8D2rMFA91LSsGNYLvKGsYWTq6QsxxfxmHH4nSKjg4"
-          },
-          "pubKey": {
-            "value": "7VeRLAf1MwnbCwJ9GeWUbESSrtTLSm5784SpC8JwKTzUjYRj"
-          }
-        },
-        {
-          "digest": {
-            "value": "SMHrnQDd6er7HJfzAF9EKuXmECshLnvQyazXUrvy4psdizcWrQjdvnJrRkEJDrQxbSjbLa6cg4GpDQ9VacyQSNgNrs"
-          },
-          "pubKey": {
-            "value": "7VeRNp8XqScLRTTK3jaMZuxq5QqDiNXm3AsryBXX73RhPFy4"
-          }
-        },
-        {
-          "digest": {
-            "value": "SMLoBaT2fTDiE8eHSSnQ7223uLKAuEZhG41Kt1bJcX3iHzHAQZjeWkZC6ie7mQV1XcEhmSH245jhqmq7enaeii8AMt"
-          },
-          "pubKey": {
-            "value": "7VeRJ5CXPQKymmH64yPpESreBv5LX3hpC6SdL2vKDhmG5xXc"
-          }
-        },
-        {
-          "digest": {
-            "value": "SMJXBQZJ2a4ZbHM6oPR7ynF9vRXX5XwGGcasFe4PYTJWLZi7yWuCWydHzGcQBTSPDyzG63T122KXkDF5Ej1FqDS3ac"
-          },
-          "pubKey": {
-            "value": "7VeRBfNN89ecJHbkqjvJTAo3CbmmuBq7xEYthdJexdmcJHWu"
-          }
-        }
-      ]
+  "data": {
+    "userAddress": {
+      "value": "LdeP3Mjgzd2ScdmC4XihHPUqXKhMjMZK3qCmA"
+    },
+    "transactionPrivilegesBitset": {
+      "privilege": [
+        "DIRECT_OPERATION",
+        "CONTRACT_OPERATION"
+      ],
+      "permissionCount": 2
+    },
+    "userRole": [
+      "DEFAULT"
+    ],
+    "ledgerPrivilegesBitset": {
+      "privilege": [
+        "CONFIGURE_ROLES",
+        "AUTHORIZE_USER_ROLES",
+        "SET_CONSENSUS",
+        "SET_CRYPTO",
+        "REGISTER_PARTICIPANT",
+        "REGISTER_USER",
+        "REGISTER_DATA_ACCOUNT",
+        "REGISTER_CONTRACT",
+        "UPGRADE_CONTRACT",
+        "SET_USER_ATTRIBUTES",
+        "WRITE_DATA_ACCOUNT",
+        "APPROVE_TX",
+        "CONSENSUS_TX",
+        "REGISTER_EVENT_ACCOUNT",
+        "WRITE_EVENT_ACCOUNT"
+      ],
+      "permissionCount": 15
     }
-  ],
+  },
   "success": true
 }
