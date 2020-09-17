@@ -19,6 +19,11 @@ type TxTemplate struct {
 	stateManager *TxStateManager
 }
 
+func (t *TxTemplate) ContractEvents() *ContractEventSendOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.ContractEvents()
+}
+
 func (t *TxTemplate) EventAccounts() *EventAccountRegisterOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.EventAccounts()

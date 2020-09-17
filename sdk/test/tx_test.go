@@ -7,6 +7,7 @@ import (
 	"framework-go/ledger_model"
 	"framework-go/sdk"
 	"framework-go/utils/base58"
+	"framework-go/utils/bytes"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -78,7 +79,7 @@ func TestDataAccount(t *testing.T) {
 	// 创建交易
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 2; i++ {
 		// 生成公私钥对
 		user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 		// 注册数据账户
@@ -136,8 +137,6 @@ func TestContract(t *testing.T) {
 	require.Nil(t, err)
 	txTemp.Contracts().Deploy(user.GetIdentity(), contract, -1)
 
-	txTemp.Contracts().Deploy(user.GetIdentity(), contract, 0)
-
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
 
@@ -149,6 +148,64 @@ func TestContract(t *testing.T) {
 	require.Nil(t, err)
 	require.True(t, resp.Success)
 
+	// 创建合约调用交易
+	txTemp = service.NewTransaction(ledgerHashs[0])
+	args := ledger_model.BytesValueList{
+		[]ledger_model.BytesValue{
+			{
+				ledger_model.BYTES,
+				[]byte("imuge"),
+			},
+		},
+	}
+	txTemp.ContractEvents().Send(user.GetAddress(), "array", args)
+	// TX 准备就绪；
+	prepTx = txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err = prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+	res := resp.OperationResults
+	require.Equal(t, 1, len(res))
+	require.EqualValues(t, "ok", bytes.ToString(res[0].Result.Bytes))
+
+	// 创建合约调用交易
+	txTemp = service.NewTransaction(ledgerHashs[0])
+	args = ledger_model.BytesValueList{
+		[]ledger_model.BytesValue{
+			{
+				ledger_model.TEXT,
+				[]byte("j5kXwtNnZk16kjZgXbMJZHm3HEp6ryEbbKqLT59Npkevat"),
+			},
+			{
+				ledger_model.TEXT,
+				[]byte("LdeNpCtBeuFQka6kCCwaWPk5Uicsy9d5nav5t"),
+			},
+			{
+				ledger_model.TEXT,
+				[]byte("jojo"),
+			},
+			{
+				ledger_model.INT64,
+				bytes.Int64ToBytes(100),
+			},
+		},
+	}
+	txTemp.ContractEvents().Send(user.GetAddress(), "create", args)
+	// TX 准备就绪；
+	prepTx = txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err = prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
 }
 
 func TestRegisterParticipant(t *testing.T) {

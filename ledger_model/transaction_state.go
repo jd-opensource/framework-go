@@ -103,11 +103,11 @@ func (t TransactionState) GetValue(CODE int32) binary_proto.EnumContract {
 		return IGNORED_BY_BLOCK_FULL_ROLLBACK
 	case int32(0x45):
 		return IGNORED_BY_CONSENSUS_PHASE_PRECOMPUTE_ROLLBACK
-	case int32(byte(0x80)):
+	case -int32(0x80):
 		return SYSTEM_ERROR
-	case int32(byte(0x81)):
+	case -int32(0x81):
 		return TIMEOUT
-	case int32(byte(0x82)):
+	case -int32(0x82):
 		return CONSENSUS_ERROR
 	}
 

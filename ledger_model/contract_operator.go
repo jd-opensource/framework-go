@@ -9,4 +9,7 @@ type ContractOperator interface {
 
 	// 部署合约
 	Contracts() *ContractCodeDeployOperationBuilder
+
+	// contract events
+	ContractEvents() *ContractEventSendOperationBuilder
 }
