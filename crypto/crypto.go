@@ -2,9 +2,9 @@ package crypto
 
 import (
 	"fmt"
-	"framework-go/crypto/classic"
-	"framework-go/crypto/framework"
-	"framework-go/crypto/sm"
+	"github.com/blockchain-jd-com/framework-go/crypto/classic"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/crypto/sm"
 )
 
 /**

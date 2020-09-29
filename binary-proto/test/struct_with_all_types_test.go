@@ -1,8 +1,8 @@
 package test
 
 import (
-	"framework-go/binary-proto"
-	"framework-go/utils/base58"
+	"github.com/blockchain-jd-com/framework-go/binary-proto"
+	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

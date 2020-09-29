@@ -5,8 +5,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"framework-go/utils/bytes"
-	"framework-go/utils/sha"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
+	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"math/big"
 )
 

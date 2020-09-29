@@ -2,7 +2,7 @@ package ecdsa
 
 import (
 	"crypto/rand"
-	"framework-go/utils/sha"
+	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"math/big"
 )
 

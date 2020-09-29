@@ -1,6 +1,6 @@
 package classic
 
-import "framework-go/crypto/framework"
+import "github.com/blockchain-jd-com/framework-go/crypto/framework"
 
 /**
  * @Author: imuge

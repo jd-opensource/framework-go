@@ -1,7 +1,7 @@
 package bytes
 
 import (
-	"framework-go/utils/base58"
+	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

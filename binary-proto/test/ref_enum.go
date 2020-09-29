@@ -1,6 +1,6 @@
 package test
 
-import "framework-go/binary-proto"
+import "github.com/blockchain-jd-com/framework-go/binary-proto"
 
 /*
  * Author: imuge

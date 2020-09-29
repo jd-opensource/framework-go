@@ -3,8 +3,8 @@ package sdk
 import (
 	"errors"
 	"fmt"
-	binary_proto "framework-go/binary-proto"
-	"framework-go/ledger_model"
+	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+	"github.com/blockchain-jd-com/framework-go/ledger_model"
 	"github.com/go-resty/resty/v2"
 )
 

@@ -1,7 +1,7 @@
 package binary_proto
 
 import (
-	"framework-go/utils/bytes"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 	"reflect"
 )
 

@@ -1,8 +1,8 @@
 package test
 
 import (
-	"framework-go/binary-proto"
-	"framework-go/utils/bytes"
+	"github.com/blockchain-jd-com/framework-go/binary-proto"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 )
 
 var _ binary_proto.DataContract = (*StructWithAllTypes)(nil)

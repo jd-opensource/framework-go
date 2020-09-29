@@ -1,10 +1,10 @@
 package crypto
 
 import (
-	"framework-go/crypto/framework"
-	"framework-go/utils/aes"
-	"framework-go/utils/base58"
-	"framework-go/utils/sha"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/aes"
+	"github.com/blockchain-jd-com/framework-go/utils/base58"
+	"github.com/blockchain-jd-com/framework-go/utils/sha"
 )
 
 var (

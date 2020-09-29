@@ -1,6 +1,6 @@
 package framework
 
-import "framework-go/utils/bytes"
+import "github.com/blockchain-jd-com/framework-go/utils/bytes"
 
 /**
  * @Author: imuge

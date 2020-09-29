@@ -1,7 +1,7 @@
 package classic
 
 import (
-	"framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"math/rand"
 )
 

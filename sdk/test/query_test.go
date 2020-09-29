@@ -1,10 +1,10 @@
 package test
 
 import (
-	"framework-go/crypto/framework"
-	"framework-go/ledger_model"
-	"framework-go/sdk"
-	"framework-go/utils/base58"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/ledger_model"
+	"github.com/blockchain-jd-com/framework-go/sdk"
+	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

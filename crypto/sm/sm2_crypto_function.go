@@ -1,8 +1,8 @@
 package sm
 
 import (
-	"framework-go/crypto/framework"
-	"framework-go/utils/sm2"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/sm2"
 )
 
 /**

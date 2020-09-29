@@ -1,8 +1,8 @@
 package ledger_model
 
 import (
-	binary_proto "framework-go/binary-proto"
-	"framework-go/utils/bytes"
+	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 )
 
 /*

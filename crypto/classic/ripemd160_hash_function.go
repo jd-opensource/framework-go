@@ -1,9 +1,9 @@
 package classic
 
 import (
-	"framework-go/crypto/framework"
-	"framework-go/utils/bytes"
-	"framework-go/utils/ripemd160"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
+	"github.com/blockchain-jd-com/framework-go/utils/ripemd160"
 )
 
 /**

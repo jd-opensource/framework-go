@@ -1,4 +1,4 @@
-module framework-go
+module github.com/blockchain-jd-com/framework-go
 
 go 1.13
 

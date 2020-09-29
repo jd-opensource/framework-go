@@ -1,7 +1,7 @@
 package aes
 
 import (
-	"framework-go/utils/sha"
+	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

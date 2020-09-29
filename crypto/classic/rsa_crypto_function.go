@@ -1,8 +1,8 @@
 package classic
 
 import (
-	"framework-go/crypto/framework"
-	"framework-go/utils/rsa"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/rsa"
 )
 
 /**

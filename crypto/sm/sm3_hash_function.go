@@ -1,8 +1,8 @@
 package sm
 
 import (
-	"framework-go/crypto/framework"
-	"framework-go/utils/bytes"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 	"github.com/ZZMarquis/gm/sm3"
 )
 

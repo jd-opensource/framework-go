@@ -2,8 +2,8 @@ package sdk
 
 import (
 	"fmt"
-	"framework-go/crypto/framework"
-	"framework-go/ledger_model"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/ledger_model"
 	"time"
 )
 

@@ -1,6 +1,6 @@
 package sdk
 
-import "framework-go/ledger_model"
+import "github.com/blockchain-jd-com/framework-go/ledger_model"
 
 /*
  * Author: imuge

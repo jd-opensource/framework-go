@@ -1,7 +1,7 @@
 package sdk
 
 import (
-	"framework-go/ledger_model"
+	"github.com/blockchain-jd-com/framework-go/ledger_model"
 )
 
 /*

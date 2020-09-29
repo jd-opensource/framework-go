@@ -1,9 +1,9 @@
 package test
 
 import (
-	"framework-go/crypto"
-	"framework-go/ledger_model"
-	"framework-go/utils/base58"
+	"github.com/blockchain-jd-com/framework-go/crypto"
+	"github.com/blockchain-jd-com/framework-go/ledger_model"
+	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"io/ioutil"
 	"os"
 )

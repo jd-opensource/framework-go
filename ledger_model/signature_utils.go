@@ -1,8 +1,8 @@
 package ledger_model
 
 import (
-	"framework-go/crypto"
-	"framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/crypto"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 )
 
 /*
