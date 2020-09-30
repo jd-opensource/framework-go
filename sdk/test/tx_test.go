@@ -225,7 +225,7 @@ func TestRegisterParticipant(t *testing.T) {
 	// 创建交易
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
-	name := "PARTICIPANT"
+	name := "peer4"
 	identity := participant.GetIdentity()
 
 	// 注册
@@ -254,15 +254,42 @@ func TestActiveParticipant(t *testing.T) {
 
 	// 激活
 	consensusAService := sdk.NewRestyConsensusService("127.0.0.1", 7084, false)
-	resp, err := consensusAService.ActivateParticipant(ledgerHashs[0].ToBase58(), "127.0.0.1", 20000)
+	resp, err := consensusAService.ActivateParticipant(ledgerHashs[0].ToBase58(), "127.0.0.1", 20000, "127.0.0.1", 7080)
 	require.Nil(t, err)
-	require.True(t, resp.Success)
+	require.True(t, resp)
 
 	// 验证
 	participantNodes, err := service.GetConsensusParticipants(ledgerHashs[0])
 	require.Nil(t, err)
 	for _, participant := range participantNodes {
 		require.Equal(t, ledger_model.CONSENSUS, participant.ParticipantNodeState)
+	}
+
+}
+
+func TestInactiveParticipant(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+
+	// 移除
+	consensusAService := sdk.NewRestyConsensusService("127.0.0.1", 7084, false)
+	resp, err := consensusAService.InactivateParticipant(ledgerHashs[0].ToBase58(), "LdeNj9UCKucz5QmVnRYn9cB3G7EE5mabpn3Pq", "127.0.0.1", 7080)
+	require.Nil(t, err)
+	require.True(t, resp)
+
+	// 验证
+	participantNodes, err := service.GetConsensusParticipants(ledgerHashs[0])
+	require.Nil(t, err)
+	for _, participant := range participantNodes {
+		if participant.Name == "peer4" {
+			require.Equal(t, ledger_model.DECONSENSUS, participant.ParticipantNodeState)
+		} else {
+			require.Equal(t, ledger_model.CONSENSUS, participant.ParticipantNodeState)
+		}
 	}
 
 }

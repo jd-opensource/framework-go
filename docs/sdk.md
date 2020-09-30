@@ -11,6 +11,7 @@ JD Chain[交易](#交易)提交和[查询](#查询)
 - [数据账户](#数据账户)
 - [合约](#合约)
 - [事件](#事件)
+- [节点添加/移除](#节点添加/移除)
 
 ##### 用户
 
@@ -173,6 +174,76 @@ prepTx.Sign(NODE_KEY.AsymmetricKeypair)
 
 // 提交交易；
 resp, err := prepTx.Commit()
+```
+
+##### 节点添加/移除
+
+1. 注册新节点
+```go
+// 生成公私钥对
+participantPriviteKey := crypto.DecodePrivKey(string(MustLoadFile("nodes/peer4/config/keys/jd.priv")), base58.MustDecode(string(MustLoadFile("nodes/peer4/config/keys/jd.pwd"))))
+participantPublicKey := crypto.DecodePubKey(string(MustLoadFile("nodes/peer4/config/keys/jd.pub")))
+participant := ledger_model.NewBlockchainKeypair(participantPublicKey, participantPriviteKey)
+
+// 连接网关，获取节点服务
+serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+service := serviceFactory.GetBlockchainService()
+
+// 获取账本信息
+ledgerHashs, err := service.GetLedgerHashs()
+require.Nil(t, err)
+
+// 创建交易
+txTemp := service.NewTransaction(ledgerHashs[0])
+
+name := "peer4"
+identity := participant.GetIdentity()
+
+// 注册
+txTemp.Participants().Register(name, identity)
+
+// TX 准备就绪；
+prepTx := txTemp.Prepare()
+
+// 使用网络中已存在用户私钥进行签名；
+prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+// 提交交易；
+resp, err := prepTx.Commit()
+require.Nil(t, err)
+require.True(t, resp.Success)
+```
+
+2. 激活新节点
+```go
+// 连接网关，获取节点服务
+serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+service := serviceFactory.GetBlockchainService()
+
+// 获取账本信息
+ledgerHashs, err := service.GetLedgerHashs()
+
+// 激活，向新节点发送激活请求
+consensusAService := sdk.NewRestyConsensusService("127.0.0.1", 7084, false)
+resp, err := consensusAService.ActivateParticipant(ledgerHashs[0].ToBase58(), "127.0.0.1", 20000, "127.0.0.1", 7080)
+require.Nil(t, err)
+require.True(t, resp)
+```
+
+3. 移除节点
+```go
+// 连接网关，获取节点服务
+serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+service := serviceFactory.GetBlockchainService()
+
+// 获取账本信息
+ledgerHashs, err := service.GetLedgerHashs()
+
+// 移除，向待移除节点发送移除请求
+consensusAService := sdk.NewRestyConsensusService("127.0.0.1", 7084, false)
+resp, err := consensusAService.InactivateParticipant(ledgerHashs[0].ToBase58(), "LdeNj9UCKucz5QmVnRYn9cB3G7EE5mabpn3Pq", "127.0.0.1", 7080)
+require.Nil(t, err)
+require.True(t, resp)
 ```
 
 #### 查询

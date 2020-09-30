@@ -15,6 +15,8 @@ const (
 	READY ParticipantNodeState = iota
 	// 已激活
 	CONSENSUS
+	// 不可用
+	DECONSENSUS
 )
 
 func init() {
@@ -50,6 +52,9 @@ func (p ParticipantNodeState) GetValue(CODE int32) binary_proto.EnumContract {
 	if CODE == 1 {
 		return CONSENSUS
 	}
+	if CODE == 2 {
+		return DECONSENSUS
+	}
 
 	panic("no enum value founded")
 }
@@ -60,6 +65,9 @@ func (p ParticipantNodeState) GetValueByName(name string) binary_proto.EnumContr
 	}
 	if name == "CONSENSUS" {
 		return CONSENSUS
+	}
+	if name == "DECONSENSUS" {
+		return DECONSENSUS
 	}
 
 	panic("no enum value founded")

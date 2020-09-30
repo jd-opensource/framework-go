@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/blockchain-jd-com/framework-go/ledger_model"
-	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/go-resty/resty/v2"
 	"strconv"
 )
@@ -40,12 +39,14 @@ func NewRestyConsensusService(host string, port int, secure bool) *RestyConsensu
 	}
 }
 
-func (r RestyConsensusService) ActivateParticipant(ledgerHash, host string, port int) (info ledger_model.TransactionResponse, err error) {
+func (r RestyConsensusService) ActivateParticipant(ledgerHash, host string, port int, remoteManageHost string, remoteManagePort int) (info bool, err error) {
 	url := "/management/delegate/activeparticipant"
 	params := map[string]string{
-		"ledgerHash": ledgerHash,
-		"consensusHost": host,
-		"consensusPort": strconv.Itoa(port),
+		"ledgerHash":       ledgerHash,
+		"consensusHost":    host,
+		"consensusPort":    strconv.Itoa(port),
+		"remoteManageHost": remoteManageHost,
+		"remoteManagePort": strconv.Itoa(remoteManagePort),
 	}
 	resp, err := r.client.R().SetFormData(params).SetResult(ActivateParticipantResponse{}).Post(r.baseUrl + url)
 	if err != nil {
@@ -58,28 +59,39 @@ func (r RestyConsensusService) ActivateParticipant(ledgerHash, host string, port
 	wrp, ok := resp.Result().(*ActivateParticipantResponse)
 	if !ok {
 		return info, errors.New("unparseable response")
+	} else {
+		return wrp.Success, nil
 	}
+}
 
-	data := wrp.Data.(map[string]interface{})
-	success := wrp.Success && data["success"].(bool) && data["executionState"].(string) == "SUCCESS"
-	if !success {
-		return info, errors.New(data["executionState"].(string))
+func (r RestyConsensusService) InactivateParticipant(ledgerHash, participantAddress, remoteManageHost string, remoteManagePort int) (info bool, err error) {
+	url := "/management/delegate/deactiveparticipant"
+	params := map[string]string{
+		"ledgerHash":         ledgerHash,
+		"participantAddress": participantAddress,
+		"remoteManageHost":   remoteManageHost,
+		"remoteManagePort":   strconv.Itoa(remoteManagePort),
 	}
-
-	blockHash := data["blockHash"].(map[string]interface{})["value"].(string)
-	blockHeight := int64(data["blockHeight"].(float64))
-	contentHash := data["contentHash"].(map[string]interface{})["value"].(string)
-
-	return ledger_model.TransactionResponse{
-		Success:        true,
-		BlockHeight:    blockHeight,
-		ExecutionState: ledger_model.SUCCESS,
-		BlockHash:      base58.MustDecode(blockHash),
-		ContentHash:    base58.MustDecode(contentHash),
-	}, nil
+	resp, err := r.client.R().SetFormData(params).SetResult(InactivateParticipantResponse{}).Post(r.baseUrl + url)
+	if err != nil {
+		return
+	}
+	fmt.Println(fmt.Sprintf("%s \n %v \n", url, resp))
+	if !resp.IsSuccess() {
+		return info, errors.New(resp.String())
+	}
+	wrp, ok := resp.Result().(*InactivateParticipantResponse)
+	if !ok {
+		return info, errors.New("unparseable response")
+	} else {
+		return wrp.Success, nil
+	}
 }
 
 type ActivateParticipantResponse struct {
-	Success bool        `json:"success"`
-	Data    interface{} `json:"data"`
+	Success bool `json:"success"`
+}
+
+type InactivateParticipantResponse struct {
+	Success bool `json:"success"`
 }
