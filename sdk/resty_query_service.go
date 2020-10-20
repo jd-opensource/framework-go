@@ -50,7 +50,6 @@ func (r RestyQueryService) query(url string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(fmt.Sprintf("%s \n %v \n", url, resp))
 	if !resp.IsSuccess() {
 		return nil, errors.New(resp.String())
 	}
@@ -69,7 +68,6 @@ func (r RestyQueryService) queryWithParams(url string, params map[string]string)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(fmt.Sprintf("%s \n %v \n", url, resp))
 	if !resp.IsSuccess() {
 		return nil, errors.New(resp.String())
 	}
@@ -88,7 +86,6 @@ func (r RestyQueryService) queryWithParamsFromValues(url string, params url.Valu
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(fmt.Sprintf("%s \n %v \n", url, resp))
 	if !resp.IsSuccess() {
 		return nil, errors.New(resp.String())
 	}
@@ -107,7 +104,6 @@ func (r RestyQueryService) queryWithBody(url string, params interface{}) (interf
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(fmt.Sprintf("%s \n %v \n", url, resp))
 	if !resp.IsSuccess() {
 		return nil, errors.New(resp.String())
 	}

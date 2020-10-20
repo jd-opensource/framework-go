@@ -48,7 +48,6 @@ func (r *RestyTxService) Process(txRequest ledger_model.TransactionRequest) (res
 		SetHeader("Content-Type", "application/bin-obj").
 		SetBody(msg).
 		Post(r.url)
-	fmt.Println(fmt.Sprintf("%s \n %v \n", r.url, resp))
 	if !resp.IsSuccess() {
 		err = errors.New(resp.String())
 		return
