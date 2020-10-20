@@ -99,6 +99,9 @@ func (h *UserEventListenerHandle) loadEvents() {
 	for _, point := range h.eventPoints {
 
 		startSequence := h.eventSequences[point.EventAccount+point.EventName]
+		if startSequence < 0 {
+			startSequence = 0
+		}
 		events, err := h.queryService.GetUserEvents(h.ledgerHash, point.EventAccount, point.EventName, startSequence, 10)
 		if err != nil {
 			fmt.Println(err)
@@ -113,7 +116,7 @@ func (h *UserEventListenerHandle) loadEvents() {
 			h.listener.OnEvent(event, NewUserEventContext(h.ledgerHash, h))
 		}
 
-		if maxSequence > startSequence {
+		if len(events) > 0 {
 			h.eventSequences[point.EventAccount+point.EventName] = maxSequence + 1
 		}
 	}

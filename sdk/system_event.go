@@ -100,6 +100,9 @@ func (h *SystemEventListenerHandle) start() {
 
 func (h *SystemEventListenerHandle) loadEvents() {
 	startSequence := h.eventSequence
+	if startSequence < 0 {
+		startSequence = 0
+	}
 
 	if h.eventPoint.EventName == "new_block" {
 		ledgerInfo, err := h.queryService.GetLedger(h.ledgerHash)
@@ -129,9 +132,6 @@ func (h *SystemEventListenerHandle) loadEvents() {
 		}
 		if len(events) > 0 {
 			h.listener.OnEvents(events, NewSystemEventContext(h.ledgerHash, h))
-		}
-
-		if maxSequence > startSequence {
 			h.eventSequence = maxSequence + 1
 		}
 	}
