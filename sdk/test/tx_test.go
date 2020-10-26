@@ -150,15 +150,8 @@ func TestContract(t *testing.T) {
 
 	// 创建合约调用交易
 	txTemp = service.NewTransaction(ledgerHashs[0])
-	args := ledger_model.BytesValueList{
-		[]ledger_model.BytesValue{
-			{
-				ledger_model.BYTES,
-				[]byte("imuge"),
-			},
-		},
-	}
-	txTemp.ContractEvents().Send(user.GetAddress(), "array", args)
+	err = txTemp.ContractEvents().Send(user.GetAddress(), 0, "setkv", "LdeNzsW6YM4ycbGbeKR8pMTDLSMYpmAWYTW9V", "key", int32(100), int64(-1))
+	require.Nil(t, err)
 	// TX 准备就绪；
 	prepTx = txTemp.Prepare()
 
@@ -171,41 +164,7 @@ func TestContract(t *testing.T) {
 	require.True(t, resp.Success)
 	res := resp.OperationResults
 	require.Equal(t, 1, len(res))
-	require.EqualValues(t, "ok", bytes.ToString(res[0].Result.Bytes))
-
-	// 创建合约调用交易
-	txTemp = service.NewTransaction(ledgerHashs[0])
-	args = ledger_model.BytesValueList{
-		[]ledger_model.BytesValue{
-			{
-				ledger_model.TEXT,
-				[]byte("j5kXwtNnZk16kjZgXbMJZHm3HEp6ryEbbKqLT59Npkevat"),
-			},
-			{
-				ledger_model.TEXT,
-				[]byte("LdeNpCtBeuFQka6kCCwaWPk5Uicsy9d5nav5t"),
-			},
-			{
-				ledger_model.TEXT,
-				[]byte("jojo"),
-			},
-			{
-				ledger_model.INT64,
-				bytes.Int64ToBytes(100),
-			},
-		},
-	}
-	txTemp.ContractEvents().Send(user.GetAddress(), "create", args)
-	// TX 准备就绪；
-	prepTx = txTemp.Prepare()
-
-	// 使用私钥进行签名；
-	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
-
-	// 提交交易；
-	resp, err = prepTx.Commit()
-	require.Nil(t, err)
-	require.True(t, resp.Success)
+	require.EqualValues(t, "success", bytes.ToString(res[0].Result.Bytes))
 }
 
 func TestRegisterParticipant(t *testing.T) {

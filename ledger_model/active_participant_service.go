@@ -12,7 +12,7 @@ type ActiveParticipantService interface {
 	port 待激活节点端口
 	remoteManageHost	其他任一非拜占庭节点IP
 	remoteManagePort	其他任一非拜占庭节点管理端口
-	 */
+	*/
 	ActivateParticipant(ledgerHash, ip string, port int, remoteManageHost string, remoteManagePort int) (bool, error)
 
 	/**

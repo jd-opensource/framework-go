@@ -14,7 +14,6 @@ func init() {
 }
 
 type RefGeneric struct {
-
 }
 
 func (r RefGeneric) ContractCode() int32 {

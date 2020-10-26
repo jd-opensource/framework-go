@@ -9,7 +9,6 @@ import "github.com/blockchain-jd-com/framework-go/crypto/framework"
 
 // 已就绪的交易
 type TransactionRequestBuilder interface {
-
 	GetHash() framework.HashDigest
 
 	GetTransactionContent() TransactionContent

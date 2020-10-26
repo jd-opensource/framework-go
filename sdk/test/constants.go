@@ -15,14 +15,13 @@ import (
 
 var (
 	GATEWAY_HOST = "localhost"
-	GATEWAY_PORT = 8080
+	GATEWAY_PORT = 8181
 	SECURE       = false
 
 	NODE_PRIVITE_KEY = crypto.DecodePrivKey(string(MustLoadFile("nodes/peer0/config/keys/jd.priv")), base58.MustDecode(string(MustLoadFile("nodes/peer0/config/keys/jd.pwd"))))
 	NODE_PUBLIC_KEY  = crypto.DecodePubKey(string(MustLoadFile("nodes/peer0/config/keys/jd.pub")))
 	NODE_KEY         = ledger_model.NewBlockchainKeypair(NODE_PUBLIC_KEY, NODE_PRIVITE_KEY)
 )
-
 
 func MustLoadFile(fileName string) []byte {
 	file, _ := os.Open(fileName)

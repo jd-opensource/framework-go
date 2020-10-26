@@ -6,7 +6,5 @@ package ledger_model
  */
 
 type UserAuthorize interface {
-
-	 ForUser(users [][]byte) UserRolesAuthorizer
-
+	ForUser(users [][]byte) UserRolesAuthorizer
 }

@@ -12,27 +12,27 @@ func init() {
 }
 
 type StructWithAllTypes struct {
-	I8    int8          `primitiveType:"INT8"`
-	I16   int16         `primitiveType:"INT16"`
-	I32   int32         `primitiveType:"INT32"`
-	I64   int64         `primitiveType:"INT64"`
-	I64m  int64         `primitiveType:"INT64" numberEncoding:"LONG"`
-	Bool  bool          `primitiveType:"BOOLEAN"`
-	Text  string        `primitiveType:"TEXT"`
-	Bytes []byte        `primitiveType:"BYTES"`
-	I8s   []int8        `primitiveType:"INT8" list:"true"`
-	I16s  []int16       `primitiveType:"INT16" list:"true"`
-	I32s  []int32       `primitiveType:"INT32" list:"true"`
-	I64s  []int64       `primitiveType:"INT64" list:"true"`
-	I64ms []int64       `primitiveType:"INT64" numberEncoding:"LONG" list:"true" numberEncoding:"LONG"`
-	Bools []bool        `primitiveType:"BOOLEAN" list:"true"`
-	Texts []string      `primitiveType:"TEXT" list:"true"`
-	Enum  RefEnum       `refEnum:"2"`
-	Enums []RefEnum     `refEnum:"2" list:"true"`
-	JP    *RefContract  `refContract:"3"`
-	JPs   []RefContract `refContract:"3" list:"true"`
-	JG    binary_proto.DataContract   `refContract:"4" genericContract:"true"`
-	JGs   []RefContract `refContract:"4" genericContract:"true" list:"true"`
+	I8    int8                      `primitiveType:"INT8"`
+	I16   int16                     `primitiveType:"INT16"`
+	I32   int32                     `primitiveType:"INT32"`
+	I64   int64                     `primitiveType:"INT64"`
+	I64m  int64                     `primitiveType:"INT64" numberEncoding:"LONG"`
+	Bool  bool                      `primitiveType:"BOOLEAN"`
+	Text  string                    `primitiveType:"TEXT"`
+	Bytes []byte                    `primitiveType:"BYTES"`
+	I8s   []int8                    `primitiveType:"INT8" list:"true"`
+	I16s  []int16                   `primitiveType:"INT16" list:"true"`
+	I32s  []int32                   `primitiveType:"INT32" list:"true"`
+	I64s  []int64                   `primitiveType:"INT64" list:"true"`
+	I64ms []int64                   `primitiveType:"INT64" numberEncoding:"LONG" list:"true" numberEncoding:"LONG"`
+	Bools []bool                    `primitiveType:"BOOLEAN" list:"true"`
+	Texts []string                  `primitiveType:"TEXT" list:"true"`
+	Enum  RefEnum                   `refEnum:"2"`
+	Enums []RefEnum                 `refEnum:"2" list:"true"`
+	JP    *RefContract              `refContract:"3"`
+	JPs   []RefContract             `refContract:"3" list:"true"`
+	JG    binary_proto.DataContract `refContract:"4" genericContract:"true"`
+	JGs   []RefContract             `refContract:"4" genericContract:"true" list:"true"`
 }
 
 func NewStructWithAllTypes() StructWithAllTypes {

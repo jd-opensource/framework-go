@@ -18,7 +18,7 @@ type LedgerMetadata_V2 struct {
 	// 角色权限集合的根哈希
 	RolePrivilegesHash []byte `primitiveType:"BYTES"`
 	// 用户角色授权集合的根哈希
-	UserRolesHash      []byte `primitiveType:"BYTES"`
+	UserRolesHash []byte `primitiveType:"BYTES"`
 }
 
 func (l LedgerMetadata_V2) ContractCode() int32 {

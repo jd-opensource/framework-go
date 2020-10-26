@@ -122,23 +122,44 @@ service := serviceFactory.GetBlockchainService()
 ledgerHashs, err := service.GetLedgerHashs()
 require.Nil(t, err)
 
-// 选择一个账本，创建交易
+// 创建交易
 txTemp := service.NewTransaction(ledgerHashs[0])
 
 // 部署合约
 file, err := os.Open("contract.car")
 defer file.Close()
+require.Nil(t, err)
 contract, err := ioutil.ReadAll(file)
-txTemp.Contracts().Deploy(user.GetIdentity(), contract)
+require.Nil(t, err)
+txTemp.Contracts().Deploy(user.GetIdentity(), contract, -1)
 
 // TX 准备就绪；
 prepTx := txTemp.Prepare()
 
-// 使用网络中已存在用户私钥进行签名；
+// 使用私钥进行签名；
 prepTx.Sign(NODE_KEY.AsymmetricKeypair)
 
 // 提交交易；
 resp, err := prepTx.Commit()
+require.Nil(t, err)
+require.True(t, resp.Success)
+
+// 创建合约调用交易
+txTemp = service.NewTransaction(ledgerHashs[0])
+txTemp.ContractEvents().Send(user.GetAddress(), 合约版本, "方法名", 参数列表...)
+// TX 准备就绪；
+prepTx = txTemp.Prepare()
+
+// 使用私钥进行签名；
+prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+// 提交交易；
+resp, err = prepTx.Commit()
+require.Nil(t, err)
+require.True(t, resp.Success)
+res := resp.OperationResults
+require.Equal(t, 1, len(res))
+require.EqualValues(t, "success", bytes.ToString(res[0].Result.Bytes))
 ```
 
 ##### 事件

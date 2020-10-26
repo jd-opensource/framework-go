@@ -1,9 +1,9 @@
 package sm
 
 import (
+	"github.com/ZZMarquis/gm/sm3"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
-	"github.com/ZZMarquis/gm/sm3"
 )
 
 /**
