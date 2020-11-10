@@ -1,6 +1,9 @@
 package ledger_model
 
-import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+import (
+	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+)
 
 /*
  * Author: imuge
@@ -19,6 +22,8 @@ type BlockchainIdentity struct {
 }
 
 func NewBlockchainIdentity(address, pubKey []byte) BlockchainIdentity {
+	// pubkey checking
+	framework.ParsePubKey(pubKey)
 	return BlockchainIdentity{
 		Address: address,
 		PubKey:  pubKey,
