@@ -21,12 +21,10 @@ type BlockchainIdentity struct {
 	PubKey  []byte `primitiveType:"BYTES"`
 }
 
-func NewBlockchainIdentity(address, pubKey []byte) BlockchainIdentity {
-	// pubkey checking
-	framework.ParsePubKey(pubKey)
+func NewBlockchainIdentity(pubKey framework.PubKey) BlockchainIdentity {
 	return BlockchainIdentity{
-		Address: address,
-		PubKey:  pubKey,
+		Address: framework.GenerateAddress(pubKey),
+		PubKey:  pubKey.ToBytes(),
 	}
 }
 
