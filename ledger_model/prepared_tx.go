@@ -24,7 +24,7 @@ func NewPreparedTx(txReqBuilder TransactionRequestBuilder, txService Transaction
 }
 
 func (p *PreparedTx) GetHash() framework.HashDigest {
-	return p.txReqBuilder.GetHash()
+	return p.txReqBuilder.GetTransactionHash()
 }
 
 func (p *PreparedTx) GetTransactionContent() TransactionContent {
@@ -32,7 +32,7 @@ func (p *PreparedTx) GetTransactionContent() TransactionContent {
 }
 
 func (p *PreparedTx) Sign(keyPair framework.AsymmetricKeypair) DigitalSignature {
-	signature := Sign(p.GetTransactionContent(), keyPair)
+	signature := Sign(p.txReqBuilder.GetTransactionHash(), keyPair)
 	p.AddSignature(signature)
 	return signature
 }

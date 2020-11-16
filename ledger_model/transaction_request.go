@@ -1,6 +1,9 @@
 package ledger_model
 
-import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+import (
+	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
+)
 
 /*
  * Author: imuge
@@ -14,22 +17,21 @@ func init() {
 }
 
 type TransactionRequest struct {
-	NodeRequest
-	Hash []byte `primitiveType:"BYTES"`
+	TransactionHash    []byte             `primitiveType:"BYTES"`
+	TransactionContent TransactionContent `refContract:"512"`
+	EndpointSignatures []DigitalSignature `refContract:"2864" list:"true"`
+	NodeSignatures     []DigitalSignature `refContract:"2864" list:"true"`
 }
 
-func NewTransactionRequest(content TransactionContent) TransactionRequest {
+func NewTransactionRequest(transactionHash []byte, content TransactionContent) TransactionRequest {
 	return TransactionRequest{
-		NodeRequest: NodeRequest{
-			EndpointRequest: EndpointRequest{
-				TransactionContent: content,
-			},
-		},
+		TransactionHash:    transactionHash,
+		TransactionContent: content,
 	}
 }
 
 func (t TransactionRequest) ContractCode() int32 {
-	return binary_proto.REQUEST
+	return binary_proto.TX_REQUEST
 }
 
 func (t TransactionRequest) ContractName() string {
@@ -38,4 +40,18 @@ func (t TransactionRequest) ContractName() string {
 
 func (t TransactionRequest) Description() string {
 	return ""
+}
+
+func (t *TransactionRequest) ContainsEndpointSignature(pubKey []byte) bool {
+	for _, s := range t.EndpointSignatures {
+		if bytes.Equals(s.PubKey, pubKey) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (t *TransactionRequest) AddEndpointSignatures(signature DigitalSignature) {
+	t.EndpointSignatures = append(t.EndpointSignatures, signature)
 }

@@ -44,9 +44,9 @@ func (t *TxTemplate) States() *ParticipantStateUpdateOperationBuilder {
 	return t.txBuilder.States()
 }
 
-func NewTxTemplate(ledgerHash framework.HashDigest, txService TransactionService) *TxTemplate {
+func NewTxTemplate(ledgerHash framework.HashDigest, hashAlgorithm framework.CryptoAlgorithm, txService TransactionService) *TxTemplate {
 	return &TxTemplate{
-		txBuilder:    NewTxBuilder(ledgerHash),
+		txBuilder:    NewTxBuilder(ledgerHash, hashAlgorithm),
 		stateManager: NewTxStateManager(),
 		txService:    txService,
 	}

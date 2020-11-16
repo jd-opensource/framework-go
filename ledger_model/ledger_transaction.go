@@ -14,12 +14,12 @@ func init() {
 }
 
 type LedgerTransaction struct {
-	Transaction
-	LedgerDataSnapshot
+	Request TransactionRequest `refContract:"514"`
+	Result  TransactionResult  `refContract:"515"`
 }
 
 func (l LedgerTransaction) ContractCode() int32 {
-	return binary_proto.TX_LEDGER
+	return binary_proto.TX_RECORD
 }
 
 func (l LedgerTransaction) ContractName() string {

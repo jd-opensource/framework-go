@@ -10,8 +10,8 @@ import (
  * Date: 2020/5/28 下午5:47
  */
 
-func Sign(txContent TransactionContent, keyPair framework.AsymmetricKeypair) DigitalSignature {
-	signatureDigest := SignWithPrivKey(txContent, keyPair.PrivKey)
+func SignBytes(transactionHash []byte, keyPair framework.AsymmetricKeypair) DigitalSignature {
+	signatureDigest := SignBytesWithPrivKey(transactionHash, keyPair.PrivKey)
 	return DigitalSignature{
 		DigitalSignatureBody{
 			PubKey: keyPair.PubKey.ToBytes(),
@@ -20,16 +20,26 @@ func Sign(txContent TransactionContent, keyPair framework.AsymmetricKeypair) Dig
 	}
 }
 
-func SignWithPrivKey(txContent TransactionContent, privKey framework.PrivKey) framework.SignatureDigest {
-	return crypto.GetSignatureFunctionByCode(privKey.GetAlgorithm()).Sign(privKey, txContent.Hash)
+func Sign(transactionHash framework.HashDigest, keyPair framework.AsymmetricKeypair) DigitalSignature {
+	signatureDigest := SignWithPrivKey(transactionHash, keyPair.PrivKey)
+	return DigitalSignature{
+		DigitalSignatureBody{
+			PubKey: keyPair.PubKey.ToBytes(),
+			Digest: signatureDigest.ToBytes(),
+		},
+	}
 }
 
-func VerifySignature(txContent TransactionContent, signDigest framework.SignatureDigest, pubKey framework.PubKey) bool {
-	if !verifyTxContentHash(txContent.TransactionContentBody, framework.ParseHashDigest(txContent.Hash)) {
-		return false
-	}
+func SignWithPrivKey(hash framework.HashDigest, privKey framework.PrivKey) framework.SignatureDigest {
+	return crypto.GetSignatureFunctionByCode(privKey.GetAlgorithm()).Sign(privKey, hash.ToBytes())
+}
 
-	return VerifyHashSignature(txContent.Hash, signDigest, pubKey)
+func SignBytesWithPrivKey(hash []byte, privKey framework.PrivKey) framework.SignatureDigest {
+	return crypto.GetSignatureFunctionByCode(privKey.GetAlgorithm()).Sign(privKey, hash)
+}
+
+func VerifySignature(hashAlgorithm int16, txContent TransactionContent, signDigest framework.SignatureDigest, pubKey framework.PubKey) bool {
+	return VerifyHashSignature(ComputeTxContentHash(crypto.GetCryptoFunctionByCode(hashAlgorithm).GetAlgorithm(), txContent).ToBytes(), signDigest, pubKey)
 }
 
 func VerifyHashSignature(hash []byte, signDigest framework.SignatureDigest, pubKey framework.PubKey) bool {

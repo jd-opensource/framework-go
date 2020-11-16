@@ -1,6 +1,8 @@
 package sdk
 
 import (
+	"errors"
+	"github.com/blockchain-jd-com/framework-go/crypto"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/ledger_model"
 )
@@ -15,6 +17,44 @@ var _ BlockchainService = (*GatewayBlockchainService)(nil)
 type GatewayBlockchainService struct {
 	QueryService ledger_model.BlockchainQueryService
 	TxService    ledger_model.TransactionService
+
+	LedgerHashs      []framework.HashDigest
+	cryptoSettingMap map[framework.HashDigest]ledger_model.CryptoSetting
+}
+
+func NewGatewayBlockchainService(ledgerHashs []framework.HashDigest, cryptoSettings []ledger_model.CryptoSetting, txService ledger_model.TransactionService, queryService ledger_model.BlockchainQueryService) *GatewayBlockchainService {
+	cryptoSettingMap := make(map[framework.HashDigest]ledger_model.CryptoSetting)
+	for i, ledger := range ledgerHashs {
+		cryptoSettingMap[ledger] = cryptoSettings[i]
+	}
+	return &GatewayBlockchainService{
+		QueryService:     queryService,
+		TxService:        txService,
+		LedgerHashs:      ledgerHashs,
+		cryptoSettingMap: cryptoSettingMap,
+	}
+}
+
+func (b *GatewayBlockchainService) NewTransaction(ledgerHash framework.HashDigest) ledger_model.TransactionTemplate {
+	return ledger_model.NewTxTemplate(ledgerHash, crypto.GetAlgorithmByCode(b.GetCryptoSetting(ledgerHash).HashAlgorithm), b.TxService)
+}
+
+func (b *GatewayBlockchainService) PrepareTransaction(content ledger_model.TransactionContent) ledger_model.PreparedTransaction {
+	contentHash := ledger_model.ComputeTxContentHash(crypto.GetAlgorithmByCode(b.GetCryptoSetting(framework.ParseHashDigest(content.LedgerHash)).HashAlgorithm), content)
+	txReqBuilder := ledger_model.NewTxRequestBuilder(contentHash, content)
+	return ledger_model.NewPreparedTx(txReqBuilder, b.TxService)
+}
+
+func (b *GatewayBlockchainService) GetLedgerHashs() ([]framework.HashDigest, error) {
+	return b.LedgerHashs, nil
+}
+
+func (b *GatewayBlockchainService) GetCryptoSetting(ledger framework.HashDigest) ledger_model.CryptoSetting {
+	if setting, ok := b.cryptoSettingMap[ledger]; ok {
+		return setting
+	} else {
+		panic(errors.New("Ledger[" + ledger.ToString() + "] not exist!"))
+	}
 }
 
 func (b *GatewayBlockchainService) MonitorSystemEvent(ledgerHash framework.HashDigest, eventPoint SystemEventPoint, listener SystemEventListener) SystemEventListenerHandle {
@@ -27,26 +67,6 @@ func (b *GatewayBlockchainService) MonitorUserEvent(ledgerHash framework.HashDig
 
 func (b *GatewayBlockchainService) MonitorUserEvents(ledgerHash framework.HashDigest, startingEventPoints []UserEventPoint, listener UserEventListener) UserEventListenerHandle {
 	return NewUserEventListenerHandle(b.QueryService, ledgerHash, startingEventPoints, listener)
-}
-
-func (b *GatewayBlockchainService) NewTransaction(ledgerHash framework.HashDigest) ledger_model.TransactionTemplate {
-	return ledger_model.NewTxTemplate(ledgerHash, b.TxService)
-}
-
-func (b *GatewayBlockchainService) PrepareTransaction(content ledger_model.TransactionContent) ledger_model.PreparedTransaction {
-	txReqBuilder := ledger_model.NewTxRequestBuilder(content)
-	return ledger_model.NewPreparedTx(txReqBuilder, b.TxService)
-}
-
-func NewGatewayBlockchainService(txService ledger_model.TransactionService, queryService ledger_model.BlockchainQueryService) *GatewayBlockchainService {
-	return &GatewayBlockchainService{
-		QueryService: queryService,
-		TxService:    txService,
-	}
-}
-
-func (b *GatewayBlockchainService) GetLedgerHashs() ([]framework.HashDigest, error) {
-	return b.QueryService.GetLedgerHashs()
 }
 
 func (b *GatewayBlockchainService) GetLedger(ledgerHash framework.HashDigest) (ledger_model.LedgerInfo, error) {

@@ -25,7 +25,7 @@ func (e *EndpointAutoSigner) Process(txRequest ledger_model.TransactionRequest) 
 	// TODO: 未实现按不同的账本的密码参数配置，采用不同的哈希算法和签名算法；
 	if !txRequest.ContainsEndpointSignature(e.userKey.GetIdentity().PubKey) {
 		// TODO: 优化上下文对此 TransactionContent 的多次序列化带来的额外性能开销；
-		signature := ledger_model.Sign(txRequest.TransactionContent, e.userKey.AsymmetricKeypair)
+		signature := ledger_model.SignBytes(txRequest.TransactionHash, e.userKey.AsymmetricKeypair)
 		txRequest.AddEndpointSignatures(signature)
 	}
 
