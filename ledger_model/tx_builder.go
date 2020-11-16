@@ -15,8 +15,9 @@ import (
 var _ TransactionBuilder = (*TxBuilder)(nil)
 
 type TxBuilder struct {
-	ledgerHash framework.HashDigest
-	opFactory  BlockchainOperationFactory
+	ledgerHash    framework.HashDigest
+	hashAlgorithm framework.CryptoAlgorithm
+	opFactory     BlockchainOperationFactory
 }
 
 func (t *TxBuilder) ContractEvents() *ContractEventSendOperationBuilder {
@@ -39,10 +40,11 @@ func (t *TxBuilder) States() *ParticipantStateUpdateOperationBuilder {
 	return t.opFactory.States()
 }
 
-func NewTxBuilder(ledgerHash framework.HashDigest) *TxBuilder {
+func NewTxBuilder(ledgerHash framework.HashDigest, hashAlgorithm framework.CryptoAlgorithm) *TxBuilder {
 	return &TxBuilder{
-		ledgerHash: ledgerHash,
-		opFactory:  BlockchainOperationFactory{},
+		ledgerHash:    ledgerHash,
+		hashAlgorithm: hashAlgorithm,
+		opFactory:     BlockchainOperationFactory{},
 	}
 }
 
@@ -71,11 +73,14 @@ func (t *TxBuilder) DataAccount(accountAddress []byte) *DataAccountKVSetOperatio
 }
 
 func (t *TxBuilder) PrepareRequestNow() TransactionRequestBuilder {
-	return NewTxRequestBuilder(t.PrepareContentNow())
+	return t.PrepareRequest(time.Now().Unix())
 }
 
 func (t *TxBuilder) PrepareRequest(time int64) TransactionRequestBuilder {
-	return NewTxRequestBuilder(t.PrepareContent(time))
+	txContent := t.PrepareContent(time)
+	transactionHash := ComputeTxContentHash(t.hashAlgorithm, txContent)
+
+	return NewTxRequestBuilder(transactionHash, txContent)
 }
 
 func (t *TxBuilder) PrepareContentNow() TransactionContent {
@@ -83,23 +88,19 @@ func (t *TxBuilder) PrepareContentNow() TransactionContent {
 }
 
 func (t *TxBuilder) PrepareContent(time int64) TransactionContent {
-	txContent := NewTransactionContent(t.ledgerHash, t.opFactory.operationList, time)
-	contentHash := computeTxContentHash(txContent.TransactionContentBody)
-	txContent.Hash = contentHash.ToBytes()
-
-	return txContent
+	return NewTransactionContent(t.ledgerHash, t.opFactory.operationList, time)
 }
 
-func computeTxContentHash(txContent TransactionContentBody) framework.HashDigest {
+func ComputeTxContentHash(algorithm framework.CryptoAlgorithm, txContent TransactionContent) framework.HashDigest {
 	contentBodyBytes, err := binary_proto.Cdc.Encode(txContent)
 	if err != nil {
 		panic(err)
 	}
-	contentHash := crypto.GetHashFunctionByName(DEFAULT_HASH_ALGORITHM).Hash(contentBodyBytes)
+	contentHash := crypto.GetHashFunction(algorithm).Hash(contentBodyBytes)
 	return contentHash
 }
 
-func verifyTxContentHash(txContent TransactionContentBody, verifiedHash framework.HashDigest) bool {
-	hash := computeTxContentHash(txContent)
+func VerifyTxContentHash(algorithm framework.CryptoAlgorithm, txContent TransactionContent, verifiedHash framework.HashDigest) bool {
+	hash := ComputeTxContentHash(algorithm, txContent)
 	return hash.Equals(verifiedHash)
 }

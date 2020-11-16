@@ -1,9 +1,0 @@
-{
-	"code":2852,
-	"description":"",
-	"itemNames":["REGISTERED","ACTIVED"],
-	"itemValues":[0,1],
-	"name":"ParticipantNodeState",
-	"valueType":"INT8",
-	"version":0
-}

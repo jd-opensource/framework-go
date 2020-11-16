@@ -1,9 +1,0 @@
-{
-	"code":1027,
-	"description":"",
-	"itemNames":["UNION","INTERSECT"],
-	"itemValues":[0,1],
-	"name":"USER-ROLE-POLICY",
-	"valueType":"INT8",
-	"version":0
-}

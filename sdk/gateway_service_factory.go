@@ -27,7 +27,19 @@ func NewGatewayServiceFactory(userKey ledger_model.BlockchainKeypair, blockchain
 func Connect(gatewayHost string, gatewayPort int, secure bool, userKey ledger_model.BlockchainKeypair) GatewayServiceFactory {
 	queryService := NewRestyQueryService(gatewayHost, gatewayPort, secure)
 	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort, secure))
-	service := NewGatewayBlockchainService(txService, queryService)
+	ledgerHashs, err := queryService.GetLedgerHashs()
+	if err != nil {
+		panic(err)
+	}
+	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
+	for i, ledger := range ledgerHashs {
+		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		if err != nil {
+			panic(err)
+		}
+		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+	}
+	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(userKey, service)
 }
 

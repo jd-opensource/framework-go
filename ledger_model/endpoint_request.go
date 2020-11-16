@@ -19,7 +19,7 @@ func init() {
 type EndpointRequest struct {
 	//Hash []byte `primitiveType:"BYTES"`
 	// 交易内容
-	TransactionContent TransactionContent `refContract:"528"`
+	TransactionContent TransactionContent `refContract:"512"`
 	// 终端用户的签名列表
 	EndpointSignatures []DigitalSignature `refContract:"2864" list:"true"`
 }

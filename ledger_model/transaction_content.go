@@ -17,17 +17,16 @@ func init() {
 }
 
 type TransactionContent struct {
-	TransactionContentBody
-	Hash []byte `primitiveType:"BYTES"`
+	LedgerHash []byte                      `primitiveType:"BYTES"`
+	Operations []binary_proto.DataContract `refContract:"768" genericContract:"true" list:"true"`
+	Timestamp  int64                       `primitiveType:"INT64"`
 }
 
 func NewTransactionContent(ledgerHash framework.HashDigest, operations []binary_proto.DataContract, time int64) TransactionContent {
 	return TransactionContent{
-		TransactionContentBody: TransactionContentBody{
-			LedgerHash: ledgerHash.ToBytes(),
-			Operations: operations,
-			Timestamp:  time,
-		},
+		LedgerHash: ledgerHash.ToBytes(),
+		Operations: operations,
+		Timestamp:  time,
 	}
 }
 

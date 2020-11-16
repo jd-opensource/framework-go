@@ -17,7 +17,7 @@ var (
 	// 网关服务IP
 	GATEWAY_HOST = "localhost"
 	// 网关服务端口
-	GATEWAY_PORT = 8181
+	GATEWAY_PORT = 8080
 	SECURE       = false
 
 	// 区块链上已存在的有操作权限的用户公私钥信息
