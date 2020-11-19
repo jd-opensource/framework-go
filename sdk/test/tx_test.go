@@ -46,7 +46,7 @@ func TestRegisterUser(t *testing.T) {
 	txTemp.Security().Authorziations().ForUser([][]byte{user.GetAddress()}).Authorize("MANAGER").Authorize("IMUGE")
 
 	// 注册更多用户
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 1; i++ {
 		// 生成公私钥对
 		user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 		// 注册用户
@@ -79,13 +79,13 @@ func TestDataAccount(t *testing.T) {
 	// 创建交易
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 1; i++ {
 		// 生成公私钥对
 		user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 		// 注册数据账户
 		txTemp.DataAccounts().Register(user.GetIdentity())
 		// 插入数据
-		for j := 0; j < 20; j++ {
+		for j := 0; j < 0; j++ {
 			k := fmt.Sprintf("k%d", j)
 			txTemp.DataAccount(user.GetAddress()).SetText(k, "text", -1)
 			txTemp.DataAccount(user.GetAddress()).SetInt64(k, int64(64), 0)
@@ -95,7 +95,7 @@ func TestDataAccount(t *testing.T) {
 			txTemp.DataAccount(user.GetAddress()).SetTimestamp(k, time.Now().Unix(), 4)
 		}
 		k := "k"
-		for j := 0; j < 20; j++ {
+		for j := 0; j < 0; j++ {
 			v := fmt.Sprintf("v%d", j)
 			txTemp.DataAccount(user.GetAddress()).SetText(k, v, int64(j-1))
 		}
@@ -150,7 +150,7 @@ func TestContract(t *testing.T) {
 
 	// 创建合约调用交易
 	txTemp = service.NewTransaction(ledgerHashs[0])
-	err = txTemp.ContractEvents().Send(user.GetAddress(), 0, "setkv", "LdeNzsW6YM4ycbGbeKR8pMTDLSMYpmAWYTW9V", "key", int32(100), int64(-1))
+	err = txTemp.ContractEvents().Send(user.GetAddress(), 0, "setkv", "LdeNuf6mxP2QcmZgBvRNNeGqGSrCzYQVQ6M2o", "key", int32(100), int64(-1))
 	require.Nil(t, err)
 	// TX 准备就绪；
 	prepTx = txTemp.Prepare()

@@ -109,7 +109,7 @@ func TestQuery(t *testing.T) {
 			// 遍历所有交易
 			for _, tx := range txsByHeight {
 
-				txHash := framework.ParseHashDigest(tx.TransactionContent.Hash)
+				txHash := framework.ParseHashDigest(tx.Request.TransactionHash)
 
 				// 根据交易内容的哈希获取对应的交易记录
 				txByHash, err := blockchainService.GetTransactionByContentHash(ledger, txHash)
@@ -119,7 +119,7 @@ func TestQuery(t *testing.T) {
 				// 根据交易内容的哈希获取对应的交易状态
 				txState, err := blockchainService.GetTransactionStateByContentHash(ledger, txHash)
 				require.Nil(t, err)
-				require.Equal(t, tx.ExecutionState, txState)
+				require.Equal(t, tx.Result.ExecutionState, txState)
 			}
 
 			// 获取指定区块高度中新增的交易总数（即该区块中交易集合的数量）
