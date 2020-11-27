@@ -209,10 +209,10 @@ func (mask *NumberMask) ResolveMaskedNumber(markBytes []byte) int64 {
 	numberHead := markBytes[0] & (0xFF >> mask.BIT_COUNT)
 
 	// 转换字节大小；
-	number := numberHead & 0xFF
+	number := int64(numberHead & 0xFF)
 	for i := int32(1); i < maskLen; i++ {
-		number = (number << 8) | (markBytes[i] & 0xFF)
+		number = number*256 + int64(markBytes[i]&0xFF)
 	}
 
-	return int64(number)
+	return number
 }
