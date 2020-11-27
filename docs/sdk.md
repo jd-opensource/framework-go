@@ -2,6 +2,8 @@
 
 JD Chain[交易](#交易)提交和[查询](#查询)
 
+运行测试用例前请正确配置[constants](../sdk/test/constants.go)中相关配置信息。
+
 #### 交易
 
 测试用例参照[tx_test](../sdk/test/tx_test.go)
