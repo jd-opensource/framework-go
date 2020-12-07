@@ -3,6 +3,8 @@ package sm2
 import (
 	"crypto/rand"
 	"github.com/ZZMarquis/gm/sm2"
+	"github.com/ZZMarquis/gm/sm3"
+	"github.com/blockchain-jd-com/framework-go/utils/random"
 	"math/big"
 )
 
@@ -20,6 +22,20 @@ func GenerateKeyPair() (*sm2.PrivateKey, *sm2.PublicKey) {
 	}
 
 	return priv, pub
+}
+
+func GenerateKeyPairWithSeed(seed []byte) (*sm2.PrivateKey, *sm2.PublicKey) {
+	priv, pub, err := sm2.GenerateKey(random.NewHashSecureRandom(seed, sm3Hash))
+	if err != nil {
+		panic(err)
+	}
+
+	return priv, pub
+}
+
+func sm3Hash(d []byte) []byte {
+	s := sm3.Sum(d)
+	return s[:]
 }
 
 func PubKeyToBytes(pub *sm2.PublicKey) []byte {

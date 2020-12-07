@@ -23,3 +23,9 @@ func (b BlockchainKeyGenerator) Generate(algorithm framework.CryptoAlgorithm) le
 	cryptoKeyPair := signFunc.GenerateKeypair()
 	return ledger_model.NewBlockchainKeypair(cryptoKeyPair.PubKey, cryptoKeyPair.PrivKey)
 }
+
+func (b BlockchainKeyGenerator) GenerateWithSeed(algorithm framework.CryptoAlgorithm, seed []byte) ledger_model.BlockchainKeypair {
+	signFunc := crypto.GetSignatureFunction(algorithm)
+	cryptoKeyPair := signFunc.GenerateKeypair()
+	return ledger_model.NewBlockchainKeypair(cryptoKeyPair.PubKey, cryptoKeyPair.PrivKey)
+}

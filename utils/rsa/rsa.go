@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
+	"github.com/blockchain-jd-com/framework-go/utils/random"
 	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"math/big"
 )
@@ -17,6 +18,15 @@ import (
 
 func GenerateKeyPair() *rsa.PrivateKey {
 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+
+	return priv
+}
+
+func GenerateKeyPairWithSeed(seed []byte) *rsa.PrivateKey {
+	priv, err := rsa.GenerateKey(random.NewHashSecureRandom(seed, sha.Sha256), 2048)
 	if err != nil {
 		panic(err)
 	}
