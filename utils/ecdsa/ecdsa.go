@@ -2,6 +2,7 @@ package ecdsa
 
 import (
 	"crypto/rand"
+	"github.com/blockchain-jd-com/framework-go/utils/random"
 	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"math/big"
 )
@@ -13,6 +14,11 @@ import (
 
 func GenerateKeyPair() *PrivateKey {
 	priv, _ := GenerateKey(S256(), rand.Reader)
+	return priv
+}
+
+func GenerateKeyPairWithSeed(seed []byte) *PrivateKey {
+	priv, _ := GenerateKey(S256(), random.NewHashSecureRandom(seed, sha.Sha256))
 	return priv
 }
 

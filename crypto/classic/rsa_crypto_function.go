@@ -156,6 +156,20 @@ func (R RSACryptoFunction) GenerateKeypair() framework.AsymmetricKeypair {
 	return framework.NewAsymmetricKeypair(framework.NewPubKey(R.GetAlgorithm(), rsa.PubKeyToBytes(&priv.PublicKey)), framework.NewPrivKey(R.GetAlgorithm(), rsa.PrivKeyToBytes(priv)))
 }
 
+func (R RSACryptoFunction) GenerateKeypairWithSeed(seed []byte) (keypair framework.AsymmetricKeypair, err error) {
+	defer func() {
+		r := recover()
+		if r != nil {
+			err = r.(error)
+			return
+		}
+	}()
+	priv := rsa.GenerateKeyPairWithSeed(seed)
+	keypair = framework.NewAsymmetricKeypair(framework.NewPubKey(R.GetAlgorithm(), rsa.PubKeyToBytes(&priv.PublicKey)), framework.NewPrivKey(R.GetAlgorithm(), rsa.PrivKeyToBytes(priv)))
+
+	return
+}
+
 func (R RSACryptoFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return RSA_ALGORITHM
 }

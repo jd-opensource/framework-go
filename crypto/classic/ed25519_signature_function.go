@@ -30,6 +30,23 @@ func (E ED25519SignatureFunction) GenerateKeypair() framework.AsymmetricKeypair 
 	return framework.NewAsymmetricKeypair(framework.NewPubKey(E.GetAlgorithm(), pub), framework.NewPrivKey(E.GetAlgorithm(), seed))
 }
 
+func (E ED25519SignatureFunction) GenerateKeypairWithSeed(seed []byte) (keypair framework.AsymmetricKeypair, err error) {
+	defer func() {
+		r := recover()
+		if r != nil {
+			err = r.(error)
+			return
+		}
+	}()
+	if len(seed) < 32 {
+		panic("seed length must gte 32")
+	}
+	pub, seed := ed25519.GenerateKeyPairWithSeed(seed)
+	keypair = framework.NewAsymmetricKeypair(framework.NewPubKey(E.GetAlgorithm(), pub), framework.NewPrivKey(E.GetAlgorithm(), seed))
+
+	return
+}
+
 func (E ED25519SignatureFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return ED25519_ALGORITHM
 }

@@ -167,6 +167,20 @@ func (S SM2CryptoFunction) GenerateKeypair() framework.AsymmetricKeypair {
 	return framework.NewAsymmetricKeypair(framework.NewPubKey(S.GetAlgorithm(), sm2.PubKeyToBytes(pub)), framework.NewPrivKey(S.GetAlgorithm(), sm2.PrivKeyToBytes(priv)))
 }
 
+func (S SM2CryptoFunction) GenerateKeypairWithSeed(seed []byte) (keypair framework.AsymmetricKeypair, err error) {
+	defer func() {
+		r := recover()
+		if r != nil {
+			err = r.(error)
+			return
+		}
+	}()
+	priv, pub := sm2.GenerateKeyPairWithSeed(seed)
+	keypair = framework.NewAsymmetricKeypair(framework.NewPubKey(S.GetAlgorithm(), sm2.PubKeyToBytes(pub)), framework.NewPrivKey(S.GetAlgorithm(), sm2.PrivKeyToBytes(priv)))
+
+	return
+}
+
 func (S SM2CryptoFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return SM2_ALGORITHM
 }
