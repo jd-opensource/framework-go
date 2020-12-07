@@ -79,7 +79,7 @@ func (t *TxBuilder) PrepareRequest(time int64) TransactionRequestBuilder {
 }
 
 func (t *TxBuilder) PrepareContentNow() TransactionContent {
-	return t.PrepareContent(time.Now().Unix())
+	return t.PrepareContent(time.Now().UnixNano() / 1e6)
 }
 
 func (t *TxBuilder) PrepareContent(time int64) TransactionContent {
