@@ -34,7 +34,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(NIL)
+	binary_proto.RegisterEnum(NIL)
 }
 
 var _ binary_proto.EnumContract = (*DataType)(nil)

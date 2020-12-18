@@ -10,7 +10,7 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*LedgerMetadata)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(LedgerMetadata{})
+	binary_proto.RegisterContract(LedgerMetadata{})
 }
 
 // 账本的元数据

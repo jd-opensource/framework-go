@@ -15,7 +15,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(ONE)
+	binary_proto.RegisterEnum(ONE)
 }
 
 var _ binary_proto.EnumContract = (*RefEnum)(nil)

@@ -45,7 +45,7 @@ var (
 var _ binary_proto.DataContract = (*CryptoAlgorithm)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(CryptoAlgorithm{})
+	binary_proto.RegisterContract(CryptoAlgorithm{})
 }
 
 type CryptoAlgorithm struct {

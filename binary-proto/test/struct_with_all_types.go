@@ -8,7 +8,7 @@ import (
 var _ binary_proto.DataContract = (*StructWithAllTypes)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(StructWithAllTypes{})
+	binary_proto.RegisterContract(StructWithAllTypes{})
 }
 
 type StructWithAllTypes struct {

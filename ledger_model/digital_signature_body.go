@@ -10,7 +10,7 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*DigitalSignatureBody)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(DigitalSignatureBody{})
+	binary_proto.RegisterContract(DigitalSignatureBody{})
 }
 
 type DigitalSignatureBody struct {

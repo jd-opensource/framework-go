@@ -13,7 +13,7 @@ import (
 var _ binary_proto.DataContract = (*EndpointRequest)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(EndpointRequest{})
+	binary_proto.RegisterContract(EndpointRequest{})
 }
 
 type EndpointRequest struct {

@@ -10,8 +10,8 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*UserAuthorizeOperation)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(UserRolesEntry{})
-	binary_proto.Cdc.RegisterContract(UserAuthorizeOperation{})
+	binary_proto.RegisterContract(UserRolesEntry{})
+	binary_proto.RegisterContract(UserAuthorizeOperation{})
 }
 
 // 角色配置操作

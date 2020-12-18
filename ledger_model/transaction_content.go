@@ -13,7 +13,7 @@ import (
 var _ binary_proto.DataContract = (*TransactionContent)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(TransactionContent{})
+	binary_proto.RegisterContract(TransactionContent{})
 }
 
 type TransactionContent struct {

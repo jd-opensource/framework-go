@@ -10,8 +10,8 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*RolesConfigureOperation)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(RolePrivilegeEntry{})
-	binary_proto.Cdc.RegisterContract(RolesConfigureOperation{})
+	binary_proto.RegisterContract(RolePrivilegeEntry{})
+	binary_proto.RegisterContract(RolesConfigureOperation{})
 }
 
 type RolesConfigureOperation struct {

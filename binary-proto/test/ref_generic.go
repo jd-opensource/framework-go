@@ -10,7 +10,7 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*RefGeneric)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(RefGeneric{})
+	binary_proto.RegisterContract(RefGeneric{})
 }
 
 type RefGeneric struct {

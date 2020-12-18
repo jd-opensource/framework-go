@@ -17,7 +17,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(DIRECT_OPERATION)
+	binary_proto.RegisterEnum(DIRECT_OPERATION)
 }
 
 var _ binary_proto.EnumContract = (*TransactionPermission)(nil)

@@ -46,7 +46,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(CONFIGURE_ROLES)
+	binary_proto.RegisterEnum(CONFIGURE_ROLES)
 }
 
 var _ binary_proto.EnumContract = (*LedgerPermission)(nil)

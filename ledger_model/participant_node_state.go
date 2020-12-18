@@ -20,7 +20,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(READY)
+	binary_proto.RegisterEnum(READY)
 }
 
 var _ binary_proto.EnumContract = (*ParticipantNodeState)(nil)
