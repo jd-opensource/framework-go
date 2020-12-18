@@ -6,6 +6,7 @@ import (
 	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"reflect"
 	"strconv"
+	"sync"
 )
 
 /**
@@ -13,30 +14,60 @@ import (
  * @Date: 2020/5/21 下午
  */
 
-var Cdc = NewCodec()
+//var Cdc = NewCodec()
 
-type Codec struct {
+var (
 	// 契约类型
-	ContractMap map[int32]DataContract
-	VersionMap  map[int32]int64
-	// 枚举类型
-	EnumMap map[int32]EnumContract
-}
+	contractMap map[int32]DataContract
 
-func NewCodec() *Codec {
-	return &Codec{
-		make(map[int32]DataContract),
-		make(map[int32]int64),
-		make(map[int32]EnumContract),
-	}
+	// 枚举类型
+	enumMap map[int32]EnumContract
+
+	// 锁
+	mapLocker sync.RWMutex
+
+	// once
+	once sync.Once
+)
+
+func init() {
+	once.Do(func() {
+		contractMap = make(map[int32]DataContract)
+		enumMap = make( map[int32]EnumContract)
+	})
 }
 
 /**
 注册契约
 */
-func (c *Codec) RegisterContract(contract DataContract) {
-	c.ContractMap[contract.ContractCode()] = contract
+func RegisterContract(contract DataContract) {
+	mapLocker.Lock()
+	defer mapLocker.Unlock()
+
+	contractMap[contract.ContractCode()] = contract
 }
+
+/**
+注册枚举
+*/
+func RegisterEnum(enum EnumContract) {
+	mapLocker.Lock()
+	defer mapLocker.Unlock()
+
+	enumMap[enum.ContractCode()] = enum
+}
+
+
+type Codec struct {
+	VersionMap  map[int32]int64
+}
+
+func NewCodec() *Codec {
+	return &Codec{
+		make(map[int32]int64),
+	}
+}
+
 
 // 计算契约版本号`
 func (c *Codec) CalculateVersion(contract DataContract) error {
@@ -75,7 +106,11 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 				bs := make([]byte, 14)
 				bs[0] = array
 				bs[1] = byte(3)
-				refCon := (c.ContractMap[int32(refContract)]).(DataContract)
+
+				mapLocker.RLock()
+				refCon := (contractMap[int32(refContract)]).(DataContract)
+				mapLocker.RUnlock()
+
 				copy(bs[2:6], bytes.Int32ToBytes(refCon.ContractCode()))
 				ver, ok := c.VersionMap[refCon.ContractCode()]
 				if !ok {
@@ -91,7 +126,11 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 				bs := make([]byte, 14)
 				bs[0] = array
 				bs[1] = byte(2)
-				refCon := (c.ContractMap[int32(refContract)]).(DataContract)
+
+				mapLocker.RLock()
+				refCon := (contractMap[int32(refContract)]).(DataContract)
+				mapLocker.RUnlock()
+
 				copy(bs[2:6], bytes.Int32ToBytes(refCon.ContractCode()))
 				ver, ok := c.VersionMap[refCon.ContractCode()]
 				if !ok {
@@ -107,7 +146,11 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 				bs := make([]byte, 14)
 				bs[0] = array
 				bs[1] = byte(1)
-				enumCon := (c.EnumMap[int32(refEnum)]).(EnumContract)
+
+				mapLocker.RLock()
+				enumCon := (enumMap[int32(refEnum)]).(EnumContract)
+				mapLocker.RUnlock()
+
 				copy(bs[2:6], bytes.Int32ToBytes(enumCon.ContractCode()))
 				copy(bs[6:], bytes.Int64ToBytes(enumCon.ContractVersion()))
 				buf = append(buf, bs...)
@@ -122,13 +165,6 @@ func (c *Codec) calculateFieldVersion(rt reflect.Type) ([]byte, error) {
 	}
 
 	return buf, nil
-}
-
-/**
-注册枚举
-*/
-func (c *Codec) RegisterEnum(enum EnumContract) {
-	c.EnumMap[enum.ContractCode()] = enum
 }
 
 func (c *Codec) Encode(contract DataContract) ([]byte, error) {
@@ -228,7 +264,10 @@ func (c *Codec) encodeField(tField reflect.StructField, vField reflect.Value) ([
 func (c *Codec) Decode(data []byte) (interface{}, error) {
 	// 解析头信息
 	code, _ := decodeHeader(data)
-	contract := c.ContractMap[code]
+
+	mapLocker.RLock()
+	contract := contractMap[code]
+	mapLocker.RUnlock()
 
 	value, _, err := c.decode(data[HEAD_BYTES:], contract)
 	if err != nil {

@@ -40,7 +40,7 @@ func NewRestyTxService(host string, port int, secure bool) *RestyTxService {
 }
 
 func (r *RestyTxService) Process(txRequest ledger_model.TransactionRequest) (response ledger_model.TransactionResponse, err error) {
-	msg, _ := binary_proto.Cdc.Encode(txRequest)
+	msg, _ := binary_proto.NewCodec().Encode(txRequest)
 
 	client := resty.New()
 	resp, err := client.R().
@@ -52,10 +52,9 @@ func (r *RestyTxService) Process(txRequest ledger_model.TransactionRequest) (res
 		err = errors.New(resp.String())
 		return
 	}
-	tresp, err := binary_proto.Cdc.Decode(resp.Body())
-	if err != nil {
-		return
+	if tresp, err := binary_proto.NewCodec().Decode(resp.Body()); err != nil {
+		return ledger_model.TransactionResponse{}, err
+	} else {
+		return tresp.(ledger_model.TransactionResponse), nil
 	}
-
-	return tresp.(ledger_model.TransactionResponse), nil
 }

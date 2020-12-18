@@ -10,7 +10,7 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*MerkleSnapshot)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(MerkleSnapshot{})
+	binary_proto.RegisterContract(MerkleSnapshot{})
 }
 
 type MerkleSnapshot struct {

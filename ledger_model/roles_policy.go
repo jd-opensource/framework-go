@@ -17,7 +17,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(UNION)
+	binary_proto.RegisterEnum(UNION)
 }
 
 var _ binary_proto.EnumContract = (*RolesPolicy)(nil)

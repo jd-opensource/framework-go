@@ -92,7 +92,7 @@ func (t *TxBuilder) PrepareContent(time int64) TransactionContent {
 }
 
 func ComputeTxContentHash(algorithm framework.CryptoAlgorithm, txContent TransactionContent) framework.HashDigest {
-	contentBodyBytes, err := binary_proto.Cdc.Encode(txContent)
+	contentBodyBytes, err := binary_proto.NewCodec().Encode(txContent)
 	if err != nil {
 		panic(err)
 	}

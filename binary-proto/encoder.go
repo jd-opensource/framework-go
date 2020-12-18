@@ -88,7 +88,10 @@ func encodeString(data string) []byte {
 }
 
 func encodeEnum(c *Codec, value int64, refEnum int) []byte {
-	contract := (c.EnumMap[int32(refEnum)]).(EnumContract)
+	mapLocker.RLock()
+	contract := (enumMap[int32(refEnum)]).(EnumContract)
+	mapLocker.RUnlock()
+
 	switch contract.ContractType() {
 	case PRIMITIVETYPE_INT8:
 		return []byte{encodeInt8(int8(value))}
@@ -114,7 +117,10 @@ func encodeContract(c *Codec, reflectContract int, v interface{}) []byte {
 	if v == nil || (reflect.ValueOf(v).Kind() == reflect.Ptr && reflect.ValueOf(v).IsNil()) {
 		// 空值，仅编码头信息
 		// 编码头信息
-		contract, ok := c.ContractMap[int32(reflectContract)]
+		mapLocker.RLock()
+		contract, ok := contractMap[int32(reflectContract)]
+		mapLocker.RUnlock()
+
 		if !ok {
 			panic(fmt.Sprintf("contract %d not exists", reflectContract))
 		}

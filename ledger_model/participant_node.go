@@ -12,7 +12,7 @@ import (
 var _ binary_proto.DataContract = (*ParticipantNode)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(ParticipantNode{})
+	binary_proto.RegisterContract(ParticipantNode{})
 }
 
 // 参与方节点

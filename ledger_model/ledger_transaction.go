@@ -10,7 +10,7 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*LedgerTransaction)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(LedgerTransaction{})
+	binary_proto.RegisterContract(LedgerTransaction{})
 }
 
 type LedgerTransaction struct {

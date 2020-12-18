@@ -48,7 +48,7 @@ const (
 )
 
 func init() {
-	binary_proto.Cdc.RegisterEnum(SUCCESS)
+	binary_proto.RegisterEnum(SUCCESS)
 }
 
 var _ binary_proto.EnumContract = (*TransactionState)(nil)

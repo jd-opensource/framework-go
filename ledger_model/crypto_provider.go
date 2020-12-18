@@ -13,7 +13,7 @@ import (
 var _ binary_proto.DataContract = (*CryptoProvider)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(CryptoProvider{})
+	binary_proto.RegisterContract(CryptoProvider{})
 }
 
 type CryptoProvider struct {

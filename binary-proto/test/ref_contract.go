@@ -10,7 +10,7 @@ import "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*RefContract)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(RefContract{})
+	binary_proto.RegisterContract(RefContract{})
 }
 
 type RefContract struct {
@@ -56,7 +56,7 @@ func (r RefContractInner) Description() string {
 var _ binary_proto.DataContract = (*RefContractInner)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(RefContractInner{})
+	binary_proto.RegisterContract(RefContractInner{})
 }
 
 func NewRefContractInner() RefContractInner {

@@ -10,7 +10,7 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*Operation)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(Operation{})
+	binary_proto.RegisterContract(Operation{})
 }
 
 type Operation struct {

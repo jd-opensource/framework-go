@@ -10,7 +10,7 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*UserAccountHeader)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(UserAccountHeader{})
+	binary_proto.RegisterContract(UserAccountHeader{})
 }
 
 type UserAccountHeader struct {

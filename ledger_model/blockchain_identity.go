@@ -13,7 +13,7 @@ import (
 var _ binary_proto.DataContract = (*BlockchainIdentity)(nil)
 
 func init() {
-	binary_proto.Cdc.RegisterContract(BlockchainIdentity{})
+	binary_proto.RegisterContract(BlockchainIdentity{})
 }
 
 type BlockchainIdentity struct {
