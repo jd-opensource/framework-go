@@ -662,7 +662,7 @@ func parseEvent(event gjson.Result) ledger_model.Event {
 	if event.Get("eventAccount").Exists() {
 		info.EventAccount = base58.MustDecode(event.Get("eventAccount.value").String())
 	}
-	if event.Get("content.nil").Bool() {
+	if !event.Get("content.nil").Bool() {
 		info.Content = parseBytesValue(event.Get("content"))
 	}
 
