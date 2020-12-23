@@ -18,7 +18,7 @@ func GenerateKeyPair() *PrivateKey {
 }
 
 func GenerateKeyPairWithSeed(seed []byte) *PrivateKey {
-	priv, _ := GenerateKey(S256(), random.NewHashSecureRandom(seed, sha.Sha256))
+	priv, _ := GenerateKey(S256(), random.NewHashSecureRandom(seed, 32, random.Sha256))
 	return priv
 }
 

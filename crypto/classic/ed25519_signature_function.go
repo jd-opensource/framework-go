@@ -1,6 +1,7 @@
 package classic
 
 import (
+	"errors"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/utils/ed25519"
 )
@@ -34,7 +35,7 @@ func (E ED25519SignatureFunction) GenerateKeypairWithSeed(seed []byte) (keypair 
 	defer func() {
 		r := recover()
 		if r != nil {
-			err = r.(error)
+			err = errors.New(r.(string))
 			return
 		}
 	}()

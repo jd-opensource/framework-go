@@ -30,17 +30,7 @@ func (E ECDSASignatureFunction) GenerateKeypair() framework.AsymmetricKeypair {
 }
 
 func (E ECDSASignatureFunction) GenerateKeypairWithSeed(seed []byte) (keypair framework.AsymmetricKeypair, err error) {
-	defer func() {
-		r := recover()
-		if r != nil {
-			err = r.(error)
-			return
-		}
-	}()
-	priv := ecdsa.GenerateKeyPairWithSeed(seed)
-	keypair = framework.NewAsymmetricKeypair(framework.NewPubKey(E.GetAlgorithm(), ecdsa.PubKeyToBytes(&priv.PublicKey)), framework.NewPrivKey(E.GetAlgorithm(), ecdsa.PrivKeyToBytes(priv)))
-
-	return
+	panic("not support yet")
 }
 
 func (E ECDSASignatureFunction) GetAlgorithm() framework.CryptoAlgorithm {

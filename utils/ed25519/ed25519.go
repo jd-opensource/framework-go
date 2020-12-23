@@ -3,7 +3,6 @@ package ed25519
 import (
 	"crypto/rand"
 	"github.com/blockchain-jd-com/framework-go/utils/random"
-	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"golang.org/x/crypto/ed25519"
 )
 
@@ -22,7 +21,7 @@ func GenerateKeyPair() (ed25519.PublicKey, []byte) {
 }
 
 func GenerateKeyPairWithSeed(seed []byte) (ed25519.PublicKey, []byte) {
-	pub, priv, err := ed25519.GenerateKey(random.NewHashSecureRandom(seed, sha.Sha256))
+	pub, priv, err := ed25519.GenerateKey(random.NewHashSecureRandom(seed, 32, random.Sha256))
 	if err != nil {
 		panic(err)
 	}
