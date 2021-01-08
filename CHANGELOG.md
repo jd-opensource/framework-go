@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.1
+2021.01.08
+
+**Bug Fixes**
+* [频繁发送交易失败](https://github.com/blockchain-jd-com/framework-go/issues/3)
+
 ## v1.0.0
 2020.11.27
 
