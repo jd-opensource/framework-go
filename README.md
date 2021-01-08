@@ -10,6 +10,7 @@ JD Chain SDK  Go 语言实现版本，对应于 JD Chain Framework 中，Java �
 版本对应关系：
 |  framework-go   | JD Chain Framework  |
 |  ----  | ----  |
+| 1.1.*  | 1.4.0 |
 | 1.0.*  | 1.3.0 |
 
 ## Crypto
