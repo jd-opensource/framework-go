@@ -106,6 +106,15 @@ func TestQuery(t *testing.T) {
 			require.Nil(t, err)
 			require.Equal(t, txsByHeight, txsByHash)
 
+			//分页返回指定账本序号的区块中新增加的交易列表
+			txsByHeight, err = blockchainService.GetAdditionalTransactionsByHeight(ledger, height, 0, txCountByHeight)
+			require.Nil(t, err)
+
+			// 分页返回指定账本序号的区块中新增加的交易列表
+			txsByHash, err = blockchainService.GetAdditionalTransactionsByHash(ledger, blockHash, 0, txCountByHeight)
+			require.Nil(t, err)
+			require.Equal(t, txsByHeight, txsByHash)
+
 			// 遍历所有交易
 			for _, tx := range txsByHeight {
 

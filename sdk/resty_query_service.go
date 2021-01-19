@@ -1297,3 +1297,45 @@ func (r RestyQueryService) GetUserPrivileges(ledgerHash framework.HashDigest, us
 
 	return
 }
+
+func (r RestyQueryService) GetAdditionalTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int64) (info []ledger_model.LedgerTransaction, err error) {
+	params := map[string]string{
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
+	}
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/blocks/height/%d/txs/additional-txs", ledgerHash.ToBase58(), height), params)
+	if err != nil {
+		return info, err
+	}
+	txArray := wrp.Array()
+	info = make([]ledger_model.LedgerTransaction, len(txArray))
+	for i, tx := range txArray {
+		info[i] = ledger_model.LedgerTransaction{
+			Request: parseTxRequest(tx.Get("request")),
+			Result:  parseTxResult(tx.Get("result")),
+		}
+	}
+
+	return
+}
+
+func (r RestyQueryService) GetAdditionalTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int64) (info []ledger_model.LedgerTransaction, err error) {
+	params := map[string]string{
+		"fromIndex": strconv.FormatInt(fromIndex, 10),
+		"count":     strconv.FormatInt(count, 10),
+	}
+	wrp, err := r.queryWithParams(fmt.Sprintf("/ledgers/%s/blocks/hash/%s/txs/additional-txs", ledgerHash.ToBase58(), blockHash.ToBase58()), params)
+	if err != nil {
+		return info, err
+	}
+	txArray := wrp.Array()
+	info = make([]ledger_model.LedgerTransaction, len(txArray))
+	for i, tx := range txArray {
+		info[i] = ledger_model.LedgerTransaction{
+			Request: parseTxRequest(tx.Get("request")),
+			Result:  parseTxResult(tx.Get("result")),
+		}
+	}
+
+	return
+}

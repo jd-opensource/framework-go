@@ -312,3 +312,11 @@ func (b *GatewayBlockchainService) GetRolePrivileges(ledgerHash framework.HashDi
 func (b *GatewayBlockchainService) GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (ledger_model.UserRolesPrivileges, error) {
 	return b.QueryService.GetUserPrivileges(ledgerHash, userAddress)
 }
+
+func (b *GatewayBlockchainService) GetAdditionalTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int64) ([]ledger_model.LedgerTransaction, error) {
+	return b.QueryService.GetAdditionalTransactionsByHeight(ledgerHash, height, fromIndex, count)
+}
+
+func (b *GatewayBlockchainService) GetAdditionalTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int64) ([]ledger_model.LedgerTransaction, error) {
+	return b.QueryService.GetAdditionalTransactionsByHash(ledgerHash, blockHash, fromIndex, count)
+}

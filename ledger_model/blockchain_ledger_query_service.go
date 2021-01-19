@@ -426,4 +426,26 @@ type BlockChainLedgerQueryService interface {
 	 * @return
 	 */
 	GetUserPrivileges(ledgerHash framework.HashDigest, userAddress string) (UserRolesPrivileges, error)
+
+	/**
+	 * 获取指定区块高度中新增的交易
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHeight
+	 *         区块高度
+	 * @return
+	 */
+	GetAdditionalTransactionsByHeight(ledgerHash framework.HashDigest, height int64, fromIndex, count int64) ([]LedgerTransaction, error)
+
+	/**
+	 * 获取指定区块Hash中新增的交易
+	 *
+	 * @param ledgerHash
+	 *         账本Hash
+	 * @param blockHash
+	 *         区块Hash
+	 * @return
+	 */
+	GetAdditionalTransactionsByHash(ledgerHash, blockHash framework.HashDigest, fromIndex, count int64) ([]LedgerTransaction, error)
 }
