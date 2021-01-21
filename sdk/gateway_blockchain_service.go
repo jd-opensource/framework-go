@@ -19,13 +19,13 @@ type GatewayBlockchainService struct {
 	TxService    ledger_model.TransactionService
 
 	LedgerHashs      []framework.HashDigest
-	cryptoSettingMap map[string]ledger_model.CryptoSetting
+	cryptoSettingMap map[framework.HashDigest]ledger_model.CryptoSetting
 }
 
 func NewGatewayBlockchainService(ledgerHashs []framework.HashDigest, cryptoSettings []ledger_model.CryptoSetting, txService ledger_model.TransactionService, queryService ledger_model.BlockchainQueryService) *GatewayBlockchainService {
-	cryptoSettingMap := make(map[string]ledger_model.CryptoSetting)
+	cryptoSettingMap := make(map[framework.HashDigest]ledger_model.CryptoSetting)
 	for i, ledger := range ledgerHashs {
-		cryptoSettingMap[ledger.ToBase58()] = cryptoSettings[i]
+		cryptoSettingMap[ledger] = cryptoSettings[i]
 	}
 	return &GatewayBlockchainService{
 		QueryService:     queryService,
@@ -50,7 +50,7 @@ func (b *GatewayBlockchainService) GetLedgerHashs() ([]framework.HashDigest, err
 }
 
 func (b *GatewayBlockchainService) GetCryptoSetting(ledger framework.HashDigest) ledger_model.CryptoSetting {
-	if setting, ok := b.cryptoSettingMap[ledger.ToBase58()]; ok {
+	if setting, ok := b.cryptoSettingMap[ledger]; ok {
 		return setting
 	} else {
 		panic(errors.New("Ledger[" + ledger.ToString() + "] not exist!"))
@@ -183,95 +183,7 @@ func (b *GatewayBlockchainService) GetLatestDataEntriesByRange(ledgerHash framew
 
 func (b *GatewayBlockchainService) GetContract(ledgerHash framework.HashDigest, address string) (ledger_model.ContractInfo, error) {
 	return b.QueryService.GetContract(ledgerHash, address)
-}package sdk
-2
-​
-3
-import (
-4
-        "errors"
-5
-        "github.com/blockchain-jd-com/framework-go/crypto"
-6
-        "github.com/blockchain-jd-com/framework-go/crypto/framework"
-7
-        "github.com/blockchain-jd-com/framework-go/ledger_model"
-8
-)
-9
-​
-10
-/*
-11
- * Author: imuge
-12
- * Date: 2020/5/27 下午4:18
-13
- */
-14
-​
-15
-var _ BlockchainService = (*GatewayBlockchainService)(nil)
-16
-​
-17
-type GatewayBlockchainService struct {
-18
-        QueryService ledger_model.BlockchainQueryService
-19
-        TxService    ledger_model.TransactionService
-20
-​
-21
-        LedgerHashs      []framework.HashDigest
-22
-        cryptoSettingMap map[framework.HashDigest]ledger_model.CryptoSetting
-23
 }
-24
-​
-25
-func NewGatewayBlockchainService(ledgerHashs []framework.HashDigest, cryptoSettings []ledger_model.CryptoSetting, txService ledger_model.TransactionService, queryService ledger_model.BlockchainQueryService) *GatewayBlockchainService {
-26
-        cryptoSettingMap := make(map[framework.HashDigest]ledger_model.CryptoSetting)
-27
-        for i, ledger := range ledgerHashs {
-28
-                cryptoSettingMap[ledger] = cryptoSettings[i]
-29
-        }
-30
-        return &GatewayBlockchainService{
-31
-                QueryService:     queryService,
-32
-                TxService:        txService,
-33
-                LedgerHashs:      ledgerHashs,
-34
-                cryptoSettingMap: cryptoSettingMap,
-35
-        }
-36
-}
-37
-​
-38
-func (b *GatewayBlockchainService) NewTransaction(ledgerHash framework.HashDigest) ledger_model.TransactionTemplate {
-39
-        return ledger_model.NewTxTemplate(ledgerHash, crypto.GetAlgorithmByCode(b.GetCryptoSetting(ledgerHash).HashAlgorithm), b.TxService)
-40
-}
-41
-​
-42
-func (b *GatewayBlockchainService) PrepareTransaction(content ledger_model.TransactionContent) ledger_model.PreparedTransaction {
-43
-        contentHash := ledger_model.ComputeTxContentHash(crypto.GetAlgorithmByCode(b.GetCryptoSetting(framework.ParseHashDigest(content.LedgerHash)).HashAlgorithm), content)
-44
-        txReqBuilder := ledger_model.NewTxRequestBuilder(contentHash, content)
-45
-        return ledger_model.NewPreparedTx(txReqBuilder, b.TxService)
 
 func (b *GatewayBlockchainService) GetUsers(ledgerHash framework.HashDigest, fromIndex, count int64) ([]ledger_model.BlockchainIdentity, error) {
 	return b.QueryService.GetUsers(ledgerHash, fromIndex, count)
