@@ -19,13 +19,13 @@ type GatewayBlockchainService struct {
 	TxService    ledger_model.TransactionService
 
 	LedgerHashs      []framework.HashDigest
-	cryptoSettingMap map[framework.HashDigest]ledger_model.CryptoSetting
+	cryptoSettingMap map[string]ledger_model.CryptoSetting
 }
 
 func NewGatewayBlockchainService(ledgerHashs []framework.HashDigest, cryptoSettings []ledger_model.CryptoSetting, txService ledger_model.TransactionService, queryService ledger_model.BlockchainQueryService) *GatewayBlockchainService {
-	cryptoSettingMap := make(map[framework.HashDigest]ledger_model.CryptoSetting)
+	cryptoSettingMap := make(map[string]ledger_model.CryptoSetting)
 	for i, ledger := range ledgerHashs {
-		cryptoSettingMap[ledger] = cryptoSettings[i]
+		cryptoSettingMap[ledger.ToBase58()] = cryptoSettings[i]
 	}
 	return &GatewayBlockchainService{
 		QueryService:     queryService,
@@ -50,7 +50,7 @@ func (b *GatewayBlockchainService) GetLedgerHashs() ([]framework.HashDigest, err
 }
 
 func (b *GatewayBlockchainService) GetCryptoSetting(ledger framework.HashDigest) ledger_model.CryptoSetting {
-	if setting, ok := b.cryptoSettingMap[ledger]; ok {
+	if setting, ok := b.cryptoSettingMap[ledger.ToBase58()]; ok {
 		return setting
 	} else {
 		panic(errors.New("Ledger[" + ledger.ToString() + "] not exist!"))
