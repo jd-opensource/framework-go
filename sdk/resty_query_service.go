@@ -56,6 +56,10 @@ func (r RestyQueryService) query(url string) (data gjson.Result, err error) {
 	}
 
 	wrp := gjson.ParseBytes(resp.Body())
+	// 数据不存在
+	if wrp.Type == gjson.Null {
+		return data, errors.New("empty data")
+	}
 	if !wrp.Get("success").Bool() {
 		return data, errors.New(fmt.Sprintf("error code:%d msg:%s", wrp.Get("error.errorCode").Int(), wrp.Get("error.errorMessage").String()))
 	}
@@ -72,6 +76,10 @@ func (r RestyQueryService) queryWithParams(url string, params map[string]string)
 	}
 
 	wrp := gjson.ParseBytes(resp.Body())
+	// 数据不存在
+	if wrp.Type == gjson.Null {
+		return data, errors.New("empty data")
+	}
 	if !wrp.Get("success").Bool() {
 		return data, errors.New(fmt.Sprintf("error code:%d msg:%s", wrp.Get("error.errorCode").Int(), wrp.Get("error.errorMessage").String()))
 	}
@@ -88,6 +96,10 @@ func (r RestyQueryService) queryWithParamsFromValues(url string, params url.Valu
 	}
 
 	wrp := gjson.ParseBytes(resp.Body())
+	// 数据不存在
+	if wrp.Type == gjson.Null {
+		return data, errors.New("empty data")
+	}
 	if !wrp.Get("success").Bool() {
 		return data, errors.New(fmt.Sprintf("error code:%d msg:%s", wrp.Get("error.errorCode").Int(), wrp.Get("error.errorMessage").String()))
 	}
@@ -104,6 +116,10 @@ func (r RestyQueryService) queryWithBody(url string, params interface{}) (data g
 	}
 
 	wrp := gjson.ParseBytes(resp.Body())
+	// 数据不存在
+	if wrp.Type == gjson.Null {
+		return data, errors.New("empty data")
+	}
 	if !wrp.Get("success").Bool() {
 		return data, errors.New(fmt.Sprintf("error code:%d msg:%s", wrp.Get("error.errorCode").Int(), wrp.Get("error.errorMessage").String()))
 	}
