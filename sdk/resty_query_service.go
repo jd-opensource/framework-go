@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
@@ -436,6 +437,18 @@ func (r RestyQueryService) GetDataAccount(ledgerHash framework.HashDigest, addre
 	return
 }
 
+// KV value 解析
+func resolveTypedKVValue(t ledger_model.DataType, v gjson.Result) (interface{}, error) {
+	switch t {
+	case ledger_model.INT64, ledger_model.TIMESTAMP:
+		return v.Int(), nil
+	case ledger_model.BYTES, ledger_model.IMG:
+		return base64.StdEncoding.DecodeString(v.String())
+	default:
+		return v.String(), nil
+	}
+}
+
 func (r RestyQueryService) GetLatestDataEntries(ledgerHash framework.HashDigest, address string, keys []string) (info []ledger_model.TypedKVEntry, err error) {
 	params := url.Values{
 		"keys": keys,
@@ -447,11 +460,16 @@ func (r RestyQueryService) GetLatestDataEntries(ledgerHash framework.HashDigest,
 	kvArray := wrp.Array()
 	info = make([]ledger_model.TypedKVEntry, len(kvArray))
 	for i, id := range kvArray {
+		t := ledger_model.NIL.GetValueByName(id.Get("type").String()).(ledger_model.DataType)
+		v, err := resolveTypedKVValue(t, id.Get("value"))
+		if err != nil {
+			return nil, err
+		}
 		info[i] = ledger_model.TypedKVEntry{
 			Key:     id.Get("key").String(),
-			Value:   id.Get("value").String(),
+			Value:   v,
 			Version: id.Get("version").Int(),
-			Type:    ledger_model.NIL.GetValueByName(id.Get("type").String()).(ledger_model.DataType),
+			Type:    t,
 		}
 	}
 
@@ -466,11 +484,16 @@ func (r RestyQueryService) GetDataEntries(ledgerHash framework.HashDigest, addre
 	kvArray := wrp.Array()
 	info = make([]ledger_model.TypedKVEntry, len(kvArray))
 	for i, id := range kvArray {
+		t := ledger_model.NIL.GetValueByName(id.Get("type").String()).(ledger_model.DataType)
+		v, err := resolveTypedKVValue(t, id.Get("value"))
+		if err != nil {
+			return nil, err
+		}
 		info[i] = ledger_model.TypedKVEntry{
 			Key:     id.Get("key").String(),
-			Value:   id.Get("value").String(),
+			Value:   v,
 			Version: id.Get("version").Int(),
-			Type:    ledger_model.NIL.GetValueByName(id.Get("type").String()).(ledger_model.DataType),
+			Type:    t,
 		}
 	}
 
@@ -498,11 +521,16 @@ func (r RestyQueryService) GetLatestDataEntriesByRange(ledgerHash framework.Hash
 	kvArray := wrp.Array()
 	info = make([]ledger_model.TypedKVEntry, len(kvArray))
 	for i, id := range kvArray {
+		t := ledger_model.NIL.GetValueByName(id.Get("type").String()).(ledger_model.DataType)
+		v, err := resolveTypedKVValue(t, id.Get("value"))
+		if err != nil {
+			return nil, err
+		}
 		info[i] = ledger_model.TypedKVEntry{
 			Key:     id.Get("key").String(),
-			Value:   id.Get("value").String(),
+			Value:   v,
 			Version: id.Get("version").Int(),
-			Type:    ledger_model.NIL.GetValueByName(id.Get("type").String()).(ledger_model.DataType),
+			Type:    t,
 		}
 	}
 
