@@ -25,4 +25,4 @@ JD Chain SDK  Go 语言实现版本，对应于 JD Chain Framework 中，Java �
 
 提供与`JD Chain` `Java`版本`SDK`使用方式基本一致的[SDK实现](docs/sdk.md)，支持交易发送以及区块链相关数据查询。
 
-更多`JD Chain` `SDK`/`API`文档请查阅[JD Chain官网](http://ledger.jd.com/api.html)。
+更多`JD Chain` `SDK`/`API`文档请查阅[JD Chain相关文档](https://github.com/blockchain-jd-com/jdchain/wiki)。
