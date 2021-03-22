@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1
+2021.03.22
+**Bug Fixes**
+*[NewTransaction传入自解析账本异常](https://github.com/blockchain-jd-com/framework-go/issues/5)
+*JD Chain 1.4.0 公钥兼容
+
 ## v1.1.0
 2021.01.08
 对应`JD Chain` `v1.4.0` 
