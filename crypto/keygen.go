@@ -4,6 +4,7 @@ import (
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/utils/aes"
 	"github.com/blockchain-jd-com/framework-go/utils/base58"
+	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 	"github.com/blockchain-jd-com/framework-go/utils/sha"
 )
 
@@ -13,7 +14,7 @@ var (
 )
 
 func EncodePubKey(pubKey framework.PubKey) string {
-	return base58.Encode(append(PubKeyFileMagicNum, pubKey.ToBytes()...))
+	return base58.Encode(pubKey.ToBytes())
 }
 
 func DecodePubKey(base58PubKey string) framework.PubKey {
@@ -22,7 +23,12 @@ func DecodePubKey(base58PubKey string) framework.PubKey {
 		panic(err)
 	}
 
-	return framework.ParsePubKey(key[len(PubKeyFileMagicNum):])
+	// 兼容1.4.0之前版本公钥输出格式
+	if bytes.StartsWith(key, PubKeyFileMagicNum) {
+		return framework.ParsePubKey(key[len(PubKeyFileMagicNum):])
+	} else {
+		return framework.ParsePubKey(key)
+	}
 }
 
 func EncodePrivKey(privKey framework.PrivKey, pwdBytes []byte) string {
