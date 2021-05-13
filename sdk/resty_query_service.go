@@ -880,12 +880,17 @@ func parseOperations(info []gjson.Result) []binary_proto.DataContract {
 		} else if operation.Get("chainCode").Exists() {
 			// 合约部署
 			dc = parseContractCodeDeployOperation(operation.Get("chainCode"))
+		} else if operation.Get("contractAddress").Exists() {
+			// 合约调用
+			dc = parseContractEventSendOperation(operation)
 		} else if operation.Get("roles").Exists() {
 			// 角色配置
 			dc = parseRolesConfigureOperation(operation)
 		} else if operation.Get("userRolesAuthorizations").Exists() {
 			dc = parseUserAuthorizeOperation(operation.Get("userRolesAuthorizations").Array())
 		}
+
+		// TODO 操作类型不全，存在 dc 为空情况，待完善
 		operations[i] = dc
 	}
 
@@ -932,6 +937,27 @@ func parseContractCodeDeployOperation(info gjson.Result) binary_proto.DataContra
 		ContractID: parseBlockchainIdentity(info.Get("contractID")),
 		ChainCode:  bytes.StringToBytes(info.Get("chainCode").String()),
 	}
+}
+
+func parseContractEventSendOperation(info gjson.Result) binary_proto.DataContract {
+	operation := &ledger_model.ContractEventSendOperation{
+		ContractAddress: base58.MustDecode(info.Get("contractAddress.value").String()),
+		Event: info.Get("event").String(),
+		Version: info.Get("version").Int(),
+	}
+	argsArray := info.Get("args.values").Array();
+	args := make([]ledger_model.BytesValue, len(argsArray))
+	for i, arg := range argsArray {
+		args[i] = ledger_model.BytesValue{
+			Bytes:   base58.MustDecode(arg.Get("bytes.value").String()),
+			Type:    ledger_model.NIL.GetValueByName(arg.Get("type").String()).(ledger_model.DataType),
+		}
+	}
+	operation.Args = ledger_model.BytesValueList{
+		Values: args,
+	}
+
+	return operation
 }
 
 func parseRolesConfigureOperation(info gjson.Result) binary_proto.DataContract {

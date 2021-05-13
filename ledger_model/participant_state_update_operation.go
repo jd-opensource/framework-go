@@ -26,7 +26,7 @@ func (p ParticipantStateUpdateOperation) ContractCode() int32 {
 }
 
 func (p ParticipantStateUpdateOperation) ContractName() string {
-	return "ParticipantStateUpdateOperation"
+	return OperationTypeParticipantStateUpdateOperation
 }
 
 func (p ParticipantStateUpdateOperation) Description() string {

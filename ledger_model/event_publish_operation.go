@@ -24,7 +24,7 @@ func (e EventPublishOperation) ContractCode() int32 {
 }
 
 func (e EventPublishOperation) ContractName() string {
-	return "EventPublishOperation"
+	return OperationTypeEventPublishOperation
 }
 
 func (e EventPublishOperation) Description() string {

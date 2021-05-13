@@ -24,7 +24,7 @@ func (p ParticipantRegisterOperation) ContractCode() int32 {
 }
 
 func (p ParticipantRegisterOperation) ContractName() string {
-	return "ParticipantRegisterOperation"
+	return OperationTypeParticipantRegisterOperation
 }
 
 func (p ParticipantRegisterOperation) Description() string {

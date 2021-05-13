@@ -24,7 +24,7 @@ func (u UserAuthorizeOperation) ContractCode() int32 {
 }
 
 func (u UserAuthorizeOperation) ContractName() string {
-	return "UserAuthorizeOperation"
+	return OperationTypeUserAuthorizeOperation
 }
 
 func (u UserAuthorizeOperation) Description() string {

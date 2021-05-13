@@ -23,7 +23,7 @@ func (d DataAccountKVSetOperation) ContractCode() int32 {
 }
 
 func (d DataAccountKVSetOperation) ContractName() string {
-	return "DataAccountKVSetOperation"
+	return OperationTypeDataAccountKVSetOperation
 }
 
 func (d DataAccountKVSetOperation) Description() string {
