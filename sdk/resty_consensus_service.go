@@ -39,7 +39,7 @@ func NewRestyConsensusService(host string, port int, secure bool) *RestyConsensu
 	}
 }
 
-func (r RestyConsensusService) ActivateParticipant(ledgerHash, host string, port int, remoteManageHost string, remoteManagePort int) (info bool, err error) {
+func (r RestyConsensusService) ActivateParticipant(ledgerHash, host string, port int, remoteManageHost string, remoteManagePort int, shutdown bool) (info bool, err error) {
 	url := "/management/delegate/activeparticipant"
 	params := map[string]string{
 		"ledgerHash":       ledgerHash,
@@ -47,6 +47,7 @@ func (r RestyConsensusService) ActivateParticipant(ledgerHash, host string, port
 		"consensusPort":    strconv.Itoa(port),
 		"remoteManageHost": remoteManageHost,
 		"remoteManagePort": strconv.Itoa(remoteManagePort),
+		"shutdown":         strconv.FormatBool(shutdown),
 	}
 	resp, err := r.client.R().SetFormData(params).SetResult(ActivateParticipantResponse{}).Post(r.baseUrl + url)
 	if err != nil {
