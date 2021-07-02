@@ -155,7 +155,6 @@ func (t TransactionState) GetValueByName(name string) binary_proto.EnumContract 
 	case "CONSENSUS_ERROR":
 		return CONSENSUS_ERROR
 	default:
-		fmt.Printf("unknow error: %s", name)
 		return SYSTEM_ERROR
 	}
 }
