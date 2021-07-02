@@ -1,7 +1,6 @@
 package ledger_model
 
 import (
-	"fmt"
 	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 )
 
@@ -113,7 +112,6 @@ func (t TransactionState) GetValue(CODE int32) binary_proto.EnumContract {
 	case -int32(0x82):
 		return CONSENSUS_ERROR
 	default:
-		fmt.Printf("unknow code: %d", CODE)
 		return SYSTEM_ERROR
 	}
 }

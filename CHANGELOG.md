@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.2
+2021.07.02
+**Bug Fixes**
+* [JD Chain 1.4.0以上版本激活参与方缺少shutdown参数](https://github.com/blockchain-jd-com/framework-go/issues/9)
+* [交易详情缺少对合约调用操作的解析](https://github.com/blockchain-jd-com/framework-go/issues/10)
+* TransactionState#GetValue默认值
+
 ## v1.1.1
 2021.03.22
 **Bug Fixes**
