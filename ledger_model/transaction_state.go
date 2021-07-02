@@ -1,6 +1,9 @@
 package ledger_model
 
-import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+import (
+	"fmt"
+	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
+)
 
 /*
  * Author: imuge
@@ -109,9 +112,10 @@ func (t TransactionState) GetValue(CODE int32) binary_proto.EnumContract {
 		return TIMEOUT
 	case -int32(0x82):
 		return CONSENSUS_ERROR
+	default:
+		fmt.Printf("unknow code: %d", CODE)
+		return SYSTEM_ERROR
 	}
-
-	panic("no enum value founded")
 }
 
 func (t TransactionState) GetValueByName(name string) binary_proto.EnumContract {
@@ -150,7 +154,7 @@ func (t TransactionState) GetValueByName(name string) binary_proto.EnumContract 
 		return TIMEOUT
 	case "CONSENSUS_ERROR":
 		return CONSENSUS_ERROR
+	default:
+		return SYSTEM_ERROR
 	}
-
-	panic("no enum value founded")
 }

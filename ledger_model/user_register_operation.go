@@ -22,7 +22,7 @@ func (u UserRegisterOperation) ContractCode() int32 {
 }
 
 func (u UserRegisterOperation) ContractName() string {
-	return "UserRegisterOperation"
+	return OperationTypeUserRegister
 }
 
 func (u UserRegisterOperation) Description() string {

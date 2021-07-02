@@ -23,7 +23,7 @@ func (r RolesConfigureOperation) ContractCode() int32 {
 }
 
 func (r RolesConfigureOperation) ContractName() string {
-	return "RolesConfigureOperation"
+	return OperationTypeRolesConfigureOperation
 }
 
 func (r RolesConfigureOperation) Description() string {

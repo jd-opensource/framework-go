@@ -30,7 +30,7 @@ func (c ContractCodeDeployOperation) ContractCode() int32 {
 }
 
 func (c ContractCodeDeployOperation) ContractName() string {
-	return "ContractCodeDeployOperation"
+	return OperationTypeContractCodeDeployOperation
 }
 
 func (c ContractCodeDeployOperation) Description() string {

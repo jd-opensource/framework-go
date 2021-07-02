@@ -23,7 +23,7 @@ func (d DataAccountRegisterOperation) ContractCode() int32 {
 }
 
 func (d DataAccountRegisterOperation) ContractName() string {
-	return "DataAccountRegisterOperation"
+	return OperationTypeDataAccountRegisterOperation
 }
 
 func (d DataAccountRegisterOperation) Description() string {

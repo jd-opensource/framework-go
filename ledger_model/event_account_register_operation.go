@@ -22,7 +22,7 @@ func (e EventAccountRegisterOperation) ContractCode() int32 {
 }
 
 func (e EventAccountRegisterOperation) ContractName() string {
-	return "EventAccountRegisterOperation"
+	return OperationTypeEventAccountRegisterOperation
 }
 
 func (e EventAccountRegisterOperation) Description() string {

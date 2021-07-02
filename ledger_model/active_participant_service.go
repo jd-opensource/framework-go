@@ -13,7 +13,7 @@ type ActiveParticipantService interface {
 	remoteManageHost	其他任一非拜占庭节点IP
 	remoteManagePort	其他任一非拜占庭节点管理端口
 	*/
-	ActivateParticipant(ledgerHash, ip string, port int, remoteManageHost string, remoteManagePort int) (bool, error)
+	ActivateParticipant(ledgerHash, ip string, port int, remoteManageHost string, remoteManagePort int, shutdown bool) (bool, error)
 
 	/**
 	ledgerHash	账本HASH

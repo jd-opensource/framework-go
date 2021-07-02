@@ -33,7 +33,7 @@ func (c ContractEventSendOperation) ContractCode() int32 {
 }
 
 func (c ContractEventSendOperation) ContractName() string {
-	return "ContractEventSendOperation"
+	return OperationTypeContractEventSendOperation
 }
 
 func (c ContractEventSendOperation) Description() string {
