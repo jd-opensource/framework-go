@@ -73,7 +73,7 @@ func (t *TxBuilder) DataAccount(accountAddress []byte) *DataAccountKVSetOperatio
 }
 
 func (t *TxBuilder) PrepareRequestNow() TransactionRequestBuilder {
-	return t.PrepareRequest(time.Now().Unix())
+	return t.PrepareRequest(time.Now().UnixNano() / 1e6)
 }
 
 func (t *TxBuilder) PrepareRequest(time int64) TransactionRequestBuilder {
