@@ -1,13 +1,13 @@
 package sdk
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/ledger_model"
 	"github.com/blockchain-jd-com/framework-go/utils/base58"
+	"github.com/blockchain-jd-com/framework-go/utils/base64"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 	"github.com/blockchain-jd-com/framework-go/utils/network"
 	"github.com/go-resty/resty/v2"
@@ -173,7 +173,7 @@ func (r RestyQueryService) GetLedgerAdminInfo(ledgerHash framework.HashDigest) (
 		pNodes[i] = ledger_model.ParticipantNode{
 			Id:                   int32(node.Get("id").Int()),
 			Name:                 node.Get("name").String(),
-			Address:              base58.MustDecode(node.Get("address.value").String()),
+			Address:              base58.MustDecode(node.Get("address").String()),
 			PubKey:               base58.MustDecode(node.Get("pubKey").String()),
 			ParticipantNodeState: ledger_model.READY.GetValueByName(node.Get("participantNodeState").String()).(ledger_model.ParticipantNodeState),
 		}
@@ -200,7 +200,7 @@ func (r RestyQueryService) GetLedgerAdminInfo(ledgerHash framework.HashDigest) (
 	}
 	info.Settings = ledger_model.LedgerSettings{
 		ConsensusProvider: wrp.Get("settings.consensusProvider").String(),
-		ConsensusSetting:  base58.MustDecode(wrp.Get("settings.consensusSetting.value").String()),
+		ConsensusSetting:  base58.MustDecode(wrp.Get("settings.consensusSetting").String()),
 		CryptoSetting: ledger_model.CryptoSetting{
 			SupportedProviders: providers,
 			HashAlgorithm:      int16(wrp.Get("settings.cryptoSetting.hashAlgorithm").Int()),
@@ -221,7 +221,7 @@ func (r RestyQueryService) GetConsensusParticipants(ledgerHash framework.HashDig
 		info[i] = ledger_model.ParticipantNode{
 			Id:                   int32(node.Get("id").Int()),
 			Name:                 node.Get("name").String(),
-			Address:              base58.MustDecode(node.Get("address.value").String()),
+			Address:              base58.MustDecode(node.Get("address").String()),
 			PubKey:               base58.MustDecode(node.Get("pubKey").String()),
 			ParticipantNodeState: ledger_model.READY.GetValueByName(node.Get("participantNodeState").String()).(ledger_model.ParticipantNodeState),
 		}
@@ -443,7 +443,7 @@ func resolveTypedKVValue(t ledger_model.DataType, v gjson.Result) (interface{}, 
 	case ledger_model.INT64, ledger_model.TIMESTAMP:
 		return v.Int(), nil
 	case ledger_model.BYTES, ledger_model.IMG:
-		return base64.StdEncoding.DecodeString(v.String())
+		return base64.Decode(v.String())
 	default:
 		return v.String(), nil
 	}
@@ -650,7 +650,7 @@ func (r RestyQueryService) GetSystemEvents(ledgerHash framework.HashDigest, even
 func parseBytesValue(info gjson.Result) ledger_model.BytesValue {
 	return ledger_model.BytesValue{
 		Type:  ledger_model.NIL.GetValueByName(info.Get("type").String()).(ledger_model.DataType),
-		Bytes: base58.MustDecode(info.Get("bytes.value").String()),
+		Bytes: base64.MustDecode(info.Get("bytes").String()),
 	}
 }
 
@@ -704,7 +704,7 @@ func parseEvent(event gjson.Result) ledger_model.Event {
 	}
 
 	if event.Get("eventAccount").Exists() {
-		info.EventAccount = base58.MustDecode(event.Get("eventAccount.value").String())
+		info.EventAccount = base58.MustDecode(event.Get("eventAccount").String())
 	}
 	if !event.Get("content.nil").Bool() {
 		info.Content = parseBytesValue(event.Get("content"))
@@ -941,7 +941,7 @@ func parseContractCodeDeployOperation(info gjson.Result) binary_proto.DataContra
 
 func parseContractEventSendOperation(info gjson.Result) binary_proto.DataContract {
 	operation := &ledger_model.ContractEventSendOperation{
-		ContractAddress: base58.MustDecode(info.Get("contractAddress.value").String()),
+		ContractAddress: base58.MustDecode(info.Get("contractAddress").String()),
 		Event: info.Get("event").String(),
 		Version: info.Get("version").Int(),
 	}
@@ -949,7 +949,7 @@ func parseContractEventSendOperation(info gjson.Result) binary_proto.DataContrac
 	args := make([]ledger_model.BytesValue, len(argsArray))
 	for i, arg := range argsArray {
 		args[i] = ledger_model.BytesValue{
-			Bytes:   base58.MustDecode(arg.Get("bytes.value").String()),
+			Bytes:   base64.MustDecode(arg.Get("bytes").String()),
 			Type:    ledger_model.NIL.GetValueByName(arg.Get("type").String()).(ledger_model.DataType),
 		}
 	}
@@ -1040,7 +1040,7 @@ func parseDataAccountKVSetOperation(info gjson.Result) binary_proto.DataContract
 		writeSet[i] = kvSet
 	}
 	return &ledger_model.DataAccountKVSetOperation{
-		AccountAddress: base58.MustDecode(info.Get("accountAddress.value").String()),
+		AccountAddress: base58.MustDecode(info.Get("accountAddress").String()),
 		WriteSet:       writeSet,
 	}
 }
@@ -1057,14 +1057,14 @@ func parseEventPublishOperation(info gjson.Result) binary_proto.DataContract {
 		writeSet[i] = kvSet
 	}
 	return &ledger_model.EventPublishOperation{
-		EventAddress: base58.MustDecode(info.Get("eventAddress.value").String()),
+		EventAddress: base58.MustDecode(info.Get("eventAddress").String()),
 		Events:       writeSet,
 	}
 }
 
 func parseBlockchainIdentity(id gjson.Result) ledger_model.BlockchainIdentity {
 	return ledger_model.BlockchainIdentity{
-		Address: base58.MustDecode(id.Get("address.value").String()),
+		Address: base58.MustDecode(id.Get("address").String()),
 		PubKey:  base58.MustDecode(id.Get("pubKey").String()),
 	}
 }
