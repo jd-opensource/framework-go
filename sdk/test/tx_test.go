@@ -75,14 +75,13 @@ func TestDataAccount(t *testing.T) {
 	// 注册数据账户
 	txTemp.DataAccounts().Register(dataAccount.GetIdentity())
 	// 插入数据
-	//txTemp.DataAccount(dataAccount.GetAddress()).SetText("key", "text", -1)
-	//txTemp.DataAccount(dataAccount.GetAddress()).SetInt64("key", int64(64), 0)
-	//txTemp.DataAccount(dataAccount.GetAddress()).SetBytes("key", []byte("bytes"), 1)
-	//txTemp.DataAccount(dataAccount.GetAddress()).SetImage("key", []byte("image"), 2)
-	//txTemp.DataAccount(dataAccount.GetAddress()).SetJSON("key", "json", 3)
-	//txTemp.DataAccount(dataAccount.GetAddress()).SetTimestamp("key", time.Now().Unix(), 4)
-//[0, 0, 2, 0, -54, -118, -15, 111, -117, -17, -30, -6, 34, 32, 24, -125, -47, 10, -22, 57, 57, 0, 64, 74, 114, 57, -40, 55, 22, 124, 3, 4, 122, 6, -88, -67, 39, -55, 42, -74, -14, 109, -59, 1, -112, -78, 63, 1, 64, 105, 0, 0, 3, 32, 13, 122, 17, -30, -73, 64, 95, 0, 64, 76, 0, 0, 0, -112, -4, 112, 68, 86, -99, -4, -52, -66, 27, -111, 65, 21, 95, -28, -56, -96, -4, -79, -123, -31, 90, 95, -29, 74, 54, -22, 107, -52, 120, 47, -77, 48, 21, 28, 123, -34, 35, 65, 21, 1, -61, -119, -86, -112, 23, -113, -54, -106, 107, -87, -41, 94, -46, -93, 32, -93, -105, 77, -61, 91, 127, -101, -28, -51, 26, 121, -43, -94, 123, 72, 96, -6, 14, 0, 0, 11, 48, -4, 112, 68, 86, -99, -4, -52, -66, 0, 0, 0, 0, 1, 123, -90, 59, 26, 13]
-//[0, 0, 2, 0, -54, -118, -15, 111, -117, -17, -30, -6, 34, 32, 24, -125, -47, 10, -22, 57, 57, 0, 64, 74, 114, 57, -40, 55, 22, 124, 3, 4, 122, 6, -88, -67, 39, -55, 42, -74, -14, 109, -59, 1, -112, -78, 63, 1, 64, 103, 0, 0, 3, 32, 13, 122, 17, -30, -73, 64, 95, 0, 64, 76, 0, 0, 0, -112, -4, 112, 68, 86, -99, -4, -52, -66, 27, -111, 65, 21, 95, -28, -56, -96, -4, -79, -123, -31, 90, 95, -29, 74, 54, -22, 107, -52, 120, 47, -77, 48, 21, 28, 123, -34, 35, 65, 21, 1, -61, -119, -86, -112, 23, -113, -54, -106, 107, -87, -41, 94, -46, -93, 32, -93, -105, 77, -61, 91, 127, -101, -28, -51, 26, 121, -43, -94, 123, 72, 96, -6, 12, 0, 0, 11, 48, -4, 112, 68, 86, -99, -4, -52, -66, 0, 0, 1, 123, -90, 59, 26, 13]
+	txTemp.DataAccount(dataAccount.GetAddress()).SetText("key", "text", -1)
+	txTemp.DataAccount(dataAccount.GetAddress()).SetInt64("key", int64(64), 0)
+	txTemp.DataAccount(dataAccount.GetAddress()).SetBytes("key", []byte("bytes"), 1)
+	txTemp.DataAccount(dataAccount.GetAddress()).SetImage("key", []byte("image"), 2)
+	txTemp.DataAccount(dataAccount.GetAddress()).SetJSON("key", "json", 3)
+	txTemp.DataAccount(dataAccount.GetAddress()).SetTimestamp("key", time.Now().Unix(), 4)
+
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
 

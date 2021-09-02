@@ -1,9 +1,7 @@
 package test
 
 import (
-	"fmt"
 	"github.com/blockchain-jd-com/framework-go/binary-proto"
-	"github.com/blockchain-jd-com/framework-go/ledger_model"
 	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -18,19 +16,13 @@ func TestEncode(t *testing.T) {
 }
 
 func TestDecode(t *testing.T) {
-	ll := ledger_model.DigitalSignatureBody{}
-	fmt.Println(ll.PubKey)
-	decode := base58.MustDecode("11Gb7H97yLwfptkD5iqwj6DG8UrSE8LGKeZKf894hXiWKwZYLS9ro7RwKG2sfo5ZVCY1UqMUsGD18AQBXWzVoENyfdMy6h27QRZKiTgDLUKWAF4EGbqriQM2sdAR9sFN3mBANJ3xniJPRkpctxyE1ihsaMPtf34Jj6PCaAd5FuMaf6aRec29ey6Wb8JyHnPHQ9wXrvZoYTnrjdoTRQnEtnHAD2H4Q")
-	obj, err := binary_proto.NewCodec().Decode(decode)
+	origin := NewStructWithAllTypes()
+	bytes, err := binary_proto.NewCodec().Encode(origin)
 	require.Nil(t, err)
-	contract := obj.(ledger_model.TransactionContent)
-	fmt.Println(contract.Timestamp)
-	operation := contract.Operations[0].(ledger_model.DataAccountRegisterOperation)
-	fmt.Println(operation.AddressSignature)
-
-	encode, err := binary_proto.NewCodec().Encode(contract)
+	obj, err := binary_proto.NewCodec().Decode(bytes)
 	require.Nil(t, err)
-	fmt.Println(len(encode))
+	contract := obj.(StructWithAllTypes)
+	require.True(t, origin.Equals(contract))
 }
 
 func TestVersion(t *testing.T) {
