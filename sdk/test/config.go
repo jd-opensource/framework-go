@@ -15,13 +15,13 @@ var (
 	// 网关服务IP
 	GATEWAY_HOST = "localhost"
 	// 网关服务端口
-	GATEWAY_PORT = 11000
+	GATEWAY_PORT = 8080
 	SECURE       = false
 
 	// 区块链上已存在的有操作权限的用户公私钥信息
 	NODE_PRIVITE_KEY = crypto.DecodePrivKey(
-		"177gjzHTznYdPgWqZrH43W3yp37onm74wYXT4v9FukpCHBrhRysBBZh7Pzdo5AMRyQGJD7x",
-		base58.MustDecode("DYu3G8aGTMBW1WrTw76zxQJQU4DHLw9MLyy7peG4LKkY"))
-	NODE_PUBLIC_KEY = crypto.DecodePubKey("3snPdw7i7PjVKiTH2VnXZu5H8QmNaSXpnk4ei533jFpuifyjS5zzH9")
+		"177gk2TroY9kHetQu9NGxsLhNFdq65pdAUDrVxxEx6S15LhbYMW6uD5VD4Xj9HifE8cEtqS",
+		base58.MustDecode("8EjkXVSTxMFjCvNNsTo8RBMDEVQmk7gYkW4SCDuvdsBG"))
+	NODE_PUBLIC_KEY = crypto.DecodePubKey("7VeREdd9ah9pdJH4vnVR7pwjyn4RttCbanhULtPnLyRayrMz")
 	NODE_KEY        = ledger_model.NewBlockchainKeypair(NODE_PUBLIC_KEY, NODE_PRIVITE_KEY)
 )
