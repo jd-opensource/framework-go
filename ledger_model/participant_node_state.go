@@ -16,7 +16,7 @@ const (
 	// 已激活
 	CONSENSUS
 	// 不可用
-	DECONSENSUS
+	DEACTIVATED
 )
 
 func init() {
