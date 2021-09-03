@@ -53,7 +53,7 @@ func (p ParticipantNodeState) GetValue(CODE int32) binary_proto.EnumContract {
 		return CONSENSUS
 	}
 	if CODE == 2 {
-		return DECONSENSUS
+		return DEACTIVATED
 	}
 
 	panic("no enum value founded")
@@ -66,8 +66,8 @@ func (p ParticipantNodeState) GetValueByName(name string) binary_proto.EnumContr
 	if name == "CONSENSUS" {
 		return CONSENSUS
 	}
-	if name == "DECONSENSUS" {
-		return DECONSENSUS
+	if name == "DEACTIVATED" {
+		return DEACTIVATED
 	}
 
 	panic("no enum value founded")
