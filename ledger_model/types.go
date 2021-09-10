@@ -13,4 +13,6 @@ const (
 	OperationTypeContractEventSendOperation      = "ContractEventSendOperation"      // 合约调用
 	OperationTypeRolesConfigureOperation         = "RolesConfigureOperation"         // 角色配置
 	OperationTypeUserAuthorizeOperation          = "UserAuthorizeOperation"          // 用户授权
+	OperationTypeUserStateUpdate                 = "UserStateUpdateOperation"        // 用户状态变更
+	OperationTypeContractStateUpdate             = "ContractStateUpdateOperation"    // 合约状态变更
 )

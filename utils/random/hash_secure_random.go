@@ -59,7 +59,7 @@ func (sr *HashSecureRandom) Read(p []byte) (n int, err error) {
 			sr.availableSize = sr.hashSize
 		}
 		copySize := Min(left, sr.availableSize)
-		copy(p[offset:copySize + offset], sr.output[sr.hashSize-sr.availableSize:sr.hashSize-sr.availableSize+copySize])
+		copy(p[offset:copySize+offset], sr.output[sr.hashSize-sr.availableSize:sr.hashSize-sr.availableSize+copySize])
 		offset += copySize + offset
 		left -= copySize
 		sr.availableSize -= copySize

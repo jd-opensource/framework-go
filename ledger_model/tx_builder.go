@@ -20,6 +20,14 @@ type TxBuilder struct {
 	opFactory     BlockchainOperationFactory
 }
 
+func (t *TxBuilder) User(address []byte) *UserUpdateOperationBuilder {
+	return t.opFactory.User(address)
+}
+
+func (t *TxBuilder) Contract(address []byte) *ContractUpdateOperationBuilder {
+	return t.opFactory.Contract(address)
+}
+
 func (t *TxBuilder) ContractEvents() *ContractEventSendOperationBuilder {
 	return t.opFactory.ContractEvents()
 }

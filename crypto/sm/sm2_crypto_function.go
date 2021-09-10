@@ -1,8 +1,14 @@
 package sm
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"github.com/blockchain-jd-com/framework-go/crypto/ca"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/base64"
 	"github.com/blockchain-jd-com/framework-go/utils/sm2"
+	x5092 "github.com/tjfoc/gmsm/x509"
+	"strings"
 )
 
 /**
@@ -24,6 +30,55 @@ var _ framework.AsymmetricEncryptionFunction = (*SM2CryptoFunction)(nil)
 var _ framework.SignatureFunction = (*SM2CryptoFunction)(nil)
 
 type SM2CryptoFunction struct {
+}
+
+func (S SM2CryptoFunction) RetrievePrivKey(privateKey string) (framework.PrivKey, error) {
+	index := strings.Index(privateKey, "END EC PARAMETERS-----")
+	if index > 0 && strings.Contains(privateKey[:index], "BggqgRzPVQGCLQ==") {
+		privateKey = privateKey[index+22:]
+	}
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	sm2Key, err := x5092.ParsePKCS8UnecryptedPrivateKey(encoded)
+	if err != nil {
+		sm2Key, err = x5092.ParseSm2PrivateKey(encoded)
+		if err != nil {
+			return framework.PrivKey{}, err
+		}
+	}
+	return framework.NewPrivKey(S.GetAlgorithm(), sm2Key.D.Bytes()), nil
+}
+
+func (S SM2CryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (framework.PrivKey, error) {
+	index := strings.Index(privateKey, "END EC PARAMETERS-----")
+	if index > 0 && strings.Contains(privateKey[:index], "BggqgRzPVQGCLQ==") {
+		privateKey = privateKey[index+22:]
+	}
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	sm2Key, err := x5092.ParsePKCS8EcryptedPrivateKey(encoded, pwd)
+	if err != nil {
+		sm2Key, err = x5092.ParseSm2PrivateKey(encoded)
+		if err != nil {
+			return framework.PrivKey{}, err
+		}
+	}
+	return framework.NewPrivKey(S.GetAlgorithm(), sm2Key.D.Bytes()), nil
+}
+
+func (S SM2CryptoFunction) RetrievePubKeyFromCA(cert *ca.Certificate) framework.PubKey {
+	key := cert.SMCert.PublicKey.(*ecdsa.PublicKey)
+	return framework.NewPubKey(S.GetAlgorithm(), elliptic.Marshal(key, key.X, key.Y))
 }
 
 func (S SM2CryptoFunction) Encrypt(pubKey framework.PubKey, data []byte) framework.AsymmetricCiphertext {

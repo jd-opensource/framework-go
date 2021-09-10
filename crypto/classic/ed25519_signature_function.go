@@ -1,9 +1,15 @@
 package classic
 
 import (
+	ed255192 "crypto/ed25519"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
+	"github.com/blockchain-jd-com/framework-go/crypto/ca"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/base64"
 	"github.com/blockchain-jd-com/framework-go/utils/ed25519"
+	"strings"
 )
 
 /**
@@ -23,6 +29,54 @@ var (
 var _ framework.SignatureFunction = (*ED25519SignatureFunction)(nil)
 
 type ED25519SignatureFunction struct {
+}
+
+func (E ED25519SignatureFunction) RetrievePrivKey(privateKey string) (framework.PrivKey, error) {
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	key, err := x509.ParsePKCS8PrivateKey(encoded)
+	if err != nil {
+		key, err = x509.ParsePKCS1PrivateKey(encoded)
+	}
+	ed25519Key, ok := key.(ed255192.PrivateKey)
+	if ok {
+		return framework.NewPrivKey(E.GetAlgorithm(), ed25519Key[:32]), nil
+	}
+
+	return framework.PrivKey{}, errors.New("not ed25519 private key")
+}
+
+func (E ED25519SignatureFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (framework.PrivKey, error) {
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	block, rest := pem.Decode(encoded)
+	if len(rest) > 0 {
+		return framework.PrivKey{}, errors.New("extra data included in key")
+	}
+	encoded, err := x509.DecryptPEMBlock(block, pwd)
+	if err != nil {
+		return framework.PrivKey{}, errors.New("decrypt error")
+	}
+	key, err := x509.ParsePKCS8PrivateKey(encoded)
+	if err != nil {
+		key, err = x509.ParsePKCS1PrivateKey(encoded)
+	}
+	ed25519Key, ok := key.(ed255192.PrivateKey)
+	if ok {
+		return framework.NewPrivKey(E.GetAlgorithm(), ed25519Key[:32]), nil
+	}
+
+	return framework.PrivKey{}, errors.New("not ed25519 private key")
+}
+
+func (E ED25519SignatureFunction) RetrievePubKeyFromCA(cert *ca.Certificate) framework.PubKey {
+	return framework.NewPubKey(E.GetAlgorithm(), cert.ClassicCert.PublicKey.(ed255192.PublicKey))
 }
 
 func (E ED25519SignatureFunction) GenerateKeypair() framework.AsymmetricKeypair {

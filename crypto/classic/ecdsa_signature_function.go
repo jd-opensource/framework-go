@@ -1,8 +1,15 @@
 package classic
 
 import (
+	ecdsa2 "crypto/ecdsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
+	"github.com/blockchain-jd-com/framework-go/crypto/ca"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/base64"
 	"github.com/blockchain-jd-com/framework-go/utils/ecdsa"
+	"strings"
 )
 
 /**
@@ -22,6 +29,78 @@ var (
 var _ framework.SignatureFunction = (*ECDSASignatureFunction)(nil)
 
 type ECDSASignatureFunction struct {
+}
+
+func (E ECDSASignatureFunction) RetrievePrivKey(privateKey string) (framework.PrivKey, error) {
+	index := strings.Index(privateKey, "END EC PARAMETERS-----")
+	if index > 0 && strings.Contains(privateKey[:index], "BggqhkjOPQMBBw==") {
+		privateKey = privateKey[index+22:]
+	}
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	key, err := x509.ParsePKCS8PrivateKey(encoded)
+	if err != nil {
+		key, err = x509.ParsePKCS1PrivateKey(encoded)
+		if err != nil {
+			key, err = x509.ParseECPrivateKey(encoded)
+			if err != nil {
+				return framework.PrivKey{}, errors.New("not ecdsa private key")
+			}
+		}
+	}
+	ecdsaKey, ok := key.(*ecdsa2.PrivateKey)
+	if ok {
+		return framework.NewPrivKey(E.GetAlgorithm(), ecdsaKey.D.Bytes()), nil
+	}
+
+	return framework.PrivKey{}, errors.New("not ecdsa private key")
+}
+
+func (E ECDSASignatureFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (framework.PrivKey, error) {
+	index := strings.Index(privateKey, "END EC PARAMETERS-----")
+	if index > 0 && strings.Contains(privateKey[:index], "BgUrgQQACg==") {
+		privateKey = privateKey[index+22:]
+	}
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END EC PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	block, rest := pem.Decode(encoded)
+	if len(rest) > 0 {
+		return framework.PrivKey{}, errors.New("extra data included in key")
+	}
+	encoded, err := x509.DecryptPEMBlock(block, pwd)
+	if err != nil {
+		return framework.PrivKey{}, errors.New("decrypt error")
+	}
+	key, err := x509.ParsePKCS8PrivateKey(encoded)
+	if err != nil {
+		key, err = x509.ParsePKCS1PrivateKey(encoded)
+		if err != nil {
+			return framework.PrivKey{}, errors.New("not ecdsa private key")
+		}
+	}
+	ecdsaKey, ok := key.(*ecdsa2.PrivateKey)
+	if ok {
+		return framework.NewPrivKey(E.GetAlgorithm(), ecdsaKey.D.Bytes()), nil
+	}
+
+	return framework.PrivKey{}, errors.New("not ecdsa private key")
+}
+
+func (E ECDSASignatureFunction) RetrievePubKeyFromCA(cert *ca.Certificate) framework.PubKey {
+	key := cert.ClassicCert.PublicKey.(*ecdsa2.PublicKey)
+	x := key.X.Bytes()
+	y := key.Y.Bytes()
+	return framework.NewPubKey(E.GetAlgorithm(), append(append([]byte{0x04}, x...), y...))
 }
 
 func (E ECDSASignatureFunction) GenerateKeypair() framework.AsymmetricKeypair {

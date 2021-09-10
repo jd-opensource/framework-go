@@ -15,6 +15,8 @@ func init() {
 
 type UserAccountHeader struct {
 	BlockchainIdentity
+	State       AccountState `refEnum:"788"`
+	Certificate string       `primitiveType:"TEXT"`
 }
 
 func (b UserAccountHeader) ContractCode() int32 {

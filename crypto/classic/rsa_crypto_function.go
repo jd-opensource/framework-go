@@ -1,8 +1,17 @@
 package classic
 
 import (
+	rsa2 "crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
+	"github.com/blockchain-jd-com/framework-go/crypto/ca"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	"github.com/blockchain-jd-com/framework-go/utils/base64"
+	bytes2 "github.com/blockchain-jd-com/framework-go/utils/bytes"
 	"github.com/blockchain-jd-com/framework-go/utils/rsa"
+	"math/big"
+	"strings"
 )
 
 /**
@@ -29,6 +38,77 @@ var _ framework.AsymmetricEncryptionFunction = (*RSACryptoFunction)(nil)
 var _ framework.SignatureFunction = (*RSACryptoFunction)(nil)
 
 type RSACryptoFunction struct {
+}
+
+func (R RSACryptoFunction) RetrievePrivKey(privateKey string) (framework.PrivKey, error) {
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN RSA PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END RSA PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	key, err := x509.ParsePKCS8PrivateKey(encoded)
+	if err != nil {
+		key, err = x509.ParsePKCS1PrivateKey(encoded)
+	}
+	rsaKey, ok := key.(*rsa2.PrivateKey)
+	if ok {
+		return framework.NewPrivKey(R.GetAlgorithm(),
+				bytes2.Concat(rsaKey.PublicKey.N.Bytes(),
+					big.NewInt(int64(rsaKey.PublicKey.E)).Bytes(),
+					rsaKey.D.Bytes(),
+					rsaKey.Primes[0].Bytes(),
+					rsaKey.Primes[1].Bytes(),
+					rsaKey.Precomputed.Dp.Bytes(),
+					rsaKey.Precomputed.Dq.Bytes(),
+					rsaKey.Precomputed.Qinv.Bytes())),
+			nil
+	}
+
+	return framework.PrivKey{}, errors.New("not rsa private key")
+}
+
+func (R RSACryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (framework.PrivKey, error) {
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN RSA PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "-----END RSA PRIVATE KEY-----", "")
+	privateKey = strings.ReplaceAll(privateKey, "\n", "")
+	privateKey = strings.Trim(privateKey, "")
+	encoded := base64.MustDecode(privateKey)
+	block, rest := pem.Decode(encoded)
+	if len(rest) > 0 {
+		return framework.PrivKey{}, errors.New("extra data included in key")
+	}
+	encoded, err := x509.DecryptPEMBlock(block, pwd)
+	if err != nil {
+		return framework.PrivKey{}, errors.New("decrypt error")
+	}
+	key, err := x509.ParsePKCS8PrivateKey(encoded)
+	if err != nil {
+		key, err = x509.ParsePKCS1PrivateKey(encoded)
+	}
+	rsaKey, ok := key.(*rsa2.PrivateKey)
+	if ok {
+		return framework.NewPrivKey(R.GetAlgorithm(),
+				bytes2.Concat(rsaKey.PublicKey.N.Bytes(),
+					big.NewInt(int64(rsaKey.PublicKey.E)).Bytes(),
+					rsaKey.D.Bytes(),
+					rsaKey.Primes[0].Bytes(),
+					rsaKey.Primes[1].Bytes(),
+					rsaKey.Precomputed.Dp.Bytes(),
+					rsaKey.Precomputed.Dq.Bytes(),
+					rsaKey.Precomputed.Qinv.Bytes())),
+			nil
+	}
+
+	return framework.PrivKey{}, errors.New("not rsa private key")
+}
+
+func (R RSACryptoFunction) RetrievePubKeyFromCA(cert *ca.Certificate) framework.PubKey {
+	key := cert.ClassicCert.PublicKey.(*rsa2.PublicKey)
+	return framework.NewPubKey(R.GetAlgorithm(), bytes2.Concat(key.N.Bytes(), big.NewInt(int64(key.E)).Bytes()))
 }
 
 func (R RSACryptoFunction) Encrypt(pubKey framework.PubKey, data []byte) framework.AsymmetricCiphertext {

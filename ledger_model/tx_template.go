@@ -19,6 +19,16 @@ type TxTemplate struct {
 	stateManager *TxStateManager
 }
 
+func (t *TxTemplate) User(address []byte) *UserUpdateOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.User(address)
+}
+
+func (t *TxTemplate) Contract(address []byte) *ContractUpdateOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.Contract(address)
+}
+
 func (t *TxTemplate) ContractEvents() *ContractEventSendOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.ContractEvents()

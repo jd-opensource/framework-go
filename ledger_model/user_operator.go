@@ -7,4 +7,6 @@ package ledger_model
 
 type UserOperator interface {
 	Users() *UserRegisterOperationBuilder
+
+	User(address []byte) *UserUpdateOperationBuilder
 }

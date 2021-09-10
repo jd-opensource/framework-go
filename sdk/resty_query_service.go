@@ -942,15 +942,15 @@ func parseContractCodeDeployOperation(info gjson.Result) binary_proto.DataContra
 func parseContractEventSendOperation(info gjson.Result) binary_proto.DataContract {
 	operation := &ledger_model.ContractEventSendOperation{
 		ContractAddress: base58.MustDecode(info.Get("contractAddress").String()),
-		Event: info.Get("event").String(),
-		Version: info.Get("version").Int(),
+		Event:           info.Get("event").String(),
+		Version:         info.Get("version").Int(),
 	}
-	argsArray := info.Get("args.values").Array();
+	argsArray := info.Get("args.values").Array()
 	args := make([]ledger_model.BytesValue, len(argsArray))
 	for i, arg := range argsArray {
 		args[i] = ledger_model.BytesValue{
-			Bytes:   base64.MustDecode(arg.Get("bytes").String()),
-			Type:    ledger_model.NIL.GetValueByName(arg.Get("type").String()).(ledger_model.DataType),
+			Bytes: base64.MustDecode(arg.Get("bytes").String()),
+			Type:  ledger_model.NIL.GetValueByName(arg.Get("type").String()).(ledger_model.DataType),
 		}
 	}
 	operation.Args = ledger_model.BytesValueList{

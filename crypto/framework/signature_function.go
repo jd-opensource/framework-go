@@ -1,5 +1,7 @@
 package framework
 
+import "github.com/blockchain-jd-com/framework-go/crypto/ca"
+
 /**
  * @Author: imuge
  * @Date: 2020/4/28 2:53 下午
@@ -82,4 +84,13 @@ type SignatureFunction interface {
 	 * @return SignatureDigest形式的签名摘要
 	 */
 	ParseDigest(digestBytes []byte) SignatureDigest
+
+	// 从证书解析公钥
+	RetrievePubKeyFromCA(cert *ca.Certificate) PubKey
+
+	// 从私钥文件解析私钥
+	RetrievePrivKey(privateKey string) (PrivKey, error)
+
+	// 从私钥文件解析加密私钥
+	RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (PrivKey, error)
 }

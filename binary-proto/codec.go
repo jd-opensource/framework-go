@@ -34,7 +34,7 @@ var (
 func init() {
 	once.Do(func() {
 		contractMap = make(map[int32]DataContract)
-		enumMap = make( map[int32]EnumContract)
+		enumMap = make(map[int32]EnumContract)
 	})
 }
 
@@ -58,9 +58,8 @@ func RegisterEnum(enum EnumContract) {
 	enumMap[enum.ContractCode()] = enum
 }
 
-
 type Codec struct {
-	VersionMap  map[int32]int64
+	VersionMap map[int32]int64
 }
 
 func NewCodec() *Codec {
@@ -68,7 +67,6 @@ func NewCodec() *Codec {
 		make(map[int32]int64),
 	}
 }
-
 
 // 计算契约版本号`
 func (c *Codec) CalculateVersion(contract DataContract) error {

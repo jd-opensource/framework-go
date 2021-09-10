@@ -45,6 +45,15 @@ func BytesToPubKey(b []byte) (pub *sm2.PublicKey) {
 	return pub
 }
 
+func RawBytesToPubKey(b []byte) (pub *sm2.PublicKey) {
+	pub, err := sm2.RawBytesToPublicKey(b)
+	if err != nil {
+		panic(err)
+	}
+
+	return pub
+}
+
 func RetrievePubKey(priv *sm2.PrivateKey) *sm2.PublicKey {
 	pub := new(sm2.PublicKey)
 	pub.Curve = priv.Curve
