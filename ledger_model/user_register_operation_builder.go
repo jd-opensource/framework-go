@@ -1,6 +1,7 @@
 package ledger_model
 
 import (
+	ca2 "github.com/blockchain-jd-com/framework-go/crypto/ca"
 	"github.com/blockchain-jd-com/framework-go/utils/ca"
 )
 
@@ -28,9 +29,9 @@ func (urob *UserRegisterOperationBuilder) Register(userID BlockchainIdentity) Us
 	return operation
 }
 
-func (urob *UserRegisterOperationBuilder) RegisterWithCA(cert ca.Certificate) UserRegisterOperation {
+func (urob *UserRegisterOperationBuilder) RegisterWithCA(cert *ca2.Certificate) UserRegisterOperation {
 	operation := UserRegisterOperation{
-		UserID: NewBlockchainIdentity(cert.ResolvePubKey()),
+		UserID: NewBlockchainIdentity(ca.RetrievePubKey(cert)),
 		//Certificate: ca.ToPEMString(cert),
 	}
 	if urob.factory != nil {
