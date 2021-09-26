@@ -1,6 +1,7 @@
 package ca
 
 import (
+	"fmt"
 	"github.com/blockchain-jd-com/framework-go/crypto"
 	"github.com/blockchain-jd-com/framework-go/crypto/classic"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
@@ -73,5 +74,11 @@ func TestResolvePrivKey(t *testing.T) {
 			require.Nil(t, err)
 		}
 		require.Equal(t, cert[4], crypto.EncodePrivKey(key, base58.MustDecode(cert[5])))
+
+		fmt.Println(certificate.Algorithm)
+		function := crypto.GetSignatureFunctionByName(certificate.Algorithm)
+		sign := function.Sign(key, []byte("imuge"))
+		pubKey := RetrievePubKey(certificate)
+		require.True(t, function.Verify(pubKey, []byte("imuge"), sign))
 	}
 }

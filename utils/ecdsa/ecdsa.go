@@ -1,6 +1,8 @@
 package ecdsa
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 	"github.com/blockchain-jd-com/framework-go/utils/random"
 	"github.com/blockchain-jd-com/framework-go/utils/sha"
@@ -12,48 +14,47 @@ import (
  * @Date: 2020/4/30 9:25 下午
  */
 
-func GenerateKeyPair() *PrivateKey {
-	priv, _ := GenerateKey(S256(), rand.Reader)
+func GenerateKeyPair() *ecdsa.PrivateKey {
+	priv, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	return priv
 }
 
-func GenerateKeyPairWithSeed(seed []byte) *PrivateKey {
-	priv, _ := GenerateKey(S256(), random.NewHashSecureRandom(seed, 32, random.Sha256))
+func GenerateKeyPairWithSeed(seed []byte) *ecdsa.PrivateKey {
+	priv, _ := ecdsa.GenerateKey(elliptic.P256(), random.NewHashSecureRandom(seed, 32, random.Sha256))
 	return priv
 }
 
-func PubKeyToBytes(pub *PublicKey) []byte {
+func PubKeyToBytes(pub *ecdsa.PublicKey) []byte {
 	x := pub.X.Bytes()
 	y := pub.Y.Bytes()
 	return append(append([]byte{0x04}, x...), y...)
 }
 
-func BytesToPubKey(b []byte) (pub *PublicKey) {
+func BytesToPubKey(b []byte) (pub *ecdsa.PublicKey) {
 	x := new(big.Int).SetBytes(b[1:33])
 	y := new(big.Int).SetBytes(b[33:])
-	return &PublicKey{S256(), x, y}
+	return &ecdsa.PublicKey{elliptic.P256(), x, y}
 }
 
-func PrivKeyToBytes(priv *PrivateKey) []byte {
+func PrivKeyToBytes(priv *ecdsa.PrivateKey) []byte {
 	return priv.D.Bytes()
 }
 
-func BytesToPrivKey(b []byte) *PrivateKey {
-	priv := new(PrivateKey)
-	priv.PublicKey.BitCurve = S256()
+func BytesToPrivKey(b []byte) *ecdsa.PrivateKey {
+	priv := new(ecdsa.PrivateKey)
+	priv.PublicKey.Curve = elliptic.P256()
 	priv.D = new(big.Int).SetBytes(b)
-	priv.PublicKey.X, priv.PublicKey.Y = S256().ScalarBaseMult(b)
+	priv.PublicKey.X, priv.PublicKey.Y = elliptic.P256().ScalarBaseMult(b)
 
 	return priv
 }
 
-func Sign(priv *PrivateKey, plainBytes []byte) []byte {
-	hashed := sha.Sha256(plainBytes)
-	r, s, _ := sign(rand.Reader, priv, hashed)
+func Sign(priv *ecdsa.PrivateKey, plainBytes []byte) []byte {
+	r, s, _ := ecdsa.Sign(rand.Reader, priv, sha.Sha256(plainBytes))
 
 	return append(r.Bytes(), s.Bytes()...)
 }
 
-func Verify(pub *PublicKey, plainBytes, cipherBytes []byte) bool {
-	return verify(pub, sha.Sha256(plainBytes), new(big.Int).SetBytes(cipherBytes[:32]), new(big.Int).SetBytes(cipherBytes[32:]))
+func Verify(pub *ecdsa.PublicKey, plainBytes, cipherBytes []byte) bool {
+	return ecdsa.Verify(pub, sha.Sha256(plainBytes), new(big.Int).SetBytes(cipherBytes[:32]), new(big.Int).SetBytes(cipherBytes[32:]))
 }

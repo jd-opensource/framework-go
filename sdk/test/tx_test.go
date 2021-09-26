@@ -2,13 +2,11 @@ package test
 
 import (
 	"fmt"
-	"github.com/blockchain-jd-com/framework-go/crypto"
 	"github.com/blockchain-jd-com/framework-go/crypto/classic"
 	"github.com/blockchain-jd-com/framework-go/ledger_model"
 	"github.com/blockchain-jd-com/framework-go/sdk"
 	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
-	"github.com/blockchain-jd-com/framework-go/utils/sha"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -26,40 +24,37 @@ func TestRegisterUser(t *testing.T) {
 	// 连接网关，获取节点服务
 	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
 
-	fmt.Println(crypto.EncodePubKey(NODE_PUBLIC_KEY))
-	fmt.Println(crypto.EncodePrivKey(NODE_PRIVITE_KEY, sha.Sha256([]byte("1"))))
-
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
-	_, err := service.GetLedgerHashs()
+	ledgerHashs, err := service.GetLedgerHashs()
 	require.Nil(t, err)
 	//
-	//// 创建交易
-	//txTemp := service.NewTransaction(ledgerHashs[0])
-	//
-	//// 生成公私钥对
-	//user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
-	//// 注册用户
-	//txTemp.Users().Register(user.GetIdentity())
-	//// 角色权限配置
-	//txTemp.Security().Roles().Configure("MANAGER").
-	//	EnableLedgerPermission(ledger_model.REGISTER_USER).
-	//	EnableTransactionPermission(ledger_model.CONTRACT_OPERATION).
-	//	DisableLedgerPermission(ledger_model.WRITE_DATA_ACCOUNT).
-	//	DisableTransactionPermission(ledger_model.DIRECT_OPERATION)
-	//txTemp.Security().Authorziations().ForUser([][]byte{user.GetAddress()}).Authorize("MANAGER")
-	//
-	//// TX 准备就绪；
-	//prepTx := txTemp.Prepare()
-	//
-	//// 使用网络中已存在用户私钥进行签名；
-	//prepTx.Sign(NODE_KEY.AsymmetricKeypair)
-	//
-	//// 提交交易；
-	//resp, err := prepTx.Commit()
-	//require.Nil(t, err)
-	//require.True(t, resp.Success)
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 生成公私钥对
+	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	// 注册用户
+	txTemp.Users().Register(user.GetIdentity())
+	// 角色权限配置
+	txTemp.Security().Roles().Configure("MANAGER").
+		EnableLedgerPermission(ledger_model.REGISTER_USER).
+		EnableTransactionPermission(ledger_model.CONTRACT_OPERATION).
+		DisableLedgerPermission(ledger_model.WRITE_DATA_ACCOUNT).
+		DisableTransactionPermission(ledger_model.DIRECT_OPERATION)
+	txTemp.Security().Authorziations().ForUser([][]byte{user.GetAddress()}).Authorize("MANAGER")
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
 
 }
 
