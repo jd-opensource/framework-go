@@ -1,5 +1,5 @@
-github.com/ZZMarquis/gm v1.2.0 h1:KcKveiaMAVE40Wyaydz9YIBieDqImK5nTjnJsQIVxzU=
-github.com/ZZMarquis/gm v1.2.0/go.mod h1:wWbjZYgruQVd7Bb8UkSN8ujU931kx2XUW6nZLCiDE0Q=
+github.com/ZZMarquis/gm v1.3.2 h1:lFtpzg5zeeVMZ/gKi0gtYcKLBEo9XTqsZDHDz6s3Gow=
+github.com/ZZMarquis/gm v1.3.2/go.mod h1:wWbjZYgruQVd7Bb8UkSN8ujU931kx2XUW6nZLCiDE0Q=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-resty/resty/v2 v2.3.0 h1:JOOeAvjSlapTT92p8xiS19Zxev1neGikoHsXJeOq8So=
@@ -11,7 +11,6 @@ github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/tidwall/gjson v1.6.3 h1:aHoiiem0dr7GHkW001T1SMTJ7X5PvyekH5WX0whWGnI=
 github.com/tidwall/gjson v1.6.3/go.mod h1:BaHyNc5bjzYkPqgLq7mdVzeiRtULKULXLgZFKsxEHI0=
-github.com/tidwall/match v1.0.1 h1:PnKP62LPNxHKTwvHHZZzdOAOCtsJTjo6dZLCwpKm5xc=
 github.com/tidwall/match v1.0.1/go.mod h1:LujAq0jyVjBy028G1WhWfIzbpQfMO8bBZ6Tyb0+pL9E=
 github.com/tidwall/match v1.0.2 h1:uuqvHuBGSedK7awZ2YoAtpnimfwBGFjHuWLuLqQj+bU=
 github.com/tidwall/match v1.0.2/go.mod h1:LujAq0jyVjBy028G1WhWfIzbpQfMO8bBZ6Tyb0+pL9E=
