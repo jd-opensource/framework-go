@@ -11,5 +11,5 @@ type DataAccountOperator interface {
 	DataAccounts() *DataAccountRegisterOperationBuilder
 
 	// 写入数据
-	DataAccount(accountAddress []byte) *DataAccountKVSetOperationBuilder
+	DataAccount(accountAddress []byte) *DataAccountOperationBuilder
 }

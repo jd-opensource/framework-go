@@ -140,6 +140,9 @@ const (
 	REQUEST_NODE                     = 0xD10
 	REQUEST_ENDPOINT                 = 0xD20
 
+	ACCOUNT_TYPE             = 0xD02
+	TX_OP_ACC_PERMISSION_SET = 0xD10
+
 	// ------------------ 共识相关 ----------------
 
 	CONSENSUS                       = 0x1000

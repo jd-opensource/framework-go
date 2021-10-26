@@ -61,8 +61,8 @@ func (b *BlockchainOperationFactory) DataAccounts() *DataAccountRegisterOperatio
 	return NewDataAccountRegisterOperationBuilder(b)
 }
 
-func (b *BlockchainOperationFactory) DataAccount(accountAddress []byte) *DataAccountKVSetOperationBuilder {
-	return NewDataAccountKVSetOperationBuilder(accountAddress, b)
+func (b *BlockchainOperationFactory) DataAccount(accountAddress []byte) *DataAccountOperationBuilder {
+	return NewDataAccountOperationBuilder(accountAddress, b)
 }
 
 func (b *BlockchainOperationFactory) addOperation(operation binary_proto.DataContract) {

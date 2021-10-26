@@ -76,7 +76,7 @@ func (t *TxBuilder) DataAccounts() *DataAccountRegisterOperationBuilder {
 	return t.opFactory.DataAccounts()
 }
 
-func (t *TxBuilder) DataAccount(accountAddress []byte) *DataAccountKVSetOperationBuilder {
+func (t *TxBuilder) DataAccount(accountAddress []byte) *DataAccountOperationBuilder {
 	return t.opFactory.DataAccount(accountAddress)
 }
 

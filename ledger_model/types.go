@@ -15,4 +15,5 @@ const (
 	OperationTypeUserAuthorizeOperation          = "UserAuthorizeOperation"          // 用户授权
 	OperationTypeUserStateUpdate                 = "UserStateUpdateOperation"        // 用户状态变更
 	OperationTypeContractStateUpdate             = "ContractStateUpdateOperation"    // 合约状态变更
+	OperationTypeAccountPermissionSetOperation   = "AccountPermissionSetOperation"   // 账户权限变更
 )

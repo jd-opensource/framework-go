@@ -82,7 +82,7 @@ func (t *TxTemplate) DataAccounts() *DataAccountRegisterOperationBuilder {
 	return t.txBuilder.DataAccounts()
 }
 
-func (t *TxTemplate) DataAccount(accountAddress []byte) *DataAccountKVSetOperationBuilder {
+func (t *TxTemplate) DataAccount(accountAddress []byte) *DataAccountOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.DataAccount(accountAddress)
 }

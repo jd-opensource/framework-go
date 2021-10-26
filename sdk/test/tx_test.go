@@ -3,10 +3,12 @@ package test
 import (
 	"fmt"
 	"github.com/blockchain-jd-com/framework-go/crypto/classic"
+	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/ledger_model"
 	"github.com/blockchain-jd-com/framework-go/sdk"
 	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
+	"github.com/blockchain-jd-com/framework-go/utils/ca"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
@@ -34,16 +36,18 @@ func TestRegisterUser(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 生成公私钥对
-	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	userCert, _ := ca.RetrieveCertificate("-----BEGIN CERTIFICATE-----\nMIIB3zCCAYagAwIBAgIEFgKY7jAKBggqhkjOPQQDAjBwMQwwCgYDVQQKDANKRFQxDTALBgNVBAsM\nBFJPT1QxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJCSjELMAkGA1UEBwwCQkoxDTALBgNVBAMMBHJv\nb3QxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpkLmNvbTAeFw0yMTEwMTUxMTQxMjVaFw0zMTEwMTMx\nMTQxMjVaMHExDDAKBgNVBAoMA0pEVDENMAsGA1UECwwEVVNFUjELMAkGA1UEBhMCQ04xCzAJBgNV\nBAgMAkJKMQswCQYDVQQHDAJCSjEOMAwGA1UEAwwFdXNlcjExGzAZBgkqhkiG9w0BCQEWDGltdWdl\nQGpkLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABAI1OVeItk5prWS/+Bc23ExVz8420VGh\n0oa/NmzIf/aJewN0KpT1j8+wybmEyEWwdqV2rUbuJktjepkTPtpdjcyjDTALMAkGA1UdEwQCMAAw\nCgYIKoZIzj0EAwIDRwAwRAIgAtgfbwZS3yJdtYfnkoCZKM29jtBIvJLj5qXcDOHWW/YCIF0XKgwh\ng5RDHhdI3a7lh6CE5vGNZJH781MFHVCO6Ma5\n-----END CERTIFICATE-----")
+	pubkey := ca.RetrievePubKey(userCert)
+	address := framework.GenerateAddress(pubkey)
 	// 注册用户
-	txTemp.Users().Register(user.GetIdentity())
+	txTemp.Users().RegisterWithCA(userCert)
 	// 角色权限配置
 	txTemp.Security().Roles().Configure("MANAGER").
 		EnableLedgerPermission(ledger_model.REGISTER_USER).
 		EnableTransactionPermission(ledger_model.CONTRACT_OPERATION).
 		DisableLedgerPermission(ledger_model.WRITE_DATA_ACCOUNT).
 		DisableTransactionPermission(ledger_model.DIRECT_OPERATION)
-	txTemp.Security().Authorziations().ForUser([][]byte{user.GetAddress()}).Authorize("MANAGER")
+	txTemp.Security().Authorziations().ForUser([][]byte{address}).Authorize("MANAGER")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
@@ -85,7 +89,7 @@ func TestUserState(t *testing.T) {
 	require.True(t, resp.Success)
 }
 
-func TestDataAccount(t *testing.T) {
+func TestDataAccountRegister(t *testing.T) {
 
 	// 连接网关，获取节点服务
 	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
@@ -102,13 +106,73 @@ func TestDataAccount(t *testing.T) {
 	dataAccount := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 	// 注册数据账户
 	txTemp.DataAccounts().Register(dataAccount.GetIdentity())
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+}
+
+func TestDataAccountSetKV(t *testing.T) {
+
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	dataAccountAddress := base58.MustDecode("LdeNr6RxwmsXVMgwBBCcFFvpYwEJwkmrcgd7w")
+
 	// 插入数据
-	txTemp.DataAccount(dataAccount.GetAddress()).SetText("key", "text", -1)
-	txTemp.DataAccount(dataAccount.GetAddress()).SetInt64("key", int64(64), 0)
-	txTemp.DataAccount(dataAccount.GetAddress()).SetBytes("key", []byte("bytes"), 1)
-	txTemp.DataAccount(dataAccount.GetAddress()).SetImage("key", []byte("image"), 2)
-	txTemp.DataAccount(dataAccount.GetAddress()).SetJSON("key", "json", 3)
-	txTemp.DataAccount(dataAccount.GetAddress()).SetTimestamp("key", time.Now().Unix(), 4)
+	txTemp.DataAccount(dataAccountAddress).SetText("key", "text", -1)
+	txTemp.DataAccount(dataAccountAddress).SetInt64("key", int64(64), 0)
+	txTemp.DataAccount(dataAccountAddress).SetBytes("key", []byte("bytes"), 1)
+	txTemp.DataAccount(dataAccountAddress).SetImage("key", []byte("image"), 2)
+	txTemp.DataAccount(dataAccountAddress).SetJSON("key", "json", 3)
+	txTemp.DataAccount(dataAccountAddress).SetTimestamp("key", time.Now().Unix(), 4)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+}
+
+func TestDataAccountPermission(t *testing.T) {
+
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	dataAccountAddress := base58.MustDecode("LdeNvKC8tVkED4nRyhjY1t9hdNQugSC7XrhRd")
+
+	// 更新数据账户权限
+	txTemp.DataAccount(dataAccountAddress).Permission().Role("IMUGE")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
