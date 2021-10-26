@@ -9,5 +9,5 @@ type EventOperator interface {
 	// 事件账户
 	EventAccounts() *EventAccountRegisterOperationBuilder
 	// 发布消息
-	EventAccount(accountAddress []byte) *EventPublishOperationBuilder
+	EventAccount(accountAddress []byte) *EventAccountOperationBuilder
 }

@@ -36,7 +36,7 @@ func (t *TxBuilder) EventAccounts() *EventAccountRegisterOperationBuilder {
 	return t.opFactory.EventAccounts()
 }
 
-func (t *TxBuilder) EventAccount(accountAddress []byte) *EventPublishOperationBuilder {
+func (t *TxBuilder) EventAccount(accountAddress []byte) *EventAccountOperationBuilder {
 	return t.opFactory.EventAccount(accountAddress)
 }
 

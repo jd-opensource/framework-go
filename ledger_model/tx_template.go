@@ -39,7 +39,7 @@ func (t *TxTemplate) EventAccounts() *EventAccountRegisterOperationBuilder {
 	return t.txBuilder.EventAccounts()
 }
 
-func (t *TxTemplate) EventAccount(accountAddress []byte) *EventPublishOperationBuilder {
+func (t *TxTemplate) EventAccount(accountAddress []byte) *EventAccountOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.EventAccount(accountAddress)
 }

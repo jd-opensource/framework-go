@@ -172,7 +172,7 @@ func TestDataAccountPermission(t *testing.T) {
 	dataAccountAddress := base58.MustDecode("LdeNvKC8tVkED4nRyhjY1t9hdNQugSC7XrhRd")
 
 	// 更新数据账户权限
-	txTemp.DataAccount(dataAccountAddress).Permission().Role("IMUGE")
+	txTemp.DataAccount(dataAccountAddress).Permission().Role("ROLE")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
@@ -267,7 +267,7 @@ func TestContractState(t *testing.T) {
 	require.True(t, resp.Success)
 }
 
-func TestUserEvent(t *testing.T) {
+func TestUserEventAccountRegister(t *testing.T) {
 
 	// 连接网关，获取节点服务
 	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
@@ -284,10 +284,70 @@ func TestUserEvent(t *testing.T) {
 	eventAccount := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 	// 注册事件账户
 	txTemp.EventAccounts().Register(eventAccount.GetIdentity())
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+}
+
+func TestUserEventPublish(t *testing.T) {
+
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	eventAccountAddress := base58.MustDecode("LdeNvKC8tVkED4nRyhjY1t9hdNQugSC7XrhRd")
+
 	// 发布事件
-	txTemp.EventAccount(eventAccount.GetAddress()).PublishString("topic", "text", -1)
-	txTemp.EventAccount(eventAccount.GetAddress()).PublishInt64("topic", int64(64), 0)
-	txTemp.EventAccount(eventAccount.GetAddress()).PublishBytes("topic", []byte("bytes"), 1)
+	txTemp.EventAccount(eventAccountAddress).PublishString("topic", "text", -1)
+	txTemp.EventAccount(eventAccountAddress).PublishInt64("topic", int64(64), 0)
+	txTemp.EventAccount(eventAccountAddress).PublishBytes("topic", []byte("bytes"), 1)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+}
+
+func TestUserEventAccountPermission(t *testing.T) {
+
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	eventAccountAddress := base58.MustDecode("LdeNvKC8tVkED4nRyhjY1t9hdNQugSC7XrhRd")
+
+	// 更新事件账户权限
+	txTemp.EventAccount(eventAccountAddress).Permission().Mode(777).Role("ROLE")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()

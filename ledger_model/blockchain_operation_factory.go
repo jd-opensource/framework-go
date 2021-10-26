@@ -33,8 +33,8 @@ func (b *BlockchainOperationFactory) EventAccounts() *EventAccountRegisterOperat
 	return NewEventAccountRegisterOperationBuilder(b)
 }
 
-func (b *BlockchainOperationFactory) EventAccount(accountAddress []byte) *EventPublishOperationBuilder {
-	return NewEventPublishOperationBuilder(accountAddress, b)
+func (b *BlockchainOperationFactory) EventAccount(accountAddress []byte) *EventAccountOperationBuilder {
+	return NewEventAccountOperationBuilder(accountAddress, b)
 }
 
 func (b *BlockchainOperationFactory) Participants() *ParticipantRegisterOperationBuilder {
