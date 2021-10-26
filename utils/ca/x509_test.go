@@ -64,6 +64,7 @@ func TestResolvePubKey(t *testing.T) {
 func TestResolvePrivKey(t *testing.T) {
 	for _, cert := range certs {
 		certificate, err := RetrieveCertificate(cert[1])
+		fmt.Println(certificate.ToPEMString())
 		require.Nil(t, err)
 		var key framework.PrivKey
 		if len(cert[3]) == 0 {

@@ -14,7 +14,8 @@ func init() {
 }
 
 type UserRegisterOperation struct {
-	UserID BlockchainIdentity `refContract:"144"`
+	UserID      BlockchainIdentity `refContract:"144"`
+	Certificate string             `primitiveType:"TEXT"`
 }
 
 func (u UserRegisterOperation) ContractCode() int32 {

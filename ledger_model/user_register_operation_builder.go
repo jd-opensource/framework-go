@@ -31,8 +31,8 @@ func (urob *UserRegisterOperationBuilder) Register(userID BlockchainIdentity) Us
 
 func (urob *UserRegisterOperationBuilder) RegisterWithCA(cert *ca2.Certificate) UserRegisterOperation {
 	operation := UserRegisterOperation{
-		UserID: NewBlockchainIdentity(ca.RetrievePubKey(cert)),
-		//Certificate: ca.ToPEMString(cert),
+		UserID:      NewBlockchainIdentity(ca.RetrievePubKey(cert)),
+		Certificate: cert.ToPEMString(),
 	}
 	if urob.factory != nil {
 		urob.factory.addOperation(operation)
