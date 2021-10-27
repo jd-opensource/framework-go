@@ -13,20 +13,12 @@ type BlockchainOperationFactory struct {
 	operationList []binary_proto.DataContract
 }
 
-func (b *BlockchainOperationFactory) Contract(address []byte) *ContractUpdateOperationBuilder {
-	return NewContractUpdateOperationBuilder(address, b)
+func (b *BlockchainOperationFactory) Contract(address []byte) *ContractOperationBuilder {
+	return NewContractOperationBuilder(address, b)
 }
 
 func (b *BlockchainOperationFactory) User(address []byte) *UserUpdateOperationBuilder {
 	return NewUserUpdateOperationBuilder(address, b)
-}
-
-func (b *BlockchainOperationFactory) ContractEvents() *ContractEventSendOperationBuilder {
-	return NewContractEventSendOperationBuilder(b)
-}
-
-func (b *BlockchainOperationFactory) contractEvents() *ContractEventSendOperationBuilder {
-	return NewContractEventSendOperationBuilder(b)
 }
 
 func (b *BlockchainOperationFactory) EventAccounts() *EventAccountRegisterOperationBuilder {

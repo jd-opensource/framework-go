@@ -12,11 +12,12 @@ import (
  */
 
 type ContractEventSendOperationBuilder struct {
+	address []byte
 	factory *BlockchainOperationFactory
 }
 
-func NewContractEventSendOperationBuilder(factory *BlockchainOperationFactory) *ContractEventSendOperationBuilder {
-	return &ContractEventSendOperationBuilder{factory: factory}
+func NewContractEventSendOperationBuilder(address []byte, factory *BlockchainOperationFactory) *ContractEventSendOperationBuilder {
+	return &ContractEventSendOperationBuilder{address: address, factory: factory}
 }
 
 /*
@@ -25,7 +26,7 @@ func NewContractEventSendOperationBuilder(factory *BlockchainOperationFactory) *
 	event   合约方法
 	args	参数列表， 仅支持 bool/int16/int32/int64/string/[]byte
 */
-func (cesob *ContractEventSendOperationBuilder) Send(address []byte, version int64, event string, args ...interface{}) error {
+func (cesob *ContractEventSendOperationBuilder) Send(version int64, event string, args []interface{}) error {
 	params := []BytesValue{}
 	for i := 0; i < len(args); i++ {
 		v := reflect.ValueOf(args[i])
@@ -67,7 +68,7 @@ func (cesob *ContractEventSendOperationBuilder) Send(address []byte, version int
 		}
 	}
 	operation := ContractEventSendOperation{
-		ContractAddress: address,
+		ContractAddress: cesob.address,
 		Event:           event,
 		Args:            BytesValueList{params},
 		Version:         version,

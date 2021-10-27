@@ -187,7 +187,7 @@ func TestDataAccountPermission(t *testing.T) {
 
 }
 
-func TestContract(t *testing.T) {
+func TestContractDeploy(t *testing.T) {
 	// 生成公私钥对
 	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 
@@ -203,7 +203,7 @@ func TestContract(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 部署合约
-	file, err := os.Open("contract-samples-1.4.0.RELEASE.car")
+	file, err := os.Open("contract-samples-1.6.0-SNAPSHOT.car")
 	defer file.Close()
 	require.Nil(t, err)
 	contract, err := ioutil.ReadAll(file)
@@ -220,19 +220,34 @@ func TestContract(t *testing.T) {
 	resp, err := prepTx.Commit()
 	require.Nil(t, err)
 	require.True(t, resp.Success)
+}
+
+func TestContractInvoke(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	contractAddress := base58.MustDecode("LdeNx8nyttR6sbYrqtmm3RyTobRpZStJQHbkB")
 
 	// 创建合约调用交易，请修改数据账户地址为链上已经存在的数据账户地址
 	txTemp = service.NewTransaction(ledgerHashs[0])
-	err = txTemp.ContractEvents().Send(user.GetAddress(), 0, "register-user", "至少32位字节数-----------------------------")
+	err = txTemp.Contract(contractAddress).Invoke("registerUser", "至少32位字节数----------------------------")
 	require.Nil(t, err)
 	// TX 准备就绪；
-	prepTx = txTemp.Prepare()
+	prepTx := txTemp.Prepare()
 
 	// 使用私钥进行签名；
 	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
 
 	// 提交交易；
-	resp, err = prepTx.Commit()
+	resp, err := prepTx.Commit()
 	require.Nil(t, err)
 	require.True(t, resp.Success)
 	res := resp.OperationResults
@@ -252,13 +267,44 @@ func TestContractState(t *testing.T) {
 	// 创建交易
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
+	contractAddress := base58.MustDecode("LdeNx8nyttR6sbYrqtmm3RyTobRpZStJQHbkB")
+
 	// 更新合约状态
-	txTemp.Contract(base58.MustDecode("LdeNxyo5qifskkKQW3PRKBjEHuHeXUFLC1GXL")).State(ledger_model.FREEZE)
+	txTemp.Contract(contractAddress).State(ledger_model.NORMAL)
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
 
 	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+}
+
+func TestContractPermission(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	contractAddress := base58.MustDecode("LdeNvKC8tVkED4nRyhjY1t9hdNQugSC7XrhRd")
+
+	// 更新数据账户权限
+	txTemp.Contract(contractAddress).Permission().Role("ROLE").Mode(777)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
 	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
 
 	// 提交交易；

@@ -10,9 +10,6 @@ type ContractOperator interface {
 	// 部署合约
 	Contracts() *ContractCodeDeployOperationBuilder
 
-	// contract events
-	ContractEvents() *ContractEventSendOperationBuilder
-
 	// 合约更新操作
-	Contract(address []byte) *ContractUpdateOperationBuilder
+	Contract(address []byte) *ContractOperationBuilder
 }
