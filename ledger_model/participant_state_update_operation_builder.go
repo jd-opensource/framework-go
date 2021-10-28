@@ -13,11 +13,10 @@ func NewParticipantStateUpdateOperationBuilder(factory *BlockchainOperationFacto
 	return &ParticipantStateUpdateOperationBuilder{factory: factory}
 }
 
-func (psuob *ParticipantStateUpdateOperationBuilder) Update(blockchainIdentity BlockchainIdentity, networkAddress []byte, participantNodeState ParticipantNodeState) ParticipantStateUpdateOperation {
+func (psuob *ParticipantStateUpdateOperationBuilder) Update(blockchainIdentity BlockchainIdentity, participantNodeState ParticipantNodeState) ParticipantStateUpdateOperation {
 	operation := ParticipantStateUpdateOperation{
-		StateUpdateIdentity: blockchainIdentity,
-		NetworkAddress:      networkAddress,
-		State:               participantNodeState,
+		ParticipantID: blockchainIdentity,
+		State:         participantNodeState,
 	}
 	if psuob.factory != nil {
 		psuob.factory.addOperation(operation)

@@ -161,7 +161,7 @@ func (b *GatewayBlockchainService) GetUser(ledgerHash framework.HashDigest, addr
 	return b.QueryService.GetUser(ledgerHash, address)
 }
 
-func (b *GatewayBlockchainService) GetDataAccount(ledgerHash framework.HashDigest, address string) (ledger_model.BlockchainIdentity, error) {
+func (b *GatewayBlockchainService) GetDataAccount(ledgerHash framework.HashDigest, address string) (ledger_model.DataAccountInfo, error) {
 	return b.QueryService.GetDataAccount(ledgerHash, address)
 }
 
@@ -221,7 +221,7 @@ func (b *GatewayBlockchainService) GetSystemEventsTotalCount(digest framework.Ha
 	return b.QueryService.GetSystemEventsTotalCount(digest, eventName)
 }
 
-func (b *GatewayBlockchainService) GetUserEventAccount(digist framework.HashDigest, address string) (ledger_model.BlockchainIdentity, error) {
+func (b *GatewayBlockchainService) GetUserEventAccount(digist framework.HashDigest, address string) (ledger_model.EventAccountInfo, error) {
 	return b.QueryService.GetUserEventAccount(digist, address)
 }
 

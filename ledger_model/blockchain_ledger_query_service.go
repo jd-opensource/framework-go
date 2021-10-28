@@ -111,7 +111,7 @@ type BlockChainLedgerQueryService interface {
 	GetUser(ledgerHash framework.HashDigest, address string) (UserInfo, error)
 
 	// 返回数据账户信息
-	GetDataAccount(ledgerHash framework.HashDigest, address string) (BlockchainIdentity, error)
+	GetDataAccount(ledgerHash framework.HashDigest, address string) (DataAccountInfo, error)
 
 	/**
 	 * 返回数据账户中指定的键的最新值；
@@ -217,7 +217,7 @@ type BlockChainLedgerQueryService interface {
 	 * @param address
 	 * @return
 	 */
-	GetUserEventAccount(digist framework.HashDigest, address string) (BlockchainIdentity, error)
+	GetUserEventAccount(digist framework.HashDigest, address string) (EventAccountInfo, error)
 
 	/**
 	 * 返回事件账户总数； <br>

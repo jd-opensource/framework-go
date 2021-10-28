@@ -50,7 +50,7 @@ func (as AccountState) GetValue(CODE int32) binary_proto.EnumContract {
 		return NORMAL
 	} else if CODE == int32(2) {
 		return FREEZE
-	} else if CODE == int32(2) {
+	} else if CODE == int32(3) {
 		return REVOKE
 	}
 

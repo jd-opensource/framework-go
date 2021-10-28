@@ -43,6 +43,14 @@ const (
 	REGISTER_EVENT_ACCOUNT = LedgerPermission(0x0D)
 	// 发布事件
 	WRITE_EVENT_ACCOUNT = LedgerPermission(0x0E)
+	// 更新用户状态
+	UPDATE_USER_STATE = LedgerPermission(0x0F)
+	// 更新根证书
+	UPDATE_ROOT_CA = LedgerPermission(0x10)
+	// 更新用户证书
+	UPDATE_USER_CA = LedgerPermission(0x11)
+	// 更新合约状态
+	UPDATE_CONTRACT_STATE = LedgerPermission(0x12)
 )
 
 func init() {
@@ -117,6 +125,18 @@ func (l LedgerPermission) GetValue(CODE int32) binary_proto.EnumContract {
 	if CODE == int32(WRITE_EVENT_ACCOUNT) {
 		return WRITE_EVENT_ACCOUNT
 	}
+	if CODE == int32(UPDATE_USER_STATE) {
+		return UPDATE_USER_STATE
+	}
+	if CODE == int32(UPDATE_ROOT_CA) {
+		return UPDATE_ROOT_CA
+	}
+	if CODE == int32(UPDATE_USER_CA) {
+		return UPDATE_USER_CA
+	}
+	if CODE == int32(UPDATE_CONTRACT_STATE) {
+		return UPDATE_CONTRACT_STATE
+	}
 
 	panic("no enum value founded")
 }
@@ -166,6 +186,18 @@ func (l LedgerPermission) GetValueByName(name string) binary_proto.EnumContract 
 	}
 	if name == "WRITE_EVENT_ACCOUNT" {
 		return WRITE_EVENT_ACCOUNT
+	}
+	if name == "UPDATE_USER_STATE" {
+		return UPDATE_USER_STATE
+	}
+	if name == "UPDATE_ROOT_CA" {
+		return UPDATE_ROOT_CA
+	}
+	if name == "UPDATE_USER_CA" {
+		return UPDATE_USER_CA
+	}
+	if name == "UPDATE_CONTRACT_STATE" {
+		return UPDATE_CONTRACT_STATE
 	}
 
 	panic("no enum value founded")

@@ -17,8 +17,8 @@ func init() {
 }
 
 type BlockchainIdentity struct {
-	Address []byte `primitiveType:"BYTES"`
-	PubKey  []byte `primitiveType:"BYTES"`
+	Address []byte `primitiveType:"BYTES" json:"address"`
+	PubKey  []byte `primitiveType:"BYTES" json:"pubkey"`
 }
 
 func NewBlockchainIdentity(pubKey framework.PubKey) BlockchainIdentity {

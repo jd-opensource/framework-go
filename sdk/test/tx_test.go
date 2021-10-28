@@ -89,6 +89,68 @@ func TestUserState(t *testing.T) {
 	require.True(t, resp.Success)
 }
 
+func TestUserCA(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 解析证书
+	certificate, err := ca.RetrieveCertificate("-----BEGIN CERTIFICATE----- MIIB4DCCAYagAwIBAgIENhE1ZTAKBggqhkjOPQQDAjBwMQwwCgYDVQQKDANKRFQxDTALBgNVBAsM BFJPT1QxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJCSjELMAkGA1UEBwwCQkoxDTALBgNVBAMMBHJv b3QxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpkLmNvbTAeFw0yMTEwMjcwODQ3MDdaFw0zMTEwMjUw ODQ3MDdaMHExDDAKBgNVBAoMA0pEVDENMAsGA1UECwwEUEVFUjELMAkGA1UEBhMCQ04xCzAJBgNV BAgMAkJKMQswCQYDVQQHDAJCSjEOMAwGA1UEAwwFcGVlcjAxGzAZBgkqhkiG9w0BCQEWDGltdWdl QGpkLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLFhLigz1Rpd1rahUmlLiatzhYgnQtVP yZApmn42oWiEFMa68xaQb5jV6YLrikLK1EzyZDHLZBEoD9iS6ad7KqqjDTALMAkGA1UdEwQCMAAw CgYIKoZIzj0EAwIDSAAwRQIgBllErLVMu5qG6kpEyvY1rWmeVn+4SzhrH3w8+dPHlqQCIQC2Cf86 Bl/6zHUzsOZdbbXOjv6cuUh6VwO60HeKgAHQeg== -----END CERTIFICATE-----")
+	require.Nil(t, err)
+
+	// 更新用户证书
+	txTemp.User(base58.MustDecode("LdePN6sPpMcv42Yo2hHQAJCkwcnmKj9S83GKe")).CA(certificate)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+}
+
+func TestRootCA(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 解析证书
+	certificate, err := ca.RetrieveCertificate("-----BEGIN CERTIFICATE----- MIIB4DCCAYagAwIBAgIENhE1ZTAKBggqhkjOPQQDAjBwMQwwCgYDVQQKDANKRFQxDTALBgNVBAsM BFJPT1QxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJCSjELMAkGA1UEBwwCQkoxDTALBgNVBAMMBHJv b3QxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpkLmNvbTAeFw0yMTEwMjcwODQ3MDdaFw0zMTEwMjUw ODQ3MDdaMHExDDAKBgNVBAoMA0pEVDENMAsGA1UECwwEUEVFUjELMAkGA1UEBhMCQ04xCzAJBgNV BAgMAkJKMQswCQYDVQQHDAJCSjEOMAwGA1UEAwwFcGVlcjAxGzAZBgkqhkiG9w0BCQEWDGltdWdl QGpkLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABLFhLigz1Rpd1rahUmlLiatzhYgnQtVP yZApmn42oWiEFMa68xaQb5jV6YLrikLK1EzyZDHLZBEoD9iS6ad7KqqjDTALMAkGA1UdEwQCMAAw CgYIKoZIzj0EAwIDSAAwRQIgBllErLVMu5qG6kpEyvY1rWmeVn+4SzhrH3w8+dPHlqQCIQC2Cf86 Bl/6zHUzsOZdbbXOjv6cuUh6VwO60HeKgAHQeg== -----END CERTIFICATE-----")
+	require.Nil(t, err)
+
+	// 更新根证书
+	txTemp.User(base58.MustDecode("LdePN6sPpMcv42Yo2hHQAJCkwcnmKj9S83GKe")).CA(certificate)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+}
+
 func TestDataAccountRegister(t *testing.T) {
 
 	// 连接网关，获取节点服务

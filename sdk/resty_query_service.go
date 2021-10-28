@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
@@ -9,7 +10,6 @@ import (
 	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/blockchain-jd-com/framework-go/utils/base64"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
-	"github.com/blockchain-jd-com/framework-go/utils/network"
 	"github.com/go-resty/resty/v2"
 	"github.com/tidwall/gjson"
 	"net/url"
@@ -179,8 +179,17 @@ func (r RestyQueryService) GetLedgerAdminInfo(ledgerHash framework.HashDigest) (
 		}
 	}
 	info.Participants = pNodes
-	autoVerifyHash := wrp.Get("settings.cryptoSetting.autoVerifyHash").Bool()
-	supportedProviders := wrp.Get("settings.cryptoSetting.supportedProviders").Array()
+	info.Settings = ledger_model.LedgerSettings{
+		ConsensusProvider: wrp.Get("settings.consensusProvider").String(),
+		ConsensusSetting:  base58.MustDecode(wrp.Get("settings.consensusSetting").String()),
+		CryptoSetting:     parseCryptoSetting(wrp.Get("settings.cryptoSetting")),
+	}
+	return
+}
+
+func parseCryptoSetting(info gjson.Result) ledger_model.CryptoSetting {
+	autoVerifyHash := info.Get("autoVerifyHash").Bool()
+	supportedProviders := info.Get("supportedProviders").Array()
 	providers := make([]ledger_model.CryptoProvider, len(supportedProviders))
 	for i, node := range supportedProviders {
 		algorithmsArray := node.Get("algorithms").Array()
@@ -198,16 +207,11 @@ func (r RestyQueryService) GetLedgerAdminInfo(ledgerHash framework.HashDigest) (
 			Algorithms: algorithms,
 		}
 	}
-	info.Settings = ledger_model.LedgerSettings{
-		ConsensusProvider: wrp.Get("settings.consensusProvider").String(),
-		ConsensusSetting:  base58.MustDecode(wrp.Get("settings.consensusSetting").String()),
-		CryptoSetting: ledger_model.CryptoSetting{
-			SupportedProviders: providers,
-			HashAlgorithm:      int16(wrp.Get("settings.cryptoSetting.hashAlgorithm").Int()),
-			AutoVerifyHash:     autoVerifyHash,
-		},
+	return ledger_model.CryptoSetting{
+		SupportedProviders: providers,
+		HashAlgorithm:      int16(info.Get("hashAlgorithm").Int()),
+		AutoVerifyHash:     autoVerifyHash,
 	}
-	return
 }
 
 func (r RestyQueryService) GetConsensusParticipants(ledgerHash framework.HashDigest) (info []ledger_model.ParticipantNode, err error) {
@@ -215,8 +219,12 @@ func (r RestyQueryService) GetConsensusParticipants(ledgerHash framework.HashDig
 	if err != nil {
 		return info, err
 	}
-	participants := wrp.Array()
-	info = make([]ledger_model.ParticipantNode, len(participants))
+	info = parseConsensusParticipants(wrp.Array())
+	return
+}
+
+func parseConsensusParticipants(participants []gjson.Result) []ledger_model.ParticipantNode {
+	info := make([]ledger_model.ParticipantNode, len(participants))
 	for i, node := range participants {
 		info[i] = ledger_model.ParticipantNode{
 			Id:                   int32(node.Get("id").Int()),
@@ -226,7 +234,8 @@ func (r RestyQueryService) GetConsensusParticipants(ledgerHash framework.HashDig
 			ParticipantNodeState: ledger_model.READY.GetValueByName(node.Get("participantNodeState").String()).(ledger_model.ParticipantNodeState),
 		}
 	}
-	return
+
+	return info
 }
 
 func (r RestyQueryService) GetLedgerMetadata(ledgerHash framework.HashDigest) (info ledger_model.LedgerMetadata, err error) {
@@ -420,20 +429,24 @@ func (r RestyQueryService) GetUser(ledgerHash framework.HashDigest, address stri
 	info = ledger_model.UserInfo{
 		UserAccountHeader: ledger_model.UserAccountHeader{
 			BlockchainIdentity: parseBlockchainIdentity(user),
+			State:              ledger_model.NORMAL.GetValueByName(user.Get("state").String()).(ledger_model.AccountState),
+			Certificate:        user.Get("certificate").String(),
 		},
 	}
 	return
 }
 
-func (r RestyQueryService) GetDataAccount(ledgerHash framework.HashDigest, address string) (info ledger_model.BlockchainIdentity, err error) {
-	id, err := r.query(fmt.Sprintf("/ledgers/%s/accounts/address/%s", ledgerHash.ToBase58(), address))
+func (r RestyQueryService) GetDataAccount(ledgerHash framework.HashDigest, address string) (info ledger_model.DataAccountInfo, err error) {
+	account, err := r.query(fmt.Sprintf("/ledgers/%s/accounts/address/%s", ledgerHash.ToBase58(), address))
 	if err != nil {
 		return info, err
 	}
-	if !id.Exists() {
+	if !account.Exists() {
 		return info, errors.New("not exists")
 	}
-	info = parseBlockchainIdentity(id)
+	info.BlockchainIdentity = parseBlockchainIdentity(account.Get("iD"))
+	info.DataCount = account.Get("dataset.dataCount").Int()
+	info.Permission = parseDataPermission(account.Get("permission"))
 	return
 }
 
@@ -550,7 +563,9 @@ func (r RestyQueryService) GetContract(ledgerHash framework.HashDigest, address 
 		MerkleSnapshot: ledger_model.MerkleSnapshot{
 			RootHash: base58.MustDecode(contract.Get("rootHash").String()),
 		},
-		ChainCode: bytes.StringToBytes(contract.Get("chainCode").String()),
+		ChainCode:  bytes.StringToBytes(contract.Get("chainCode").String()),
+		State:      ledger_model.NORMAL.GetValueByName(contract.Get("state").String()).(ledger_model.AccountState),
+		Permission: parseDataPermission(contract.Get("permission")),
 	}
 
 	return
@@ -833,6 +848,7 @@ func parseLedgerDataSnapshot(info gjson.Result) ledger_model.LedgerDataSnapshot 
 
 func parseTransactionContent(info gjson.Result) ledger_model.TransactionContent {
 	return ledger_model.TransactionContent{
+		LedgerHash: base58.MustDecode(info.Get("ledgerHash").String()),
 		Operations: parseOperations(info.Get("operations").Array()),
 		Timestamp:  info.Get("timestamp").Int(),
 	}
@@ -856,41 +872,63 @@ func parseOperations(info []gjson.Result) []binary_proto.DataContract {
 	operations := make([]binary_proto.DataContract, len(info))
 	for i, operation := range info {
 		var dc binary_proto.DataContract
-		if operation.Get("userID").Exists() {
+		switch operation.Get("@type").String() {
+		case "com.jd.blockchain.ledger.UserRegisterOperation":
 			// 注册用户
-			dc = parseUserRegisterOperation(operation.Get("userID"))
-		} else if operation.Get("accountID").Exists() {
+			dc = parseUserRegisterOperation(operation)
+		case "com.jd.blockchain.ledger.DataAccountRegisterOperation":
 			// 注册数据账户
 			dc = parseDataAccountRegisterOperation(operation.Get("accountID"))
-		} else if operation.Get("writeSet").Exists() {
+		case "com.jd.blockchain.ledger.DataAccountKVSetOperation":
 			// KV写入
 			dc = parseDataAccountKVSetOperation(operation)
-		} else if operation.Get("eventAccountID").Exists() {
+		case "com.jd.blockchain.ledger.EventAccountRegisterOperation":
 			// 事件账户注册
 			dc = parseEventAccountRegisterOperation(operation.Get("eventAccountID"))
-		} else if operation.Get("events").Exists() {
+		case "com.jd.blockchain.ledger.EventPublishOperation":
 			// 发布事件
 			dc = parseEventPublishOperation(operation)
-		} else if operation.Get("participantRegisterIdentity").Exists() {
+		case "com.jd.blockchain.ledger.ParticipantRegisterOperation":
 			// 注册参与方
-			dc = parseParticipantRegisterOperation(operation.Get("participantRegisterIdentity"))
-		} else if operation.Get("stateUpdateIdentity").Exists() {
+			dc = parseParticipantRegisterOperation(operation)
+		case "com.jd.blockchain.ledger.ParticipantStateUpdateOperation":
 			// 参与方状态变更
-			dc = parseParticipantStateUpdateOperation(operation.Get("stateUpdateIdentity"))
-		} else if operation.Get("chainCode").Exists() {
+			dc = parseParticipantStateUpdateOperation(operation)
+		case "com.jd.blockchain.ledger.ContractCodeDeployOperation":
 			// 合约部署
 			dc = parseContractCodeDeployOperation(operation.Get("chainCode"))
-		} else if operation.Get("contractAddress").Exists() {
+		case "com.jd.blockchain.ledger.ContractEventSendOperation":
 			// 合约调用
 			dc = parseContractEventSendOperation(operation)
-		} else if operation.Get("roles").Exists() {
+		case "com.jd.blockchain.ledger.RolesConfigureOperation":
 			// 角色配置
 			dc = parseRolesConfigureOperation(operation)
-		} else if operation.Get("userRolesAuthorizations").Exists() {
+		case "com.jd.blockchain.ledger.UserAuthorizeOperation":
+			// 用户权限配置
 			dc = parseUserAuthorizeOperation(operation.Get("userRolesAuthorizations").Array())
+		case "com.jd.blockchain.ledger.ConsensusSettingsUpdateOperation":
+			// 共识信息变更
+			dc = parseConsensusSettingsUpdateOperation(operation)
+		case "com.jd.blockchain.ledger.LedgerInitOperation":
+			// 账本初始化
+			dc = parseLedgerInitOperation(operation.Get("initSetting"))
+		case "com.jd.blockchain.ledger.UserCAUpdateOperation":
+			// 用户证书更新
+			dc = parseUserCAUpdateOperation(operation)
+		case "com.jd.blockchain.ledger.UserStateUpdateOperation":
+			// 用户状态变更
+			dc = parseUserStateUpdateOperation(operation)
+		case "com.jd.blockchain.ledger.RootCAUpdateOperation":
+			// 根证书更新
+			dc = parseRootCAUpdateOperation(operation)
+		case "com.jd.blockchain.ledger.AccountPermissionSetOperation":
+			// 账户权限配置
+			dc = parseAccountPermissionSetOperation(operation)
+		case "com.jd.blockchain.ledger.ContractStateUpdateOperation":
+			// 合约状态变更
+			dc = parseContractStateUpdateOperation(operation)
 		}
 
-		// TODO 操作类型不全，存在 dc 为空情况，待完善
 		operations[i] = dc
 	}
 
@@ -899,7 +937,8 @@ func parseOperations(info []gjson.Result) []binary_proto.DataContract {
 
 func parseUserRegisterOperation(info gjson.Result) binary_proto.DataContract {
 	return &ledger_model.UserRegisterOperation{
-		UserID: parseBlockchainIdentity(info),
+		UserID:      parseBlockchainIdentity(info.Get("userID")),
+		Certificate: info.Get("certificate").String(),
 	}
 }
 
@@ -917,18 +956,16 @@ func parseEventAccountRegisterOperation(info gjson.Result) binary_proto.DataCont
 
 func parseParticipantRegisterOperation(info gjson.Result) binary_proto.DataContract {
 	return &ledger_model.ParticipantRegisterOperation{
-		ParticipantName:             info.Get("participantName").String(),
-		ParticipantRegisterIdentity: parseBlockchainIdentity(info.Get("participantRegisterIdentity")),
+		ParticipantName: info.Get("participantName").String(),
+		ParticipantID:   parseBlockchainIdentity(info.Get("participantID")),
+		Certificate:     info.Get("certificate").String(),
 	}
 }
 
 func parseParticipantStateUpdateOperation(info gjson.Result) binary_proto.DataContract {
-	networkAddress := info.Get("networkAddress")
-	address := network.NewAddress(networkAddress.Get("host").String(), int32(networkAddress.Get("port").Int()), networkAddress.Get("secure").Bool())
 	return &ledger_model.ParticipantStateUpdateOperation{
-		State:               ledger_model.READY.GetValueByName(info.Get("state").String()).(ledger_model.ParticipantNodeState),
-		StateUpdateIdentity: parseBlockchainIdentity(info.Get("stateUpdateIdentity")),
-		NetworkAddress:      address.ToBytes(),
+		State:         ledger_model.READY.GetValueByName(info.Get("state").String()).(ledger_model.ParticipantNodeState),
+		ParticipantID: parseBlockchainIdentity(info.Get("participantID")),
 	}
 }
 
@@ -1001,6 +1038,84 @@ func parseUserAuthorizeOperation(array []gjson.Result) binary_proto.DataContract
 	}
 }
 
+func parseConsensusSettingsUpdateOperation(info gjson.Result) binary_proto.DataContract {
+	var op ledger_model.ConsensusSettingsUpdateOperation
+	json.Unmarshal([]byte(info.Raw), &op)
+	return op
+}
+
+func parseLedgerInitOperation(info gjson.Result) binary_proto.DataContract {
+	return &ledger_model.LedgerInitOperation{
+		InitSetting: ledger_model.LedgerInitSetting{
+			LedgerSeed:             []byte(info.Get("ledgerSeed").String()),
+			ConsensusParticipants:  parseConsensusParticipants(info.Get("consensusParticipants").Array()),
+			CryptoSetting:          parseCryptoSetting(info.Get("cryptoSetting")),
+			ConsensusProvider:      info.Get("consensusProvider").String(),
+			ConsensusSettings:      []byte(info.Get("consensusSettings").String()),
+			CreatedTime:            info.Get("createdTime").Int(),
+			LedgerStructureVersion: info.Get("ledgerStructureVersion").Int(),
+			IdentityMode:           ledger_model.KEYPAIR.GetValueByName(info.Get("identityMode").String()).(ledger_model.IdentityMode),
+			LedgerCertificates:     parseStringArray(info.Get("ledgerCertificates").Array()),
+			GenesisUsers:           parseGenesisUsers(info.Get("genesisUsers").Array()),
+			LedgerDataStructure:    ledger_model.MERKLE_TREE.GetValueByName(info.Get("ledgerDataStructure").String()).(ledger_model.LedgerDataStructure),
+		},
+	}
+}
+
+func parseGenesisUsers(info []gjson.Result) []ledger_model.GenesisUser {
+	array := make([]ledger_model.GenesisUser, len(info))
+	for i, item := range info {
+		array[i] = parseGenesisUser(item)
+	}
+
+	return array
+}
+
+func parseGenesisUser(info gjson.Result) ledger_model.GenesisUser {
+	return ledger_model.GenesisUser{
+		PubKey:      base58.MustDecode(info.Get("pubKey").String()),
+		Certificate: info.Get("certificate").String(),
+		Roles:       parseStringArray(info.Get("roles").Array()),
+		RolesPolicy: ledger_model.UNION.GetValueByName(info.Get("rolesPolicy").String()).(ledger_model.RolesPolicy),
+	}
+}
+
+func parseUserCAUpdateOperation(info gjson.Result) binary_proto.DataContract {
+	return &ledger_model.UserCAUpdateOperation{
+		UserAddress: base58.MustDecode(info.Get("userAddress").String()),
+		Certificate: info.Get("certificate").String(),
+	}
+}
+
+func parseUserStateUpdateOperation(info gjson.Result) binary_proto.DataContract {
+	return &ledger_model.UserStateUpdateOperation{
+		UserAddress: base58.MustDecode(info.Get("userAddress").String()),
+		State:       ledger_model.NORMAL.GetValueByName(info.Get("state").String()).(ledger_model.AccountState),
+	}
+}
+
+func parseRootCAUpdateOperation(info gjson.Result) binary_proto.DataContract {
+	var op ledger_model.RootCAUpdateOperation
+	json.Unmarshal([]byte(info.Raw), &op)
+	return op
+}
+
+func parseAccountPermissionSetOperation(info gjson.Result) binary_proto.DataContract {
+	return &ledger_model.AccountPermissionSetOperation{
+		Address:     base58.MustDecode(info.Get("address").String()),
+		AccountType: ledger_model.DATA.GetValueByName(info.Get("accountType").String()).(ledger_model.AccountType),
+		Mode:        int32(info.Get("mode").Int()),
+		Role:        info.Get("role").String(),
+	}
+}
+
+func parseContractStateUpdateOperation(info gjson.Result) binary_proto.DataContract {
+	return &ledger_model.ContractStateUpdateOperation{
+		ContractAddress: base58.MustDecode(info.Get("contractAddress").String()),
+		State:           ledger_model.NORMAL.GetValueByName(info.Get("state").String()).(ledger_model.AccountState),
+	}
+}
+
 func parseStringArray(info []gjson.Result) []string {
 	array := make([]string, len(info))
 	for i, item := range info {
@@ -1069,6 +1184,12 @@ func parseBlockchainIdentity(id gjson.Result) ledger_model.BlockchainIdentity {
 	}
 }
 
+func parseDataPermission(permission gjson.Result) ledger_model.DataPermission {
+	var p ledger_model.DataPermission
+	json.Unmarshal([]byte(permission.Raw), &p)
+	return p
+}
+
 func (r RestyQueryService) GetSystemEventNameTotalCount(ledgerHash framework.HashDigest) (info int64, err error) {
 	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/system/names/count", ledgerHash.ToBase58()))
 	if err != nil {
@@ -1100,13 +1221,18 @@ func (r RestyQueryService) GetSystemEventsTotalCount(ledgerHash framework.HashDi
 	return wrp.Int(), nil
 }
 
-func (r RestyQueryService) GetUserEventAccount(ledgerHash framework.HashDigest, address string) (info ledger_model.BlockchainIdentity, err error) {
-	wrp, err := r.query(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s", ledgerHash.ToBase58(), address))
+func (r RestyQueryService) GetUserEventAccount(ledgerHash framework.HashDigest, address string) (info ledger_model.EventAccountInfo, err error) {
+	account, err := r.query(fmt.Sprintf("/ledgers/%s/events/user/accounts/%s", ledgerHash.ToBase58(), address))
 	if err != nil {
 		return info, err
 	}
-
-	return parseBlockchainIdentity(wrp), nil
+	if !account.Exists() {
+		return info, errors.New("not exists")
+	}
+	info.BlockchainIdentity = parseBlockchainIdentity(account.Get("iD"))
+	info.DataCount = account.Get("dataset.dataCount").Int()
+	info.Permission = parseDataPermission(account.Get("permission"))
+	return info, err
 }
 
 func (r RestyQueryService) GetUserEventAccountTotalCount(ledgerHash framework.HashDigest) (info int64, err error) {

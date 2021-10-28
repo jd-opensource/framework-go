@@ -1,5 +1,7 @@
 package ledger_model
 
+import "github.com/blockchain-jd-com/framework-go/crypto/ca"
+
 /*
  * Author: imuge
  * Date: 2021/9/10 下午4:33
@@ -21,6 +23,18 @@ func (uuob *UserUpdateOperationBuilder) State(state AccountState) UserStateUpdat
 	operation := UserStateUpdateOperation{
 		UserAddress: uuob.address,
 		State:       state,
+	}
+	if uuob.factory != nil {
+		uuob.factory.addOperation(operation)
+	}
+
+	return operation
+}
+
+func (uuob *UserUpdateOperationBuilder) CA(cert *ca.Certificate) UserCAUpdateOperation {
+	operation := UserCAUpdateOperation{
+		UserAddress: uuob.address,
+		Certificate: cert.ToPEMString(),
 	}
 	if uuob.factory != nil {
 		uuob.factory.addOperation(operation)

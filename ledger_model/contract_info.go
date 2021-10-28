@@ -16,8 +16,9 @@ func init() {
 type ContractInfo struct {
 	BlockchainIdentity
 	MerkleSnapshot
-	ChainCode []byte       `primitiveType:"BYTES"`
-	State     AccountState `refEnum:"788"`
+	ChainCode  []byte         `primitiveType:"BYTES"`
+	State      AccountState   `refEnum:"788"`
+	Permission DataPermission `json:"permission"`
 }
 
 func (c ContractInfo) ContractCode() int32 {

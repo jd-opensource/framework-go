@@ -14,11 +14,8 @@ func init() {
 }
 
 type ParticipantStateUpdateOperation struct {
-	StateUpdateIdentity BlockchainIdentity `refContract:"144"`
-
-	NetworkAddress []byte `primitiveType:"BYTES"`
-
-	State ParticipantNodeState `refEnum:"2852"`
+	ParticipantID BlockchainIdentity   `refContract:"144"`
+	State         ParticipantNodeState `refEnum:"2852"`
 }
 
 func (p ParticipantStateUpdateOperation) ContractCode() int32 {
