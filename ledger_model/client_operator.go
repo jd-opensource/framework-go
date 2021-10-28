@@ -12,4 +12,5 @@ type ClientOperator interface {
 	ContractOperator
 	ParticipantOperator
 	EventOperator
+	MetaInfoOperator
 }

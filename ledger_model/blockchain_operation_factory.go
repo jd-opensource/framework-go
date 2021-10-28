@@ -13,6 +13,10 @@ type BlockchainOperationFactory struct {
 	operationList []binary_proto.DataContract
 }
 
+func (b *BlockchainOperationFactory) MetaInfo() *MetaInfoUpdateOperationBuilder {
+	return NewMetaInfoUpdateOperationBuilder(b)
+}
+
 func (b *BlockchainOperationFactory) Contract(address []byte) *ContractOperationBuilder {
 	return NewContractOperationBuilder(address, b)
 }

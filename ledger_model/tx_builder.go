@@ -20,6 +20,10 @@ type TxBuilder struct {
 	opFactory     BlockchainOperationFactory
 }
 
+func (t *TxBuilder) MetaInfo() *MetaInfoUpdateOperationBuilder {
+	return t.opFactory.MetaInfo()
+}
+
 func (t *TxBuilder) User(address []byte) *UserUpdateOperationBuilder {
 	return t.opFactory.User(address)
 }

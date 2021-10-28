@@ -19,6 +19,11 @@ type TxTemplate struct {
 	stateManager *TxStateManager
 }
 
+func (t *TxTemplate) MetaInfo() *MetaInfoUpdateOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.MetaInfo()
+}
+
 func (t *TxTemplate) User(address []byte) *UserUpdateOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.User(address)
