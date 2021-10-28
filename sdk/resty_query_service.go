@@ -764,6 +764,7 @@ func parseTxResult(result gjson.Result) ledger_model.TransactionResult {
 		ExecutionState:  ledger_model.SUCCESS.GetValueByName(result.Get("executionState").String()).(ledger_model.TransactionState),
 		TransactionHash: base58.MustDecode(result.Get("transactionHash").String()),
 		DataSnapshot:    parseLedgerDataSnapshot(result.Get("dataSnapshot")),
+		DerivedOperations: parseOperations(result.Get("derivedOperations").Array()),
 	}
 }
 

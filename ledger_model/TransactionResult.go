@@ -14,11 +14,12 @@ func init() {
 }
 
 type TransactionResult struct {
-	TransactionHash  []byte             `primitiveType:"BYTES"`
-	BlockHeight      int64              `primitiveType:"INT64"`
-	ExecutionState   TransactionState   `refEnum:"2850"`
-	OperationResults []OperationResult  `refContract:"880" list:"true"`
-	DataSnapshot     LedgerDataSnapshot `refContract:"304"`
+	TransactionHash   []byte                      `primitiveType:"BYTES"`
+	BlockHeight       int64                       `primitiveType:"INT64"`
+	ExecutionState    TransactionState            `refEnum:"2850"`
+	OperationResults  []OperationResult           `refContract:"880" list:"true"`
+	DataSnapshot      LedgerDataSnapshot          `refContract:"304"`
+	DerivedOperations []binary_proto.DataContract `refContract:"768" genericContract:"true" list:"true"`
 }
 
 func (t TransactionResult) ContractCode() int32 {

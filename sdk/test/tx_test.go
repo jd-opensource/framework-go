@@ -296,7 +296,7 @@ func TestContractInvoke(t *testing.T) {
 	// 创建交易
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
-	contractAddress := base58.MustDecode("LdeNx8nyttR6sbYrqtmm3RyTobRpZStJQHbkB")
+	contractAddress := base58.MustDecode("LdeNtygMv86tAzgcYTg8n9FRSWpGpc8Br6b8w")
 
 	// 创建合约调用交易，请修改数据账户地址为链上已经存在的数据账户地址
 	txTemp = service.NewTransaction(ledgerHashs[0])
