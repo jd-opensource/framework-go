@@ -39,6 +39,8 @@ const (
 	REJECTED_BY_SECURITY_POLICY = TransactionState(0x11)
 	// 账户注册冲突
 	ACCOUNT_REGISTER_CONFLICT = TransactionState(0x12)
+	// 角色不存在
+	ROLE_DOES_NOT_EXIST = TransactionState(0x13)
 	// 由于在错误的账本上执行交易而被忽略
 	IGNORED_BY_WRONG_LEDGER = TransactionState(0x40)
 	// 由于交易内容的验签失败而忽略
@@ -129,6 +131,8 @@ func (t TransactionState) GetValue(CODE int32) binary_proto.EnumContract {
 		return REJECTED_BY_SECURITY_POLICY
 	case int32(0x12):
 		return ACCOUNT_REGISTER_CONFLICT
+	case int32(0x13):
+		return ROLE_DOES_NOT_EXIST
 	case int32(0x40):
 		return IGNORED_BY_WRONG_LEDGER
 	case int32(0x41):
@@ -196,6 +200,8 @@ func (t TransactionState) GetValueByName(name string) binary_proto.EnumContract 
 		return REJECTED_BY_SECURITY_POLICY
 	case "ACCOUNT_REGISTER_CONFLICT":
 		return ACCOUNT_REGISTER_CONFLICT
+	case "ROLE_DOES_NOT_EXIST":
+		return ROLE_DOES_NOT_EXIST
 	case "IGNORED_BY_WRONG_LEDGER":
 		return IGNORED_BY_WRONG_LEDGER
 	case "IGNORED_BY_ILLEGAL_CONTENT_SIGNATURE":
