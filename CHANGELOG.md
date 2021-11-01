@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.3.0
+2021.11.01
+
+适配`JD Chain` [1.6.0](https://github.com/blockchain-jd-com/jdchain/releases/tag/1.6.0)
+
+**FEATURES**
+* 添加[证书](https://github.com/blockchain-jd-com/jdchain/wiki/CA)支持基础工具类
+* 增加用户证书和生命周期相关操作
+* 增加合约生命周期相关操作
+* 适配`1.6.0`最新查询接口
+
+## v1.2.0
+2021.09.03
+**FEATURES**
+* 去除冗余`value`字段
+**Bug Fixes**
+* 解决空字节数组序列化与`java`版本不一致
+
 ## v1.1.2
 2021.07.02
 **Bug Fixes**
