@@ -32,6 +32,10 @@ func (t *TxBuilder) Contract(address []byte) *ContractOperationBuilder {
 	return t.opFactory.Contract(address)
 }
 
+func (t *TxBuilder) ContractEvents() *ContractEventSendOperationBuilder {
+	return t.opFactory.ContractEvents()
+}
+
 func (t *TxBuilder) EventAccounts() *EventAccountRegisterOperationBuilder {
 	return t.opFactory.EventAccounts()
 }

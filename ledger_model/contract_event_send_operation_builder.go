@@ -20,13 +20,27 @@ func NewContractEventSendOperationBuilder(address []byte, factory *BlockchainOpe
 	return &ContractEventSendOperationBuilder{address: address, factory: factory}
 }
 
+func NewDeprecatedContractEventSendOperationBuilder(factory *BlockchainOperationFactory) *ContractEventSendOperationBuilder {
+	return &ContractEventSendOperationBuilder{factory: factory}
+}
+
 /*
 	address 合约地址
 	event   合约版本
 	event   合约方法
 	args	参数列表， 仅支持 bool/int16/int32/int64/string/[]byte
 */
-func (cesob *ContractEventSendOperationBuilder) Send(version int64, event string, args []interface{}) error {
+func (cesob *ContractEventSendOperationBuilder) Send(address []byte, version int64, event string, args ...interface{}) error {
+	cesob.address = address
+	return cesob.Invoke(version, event, args)
+}
+
+/*
+	event   合约版本
+	event   合约方法
+	args	参数列表， 仅支持 bool/int16/int32/int64/string/[]byte
+*/
+func (cesob *ContractEventSendOperationBuilder) Invoke(version int64, event string, args []interface{}) error {
 	params := []BytesValue{}
 	for i := 0; i < len(args); i++ {
 		v := reflect.ValueOf(args[i])

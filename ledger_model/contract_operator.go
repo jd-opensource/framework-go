@@ -12,4 +12,7 @@ type ContractOperator interface {
 
 	// 合约更新操作
 	Contract(address []byte) *ContractOperationBuilder
+
+	// contract events
+	ContractEvents() *ContractEventSendOperationBuilder
 }

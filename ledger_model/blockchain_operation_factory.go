@@ -21,6 +21,10 @@ func (b *BlockchainOperationFactory) Contract(address []byte) *ContractOperation
 	return NewContractOperationBuilder(address, b)
 }
 
+func (b *BlockchainOperationFactory) ContractEvents() *ContractEventSendOperationBuilder {
+	return NewDeprecatedContractEventSendOperationBuilder(b)
+}
+
 func (b *BlockchainOperationFactory) User(address []byte) *UserUpdateOperationBuilder {
 	return NewUserUpdateOperationBuilder(address, b)
 }

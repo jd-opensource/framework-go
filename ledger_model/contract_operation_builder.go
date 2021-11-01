@@ -15,7 +15,7 @@ func NewContractOperationBuilder(address []byte, factory *BlockchainOperationFac
 }
 
 func (cob *ContractOperationBuilder) Invoke(event string, args ...interface{}) error {
-	return cob.invokeBuilder.Send(-1, event, args)
+	return cob.invokeBuilder.Invoke(-1, event, args)
 }
 
 func (cob *ContractOperationBuilder) State(state AccountState) {

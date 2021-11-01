@@ -241,7 +241,7 @@ func TestQuery(t *testing.T) {
 			// 返回数据账户信息
 			daid, err := blockchainService.GetDataAccount(ledger, dataAccount)
 			require.Nil(t, err)
-			require.Equal(t, da, daid)
+			require.Equal(t, da, daid.BlockchainIdentity)
 
 			// 返回指定数据账户中KV数据的总数
 			dEntriesCount, err := blockchainService.GetDataEntriesTotalCount(ledger, dataAccount)
@@ -306,7 +306,7 @@ func TestQuery(t *testing.T) {
 			// 用户事件账户
 			eventAccount, err := blockchainService.GetUserEventAccount(ledger, eventAddress)
 			require.Nil(t, err)
-			require.Equal(t, ea, eventAccount)
+			require.Equal(t, ea, eventAccount.BlockchainIdentity)
 
 			// 用户事件名总数
 			namesCount, err := blockchainService.GetUserEventNameTotalCount(ledger, eventAddress)
