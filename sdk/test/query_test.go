@@ -1,12 +1,13 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/ledger_model"
 	"github.com/blockchain-jd-com/framework-go/sdk"
 	"github.com/blockchain-jd-com/framework-go/utils/base58"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 /*
@@ -15,7 +16,7 @@ import (
  */
 
 func TestQuery(t *testing.T) {
-	blockchainService := sdk.Connect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY).GetBlockchainService()
+	blockchainService := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY).GetBlockchainService()
 
 	// 返回所有的账本的 hash 列表
 	ledgers, err := blockchainService.GetLedgerHashs()
