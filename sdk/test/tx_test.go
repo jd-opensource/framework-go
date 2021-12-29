@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/go-resty/resty/v2"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -642,4 +643,122 @@ func (E ESystemEventListener) OnEvents(events []ledger_model.Event, context sdk.
 
 	// 可通过下面的代码停止监听
 	//context.EventHandler.Cancel()
+}
+
+// 注册参与方
+func TestRegisterParticipant(t *testing.T) {
+
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+	//
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 生成公私钥对
+	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	address := framework.GenerateAddress(user.PubKey)
+	fmt.Println(address)
+
+	// 注册用户
+	txTemp.Participants().Register("peer4", ledger_model.NewBlockchainIdentity(user.PubKey))
+
+	// 角色权限配置
+	txTemp.Security().Roles().Configure("MANAGER").
+		EnableLedgerPermission(ledger_model.REGISTER_USER).
+		EnableTransactionPermission(ledger_model.CONTRACT_OPERATION).
+		DisableLedgerPermission(ledger_model.WRITE_DATA_ACCOUNT).
+		DisableTransactionPermission(ledger_model.DIRECT_OPERATION)
+	txTemp.Security().Authorziations().ForUser([][]byte{address}).Authorize("MANAGER")
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+
+}
+
+// 证书模式下注册参与方
+func TestRegisterParticipantWithCA(t *testing.T) {
+
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 解析证书
+	peerCert, _ := ca.RetrieveCertificate("-----BEGIN CERTIFICATE-----\nMIICFTCCAbugAwIBAgIEVZ132DAKBggqhkjOPQQDAjBwMQwwCgYDVQQKDANKRFQx\nDTALBgNVBAsMBFJPT1QxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJCSjELMAkGA1UE\nBwwCQkoxDTALBgNVBAMMBHJvb3QxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpkLmNv\nbTAeFw0yMTEyMjkwNjUwMDBaFw0zMTEyMjcwNjUwMDBaMHExDDAKBgNVBAoMA0pE\nVDENMAsGA1UECwwEUEVFUjELMAkGA1UEBhMCQ04xCzAJBgNVBAgMAkJKMQswCQYD\nVQQHDAJCSjEOMAwGA1UEAwwFcGVlcjQxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpk\nLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGjWubawm0nFKDEchGb4636w\nGOuR/JpWjww6R9Cm5f9pxk0PFQIyUY/8fCHtnxeYK2VPk8qKdnQ0bEDKKZY7LIaj\nQjBAMA4GA1UdDwEB/wQEAwIHgDAgBgNVHQ4BAf8EFgQUFCVXcNggdSxRKRbVs0JR\nWgVA1/wwDAYDVR0TAQH/BAIwADAKBggqhkjOPQQDAgNIADBFAiBr4dbTMJIY7zhK\nz3XCBGiTsF7LH7tJS2bVQYps6+6kLgIhAN/JoQtiGYqGiMEguZIomLopWWMjT7dn\nqA9nRSsqoWfK\n-----END CERTIFICATE-----")
+	pubkey := ca.RetrievePubKey(peerCert)
+	address := framework.GenerateAddress(pubkey)
+	fmt.Println(base58.Encode(address))
+	// 注册参与方
+	txTemp.Participants().RegisterWithCA("peer4", peerCert)
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用网络中已存在用户私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+}
+
+// 激活参与方
+func TestActiveParticipant(t *testing.T) {
+	host := "127.0.0.1"
+	port := "7084"
+	params := map[string]string{}
+	params["ledgerHash"] = "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA" // 账本哈希
+	params["consensusHost"] = "127.0.0.1"                                   // 待激活节点共识地址
+	params["consensusPort"] = "10088"                                       // 待激活节点共识端口
+	params["consensusSecure"] = "false"                                     // 待激活节点共识服务是否启动安全连接
+	params["remoteManageHost"] = "127.0.0.1"                                // 数据同步节点地址
+	params["remoteManagePort"] = "7080"                                     // 数据同步节点端口
+	params["remoteManageSecure"] = "false"                                  // 数据同步节点服务是否启动安全连接
+	params["shutdown"] = "false"                                            // 是否停止旧的节点服务
+	resp, err := resty.New().R().
+		EnableTrace().
+		SetHeader("Content-Type", "application/bin-obj").
+		SetFormData(params).
+		Post("http://" + host + ":" + port + "/management/delegate/activeparticipant")
+	require.Nil(t, err)
+	require.True(t, resp.IsSuccess())
+}
+
+// 移除参与方
+func TestInactiveParticipant(t *testing.T) {
+	host := "127.0.0.1"
+	port := "7084"
+	params := map[string]string{}
+	params["ledgerHash"] = "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA" // 账本哈希
+	params["participantAddress"] = "LdePL6sEWw8RdtiEejyXguaXreoENoeJbResZ"  // 待移除参与方地址
+
+	resp, err := resty.New().R().
+		EnableTrace().
+		SetHeader("Content-Type", "application/bin-obj").
+		SetFormData(params).
+		Post("http://" + host + ":" + port + "/management/delegate/deactiveparticipant")
+	require.Nil(t, err)
+	require.True(t, resp.IsSuccess())
 }
