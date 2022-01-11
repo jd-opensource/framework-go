@@ -19,8 +19,3 @@ func (c ConsensusSettingsUpdateOperation) ContractName() string {
 func (c ConsensusSettingsUpdateOperation) Description() string {
 	return ""
 }
-
-type Property struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}

@@ -13,6 +13,14 @@ type BlockchainOperationFactory struct {
 	operationList []binary_proto.DataContract
 }
 
+func (b *BlockchainOperationFactory) SwitchHashAlgo() *CryptoHashAlgoUpdateOperationBuilder {
+	return NewCryptoHashAlgoUpdateOperationBuilder(b)
+}
+
+func (b *BlockchainOperationFactory) SwitchSettings() *ConsensusTypeUpdateOperationBuilder {
+	return NewConsensusTypeUpdateOperationBuilder(b)
+}
+
 func (b *BlockchainOperationFactory) MetaInfo() *MetaInfoUpdateOperationBuilder {
 	return NewMetaInfoUpdateOperationBuilder(b)
 }

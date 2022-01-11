@@ -20,4 +20,6 @@ const (
 	OperationTypeRootCAUpdateOperation            = "RootCAUpdateOperation"            // 根证书更新
 	OperationTypeLedgerInitOperation              = "LedgerInitOperation"              // 账本初始化
 	OperationTypeConsensusSettingsUpdateOperation = "ConsensusSettingsUpdateOperation" // 共识信息变更
+	OperationTypeConsensusTypeUpdateOperation     = "ConsensusTypeUpdateOperation"     // 共识变更
+	OperationTypeCryptoHashAlgoUpdateOperation    = "CryptoHashAlgoUpdateOperation"    // Hash算法变更
 )

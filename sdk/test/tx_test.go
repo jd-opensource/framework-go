@@ -789,3 +789,59 @@ func TestInactiveParticipant(t *testing.T) {
 	require.Nil(t, err)
 	require.True(t, resp.IsSuccess())
 }
+
+// 共识切换
+func TestConsensusTypeUpdate(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 更新公式算法
+	txTemp.SwitchSettings().Update("com.jd.blockchain.consensus.raft.RaftConsensusProvider", []ledger_model.Property{})
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+}
+
+// 哈希算法变更
+func TestHashAlgoUpdate(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 更新哈希算法
+	txTemp.SwitchHashAlgo().Update("SHA256")
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+}

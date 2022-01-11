@@ -87,6 +87,8 @@ const (
 
 	TX_OP_CONSENSUS_SETTINGS_UPDATE = 0x390
 	TX_OP_META_CA_UPDATE            = 0x391
+	TX_OP_CONSENSUS_TYPE_UPDATE     = 0x393
+	TX_OP_CRYPTO_ALGO_UPDATE        = 0x394
 
 	// enum types of permissions;
 	ENUM_TX_PERMISSION              = 0x401

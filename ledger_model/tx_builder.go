@@ -20,6 +20,14 @@ type TxBuilder struct {
 	opFactory     BlockchainOperationFactory
 }
 
+func (t *TxBuilder) SwitchHashAlgo() *CryptoHashAlgoUpdateOperationBuilder {
+	return t.opFactory.SwitchHashAlgo()
+}
+
+func (t *TxBuilder) SwitchSettings() *ConsensusTypeUpdateOperationBuilder {
+	return t.opFactory.SwitchSettings()
+}
+
 func (t *TxBuilder) MetaInfo() *MetaInfoUpdateOperationBuilder {
 	return t.opFactory.MetaInfo()
 }
