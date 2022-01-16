@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,27 +25,44 @@ import (
 var _ ledger_model.BlockChainLedgerQueryService = (*RestyQueryService)(nil)
 
 type RestyQueryService struct {
-	host    string
-	port    int
-	secure  bool
-	client  *resty.Client
-	baseUrl string
+	host     string
+	port     int
+	secure   bool
+	client   *resty.Client
+	baseUrl  string
+	security *SSLSecurity
 }
 
-func NewRestyQueryService(host string, port int, secure bool) *RestyQueryService {
-	var baseUrl string
-	if secure {
-		baseUrl = fmt.Sprintf("https://%s:%d", host, port)
-	} else {
-		baseUrl = fmt.Sprintf("http://%s:%d", host, port)
-	}
+func NewRestyQueryService(host string, port int) *RestyQueryService {
+	baseUrl := fmt.Sprintf("http://%s:%d", host, port)
 	return &RestyQueryService{
 		host:    host,
 		port:    port,
-		secure:  secure,
+		secure:  false,
 		client:  resty.New(),
 		baseUrl: baseUrl,
 	}
+}
+
+func NewSecureRestyQueryService(host string, port int, security *SSLSecurity) *RestyQueryService {
+	baseUrl := fmt.Sprintf("https://%s:%d", host, port)
+	r := &RestyQueryService{
+		host:     host,
+		port:     port,
+		secure:   true,
+		client:   resty.New(),
+		baseUrl:  baseUrl,
+		security: security,
+	}
+	if r.security != nil {
+		r.client.SetTLSClientConfig(&tls.Config{
+			RootCAs:      r.security.RootCerts,
+			Certificates: r.security.ClientCerts,
+		})
+	} else {
+		r.client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+	}
+	return r
 }
 
 func (r RestyQueryService) query(url string) (data gjson.Result, err error) {
@@ -760,10 +778,10 @@ func parseTxRequest(request gjson.Result) ledger_model.TransactionRequest {
 
 func parseTxResult(result gjson.Result) ledger_model.TransactionResult {
 	return ledger_model.TransactionResult{
-		BlockHeight:     result.Get("blockHeight").Int(),
-		ExecutionState:  ledger_model.SUCCESS.GetValueByName(result.Get("executionState").String()).(ledger_model.TransactionState),
-		TransactionHash: base58.MustDecode(result.Get("transactionHash").String()),
-		DataSnapshot:    parseLedgerDataSnapshot(result.Get("dataSnapshot")),
+		BlockHeight:       result.Get("blockHeight").Int(),
+		ExecutionState:    ledger_model.SUCCESS.GetValueByName(result.Get("executionState").String()).(ledger_model.TransactionState),
+		TransactionHash:   base58.MustDecode(result.Get("transactionHash").String()),
+		DataSnapshot:      parseLedgerDataSnapshot(result.Get("dataSnapshot")),
 		DerivedOperations: parseOperations(result.Get("derivedOperations").Array()),
 	}
 }

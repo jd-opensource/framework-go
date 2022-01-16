@@ -16,7 +16,7 @@ import (
  */
 
 func TestQuery(t *testing.T) {
-	blockchainService := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY).GetBlockchainService()
+	blockchainService := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY).GetBlockchainService()
 
 	// 返回所有的账本的 hash 列表
 	ledgers, err := blockchainService.GetLedgerHashs()

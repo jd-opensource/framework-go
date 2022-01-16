@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -18,6 +19,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// ssl 安全连接
+func TestSSLConnect(t *testing.T) {
+	// 是否建立安全连接
+	if SECURE {
+		// 判断是否忽略证书
+		if len(SSL_ROOT_CERT) > 0 && len(SSL_CLIENT_CERT) > 0 && len(SSL_CLIENT_KEY) > 0 {
+			security, err := sdk.NewSSLSecurity(SSL_ROOT_CERT, SSL_CLIENT_CERT, SSL_CLIENT_KEY)
+			assert.Nil(t, err)
+			serviceFactory := sdk.MustSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, security)
+			//serviceFactory := sdk.MustSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, security)
+
+			serviceFactory.GetBlockchainService()
+		} else { // 忽略证书
+			serviceFactory := sdk.MustSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, nil)
+			//serviceFactory := sdk.MustSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, nil)
+
+			serviceFactory.GetBlockchainService()
+		}
+	} else {
+		serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
+		//serviceFactory := sdk.MustConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT)
+
+		serviceFactory.GetBlockchainService()
+	}
+}
+
 /*
  * Author: imuge
  * Date: 2020/5/26 上午11:29
@@ -27,7 +54,7 @@ import (
 func TestRegisterUser(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 
 	service := serviceFactory.GetBlockchainService()
 
@@ -70,7 +97,7 @@ func TestRegisterUser(t *testing.T) {
 func TestRegisterUserWithCA(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 
 	service := serviceFactory.GetBlockchainService()
 
@@ -112,7 +139,7 @@ func TestRegisterUserWithCA(t *testing.T) {
 
 func TestUserState(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -139,7 +166,7 @@ func TestUserState(t *testing.T) {
 
 func TestUserCA(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -170,7 +197,7 @@ func TestUserCA(t *testing.T) {
 
 func TestRootCA(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -202,7 +229,7 @@ func TestRootCA(t *testing.T) {
 func TestDataAccountRegister(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -233,7 +260,7 @@ func TestDataAccountRegister(t *testing.T) {
 func TestDataAccountSetKV(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -269,7 +296,7 @@ func TestDataAccountSetKV(t *testing.T) {
 func TestDataAccountPermission(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -302,7 +329,7 @@ func TestContractDeploy(t *testing.T) {
 	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -334,7 +361,7 @@ func TestContractDeploy(t *testing.T) {
 
 func TestContractInvoke(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -369,7 +396,7 @@ func TestContractInvoke(t *testing.T) {
 
 func TestContractState(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -398,7 +425,7 @@ func TestContractState(t *testing.T) {
 
 func TestContractPermission(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -428,7 +455,7 @@ func TestContractPermission(t *testing.T) {
 func TestUserEventAccountRegister(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -459,7 +486,7 @@ func TestUserEventAccountRegister(t *testing.T) {
 func TestUserEventPublish(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -492,7 +519,7 @@ func TestUserEventPublish(t *testing.T) {
 func TestUserEventAccountPermission(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -522,7 +549,7 @@ func TestUserEventAccountPermission(t *testing.T) {
 
 func TestUserEventListener(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -601,7 +628,7 @@ func (E EUserEventListener) OnEvent(event ledger_model.Event, context sdk.UserEv
 
 func TestSystemEventListener(t *testing.T) {
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
 
 	// 获取账本信息
@@ -649,7 +676,7 @@ func (E ESystemEventListener) OnEvents(events []ledger_model.Event, context sdk.
 func TestRegisterParticipant(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 
 	service := serviceFactory.GetBlockchainService()
 
@@ -693,7 +720,7 @@ func TestRegisterParticipant(t *testing.T) {
 func TestRegisterParticipantWithCA(t *testing.T) {
 
 	// 连接网关，获取节点服务
-	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, SECURE, NODE_KEY)
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 
 	service := serviceFactory.GetBlockchainService()
 

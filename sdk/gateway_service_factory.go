@@ -21,9 +21,9 @@ func NewGatewayServiceFactory(blockchainService BlockchainService) *GatewayServi
 	}
 }
 
-func MustConnect(gatewayHost string, gatewayPort int, secure bool, userKey ledger_model.BlockchainKeypair) *GatewayServiceFactory {
-	queryService := NewRestyQueryService(gatewayHost, gatewayPort, secure)
-	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort, secure))
+func MustConnect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair) *GatewayServiceFactory {
+	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
+	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort))
 	ledgerHashs, err := queryService.GetLedgerHashs()
 	if err != nil {
 		panic(err)
@@ -40,9 +40,28 @@ func MustConnect(gatewayHost string, gatewayPort int, secure bool, userKey ledge
 	return NewGatewayServiceFactory(service)
 }
 
-func Connect(gatewayHost string, gatewayPort int, secure bool, userKey ledger_model.BlockchainKeypair) (*GatewayServiceFactory, error) {
-	queryService := NewRestyQueryService(gatewayHost, gatewayPort, secure)
-	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort, secure))
+func MustSecureConnect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair, security *SSLSecurity) *GatewayServiceFactory {
+	queryService := NewSecureRestyQueryService(gatewayHost, gatewayPort, security)
+	txService := NewEndpointAutoSigner(userKey, NewSecureRestyTxService(gatewayHost, gatewayPort, security))
+	ledgerHashs, err := queryService.GetLedgerHashs()
+	if err != nil {
+		panic(err)
+	}
+	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
+	for i, ledger := range ledgerHashs {
+		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		if err != nil {
+			panic(err)
+		}
+		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+	}
+	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
+	return NewGatewayServiceFactory(service)
+}
+
+func Connect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair) (*GatewayServiceFactory, error) {
+	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
+	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort))
 	ledgerHashs, err := queryService.GetLedgerHashs()
 	if err != nil {
 		return nil, err
@@ -59,9 +78,28 @@ func Connect(gatewayHost string, gatewayPort int, secure bool, userKey ledger_mo
 	return NewGatewayServiceFactory(service), nil
 }
 
-func MustConnectWithoutUserKey(gatewayHost string, gatewayPort int, secure bool) *GatewayServiceFactory {
-	queryService := NewRestyQueryService(gatewayHost, gatewayPort, secure)
-	txService := NewRestyTxService(gatewayHost, gatewayPort, secure)
+func SecureConnect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair, security *SSLSecurity) (*GatewayServiceFactory, error) {
+	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
+	txService := NewEndpointAutoSigner(userKey, NewSecureRestyTxService(gatewayHost, gatewayPort, security))
+	ledgerHashs, err := queryService.GetLedgerHashs()
+	if err != nil {
+		return nil, err
+	}
+	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
+	for i, ledger := range ledgerHashs {
+		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		if err != nil {
+			return nil, err
+		}
+		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+	}
+	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
+	return NewGatewayServiceFactory(service), nil
+}
+
+func MustConnectWithoutUserKey(gatewayHost string, gatewayPort int) *GatewayServiceFactory {
+	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
+	txService := NewRestyTxService(gatewayHost, gatewayPort)
 	ledgerHashs, err := queryService.GetLedgerHashs()
 	if err != nil {
 		panic(err)
@@ -78,9 +116,47 @@ func MustConnectWithoutUserKey(gatewayHost string, gatewayPort int, secure bool)
 	return NewGatewayServiceFactory(service)
 }
 
-func ConnectWithoutUserKey(gatewayHost string, gatewayPort int, secure bool) (*GatewayServiceFactory, error) {
-	queryService := NewRestyQueryService(gatewayHost, gatewayPort, secure)
-	txService := NewRestyTxService(gatewayHost, gatewayPort, secure)
+func MustSecureConnectWithoutUserKey(gatewayHost string, gatewayPort int, security *SSLSecurity) *GatewayServiceFactory {
+	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
+	txService := NewSecureRestyTxService(gatewayHost, gatewayPort, security)
+	ledgerHashs, err := queryService.GetLedgerHashs()
+	if err != nil {
+		panic(err)
+	}
+	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
+	for i, ledger := range ledgerHashs {
+		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		if err != nil {
+			panic(err)
+		}
+		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+	}
+	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
+	return NewGatewayServiceFactory(service)
+}
+
+func ConnectWithoutUserKey(gatewayHost string, gatewayPort int, security *SSLSecurity) (*GatewayServiceFactory, error) {
+	queryService := NewSecureRestyQueryService(gatewayHost, gatewayPort, security)
+	txService := NewSecureRestyTxService(gatewayHost, gatewayPort, security)
+	ledgerHashs, err := queryService.GetLedgerHashs()
+	if err != nil {
+		return nil, err
+	}
+	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
+	for i, ledger := range ledgerHashs {
+		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		if err != nil {
+			return nil, err
+		}
+		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+	}
+	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
+	return NewGatewayServiceFactory(service), nil
+}
+
+func SecureConnectWithoutUserKey(gatewayHost string, gatewayPort int, security *SSLSecurity) (*GatewayServiceFactory, error) {
+	queryService := NewSecureRestyQueryService(gatewayHost, gatewayPort, security)
+	txService := NewSecureRestyTxService(gatewayHost, gatewayPort, security)
 	ledgerHashs, err := queryService.GetLedgerHashs()
 	if err != nil {
 		return nil, err
