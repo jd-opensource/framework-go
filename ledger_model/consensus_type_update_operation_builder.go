@@ -24,3 +24,7 @@ func (ctuob *ConsensusTypeUpdateOperationBuilder) Update(providerName string, pr
 
 	return operation
 }
+
+func (ctuob *ConsensusTypeUpdateOperationBuilder) UpdateWithConfigFile(providerName string, configFile string) ConsensusTypeUpdateOperation {
+	return ctuob.Update(providerName, LoadProperties(configFile))
+}

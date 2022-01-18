@@ -804,8 +804,8 @@ func TestConsensusTypeUpdate(t *testing.T) {
 	// 创建交易
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
-	// 更新公式算法
-	txTemp.SwitchSettings().Update("com.jd.blockchain.consensus.raft.RaftConsensusProvider", []ledger_model.Property{})
+	// 更新共识算法
+	txTemp.SwitchSettings().UpdateWithConfigFile("com.jd.blockchain.consensus.raft.RaftConsensusProvider", "raft.config")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
