@@ -12,7 +12,7 @@ import (
  */
 
 // 从公钥生成地址
-func GenerateAddress(pubKey PubKey) []byte {
+func GenerateAddress(pubKey *PubKey) []byte {
 	h1Bytes := sha.Sha256(pubKey.GetRawKeyBytes())
 	h2Bytes := ripemd160.Hash(h1Bytes)
 	xBytes := bytes.Concat([]byte{ADDRESSVERSION_V1}, bytes.Int16ToBytes(pubKey.GetAlgorithm()), h2Bytes)

@@ -1,7 +1,7 @@
 package ledger_model
 
 type DataAccountInfo struct {
-	BlockchainIdentity
+	*BlockchainIdentity
 	// 数据权限
 	Permission DataPermission `json:"permission"`
 	// KV总数

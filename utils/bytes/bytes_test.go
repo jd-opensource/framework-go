@@ -21,7 +21,9 @@ func TestEquals(t *testing.T) {
 func TestFromBase58(t *testing.T) {
 	b := FromString("imuge")
 	b58 := b.ToBase58()
-	require.Equal(t, b, FromBase58(b58))
+	base58, err := FromBase58(b58)
+	require.Nil(t, err)
+	require.Equal(t, b, base58)
 }
 
 func TestBytes_Size(t *testing.T) {

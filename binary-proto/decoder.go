@@ -24,7 +24,8 @@ func decodeBytes(data []byte) ([]byte, int64) {
 }
 
 func decodeSize(data []byte) int64 {
-	return bytes.NUMBERMASK_NORMAL.ResolveMaskedNumber(data)
+	number, _ := bytes.NUMBERMASK_NORMAL.ResolveMaskedNumber(data)
+	return number
 }
 
 func decodePrimitiveType(data []byte, v reflect.Value, primitiveType string, numberMask bytes.NumberMask) int64 {
@@ -84,25 +85,25 @@ func decodePrimitiveType(data []byte, v reflect.Value, primitiveType string, num
 }
 
 func decodeInt8NumberMask(data []byte, mask bytes.NumberMask) (int8, int64) {
-	v := mask.ResolveMaskedNumber(data)
+	v, _ := mask.ResolveMaskedNumber(data)
 	len := mask.GetMaskLength(v)
 	return int8(v), int64(len)
 }
 
 func decodeInt16NumberMask(data []byte, mask bytes.NumberMask) (int16, int64) {
-	v := mask.ResolveMaskedNumber(data)
+	v, _ := mask.ResolveMaskedNumber(data)
 	len := mask.GetMaskLength(v)
 	return int16(v), int64(len)
 }
 
 func decodeInt32NumberMask(data []byte, mask bytes.NumberMask) (int32, int64) {
-	v := mask.ResolveMaskedNumber(data)
+	v, _ := mask.ResolveMaskedNumber(data)
 	len := mask.GetMaskLength(v)
 	return int32(v), int64(len)
 }
 
 func decodeInt64NumberMask(data []byte, mask bytes.NumberMask) (int64, int64) {
-	v := mask.ResolveMaskedNumber(data)
+	v, _ := mask.ResolveMaskedNumber(data)
 	len := mask.GetMaskLength(v)
 	return v, int64(len)
 }

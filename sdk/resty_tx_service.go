@@ -45,7 +45,7 @@ func NewSecureRestyTxService(host string, port int, security *SSLSecurity) *Rest
 	}
 }
 
-func (r *RestyTxService) Process(txRequest ledger_model.TransactionRequest) (response ledger_model.TransactionResponse, err error) {
+func (r *RestyTxService) Process(txRequest *ledger_model.TransactionRequest) (response *ledger_model.TransactionResponse, err error) {
 	msg, _ := binary_proto.NewCodec().Encode(txRequest)
 
 	client := resty.New()
@@ -69,8 +69,12 @@ func (r *RestyTxService) Process(txRequest ledger_model.TransactionRequest) (res
 		return
 	}
 	if tresp, err := binary_proto.NewCodec().Decode(resp.Body()); err != nil {
-		return ledger_model.TransactionResponse{}, err
+		return nil, err
 	} else {
-		return tresp.(ledger_model.TransactionResponse), nil
+		transactionResponse, ok := tresp.(ledger_model.TransactionResponse)
+		if !ok {
+			return nil, errors.New("not TransactionResponse")
+		}
+		return &transactionResponse, nil
 	}
 }

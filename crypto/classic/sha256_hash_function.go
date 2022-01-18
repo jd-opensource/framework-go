@@ -1,6 +1,7 @@
 package classic
 
 import (
+	"errors"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 	"github.com/blockchain-jd-com/framework-go/utils/sha"
@@ -22,15 +23,11 @@ func (S SHA256HashFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return SHA256_ALGORITHM
 }
 
-func (S SHA256HashFunction) Hash(data []byte) framework.HashDigest {
-	if data == nil {
-		panic("data is null!")
-	}
-
+func (S SHA256HashFunction) Hash(data []byte) *framework.HashDigest {
 	return framework.NewHashDigest(SHA256_ALGORITHM, sha.Sha256(data))
 }
 
-func (S SHA256HashFunction) Verify(digest framework.HashDigest, data []byte) bool {
+func (S SHA256HashFunction) Verify(digest *framework.HashDigest, data []byte) bool {
 	hashDigest := S.Hash(data)
 	return bytes.Equals(hashDigest.ToBytes(), digest.ToBytes())
 }
@@ -40,10 +37,10 @@ func (S SHA256HashFunction) SupportHashDigest(digestBytes []byte) bool {
 	return SHA256_DIGEST_BYTES == len(digestBytes) && SHA256_ALGORITHM.Match(digestBytes, 0)
 }
 
-func (S SHA256HashFunction) ParseHashDigest(digestBytes []byte) framework.HashDigest {
+func (S SHA256HashFunction) ParseHashDigest(digestBytes []byte) (*framework.HashDigest, error) {
 	if S.SupportHashDigest(digestBytes) {
-		return framework.NewHashDigest(SHA256_ALGORITHM, digestBytes)
+		return framework.NewHashDigest(SHA256_ALGORITHM, digestBytes), nil
 	} else {
-		panic("digestBytes is invalid!")
+		return nil, errors.New("invalid digestBytes!")
 	}
 }

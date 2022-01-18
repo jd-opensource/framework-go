@@ -8,7 +8,7 @@ import "github.com/blockchain-jd-com/framework-go/crypto/framework"
  */
 
 type LedgerInfo struct {
-	Hash              framework.HashDigest
-	LatestBlockHash   framework.HashDigest
+	Hash              *framework.HashDigest
+	LatestBlockHash   *framework.HashDigest
 	LatestBlockHeight int64
 }

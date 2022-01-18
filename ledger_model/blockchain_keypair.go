@@ -1,6 +1,7 @@
 package ledger_model
 
 import (
+	"errors"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 )
 
@@ -10,24 +11,28 @@ import (
  */
 
 type BlockchainKeypair struct {
-	framework.AsymmetricKeypair
-	id BlockchainIdentity
+	*framework.AsymmetricKeypair
+	id *BlockchainIdentity
 }
 
-func NewBlockchainKeypair(pubKey framework.PubKey, privKey framework.PrivKey) BlockchainKeypair {
+func NewBlockchainKeypair(pubKey *framework.PubKey, privKey *framework.PrivKey) (*BlockchainKeypair, error) {
 	if pubKey.GetAlgorithm() != privKey.GetAlgorithm() {
-		panic("The PublicKey's algorithm is different from the PrivateKey's!")
+		return nil, errors.New("The PublicKey's algorithm is different from the PrivateKey's!")
 	}
-	return BlockchainKeypair{
-		framework.NewAsymmetricKeypair(pubKey, privKey),
+	keypair, err := framework.NewAsymmetricKeypair(pubKey, privKey)
+	if err != nil {
+		return nil, err
+	}
+	return &BlockchainKeypair{
+		keypair,
 		NewBlockchainIdentity(pubKey),
-	}
+	}, nil
 }
 
 func (pair BlockchainKeypair) GetAddress() []byte {
 	return pair.id.Address
 }
 
-func (pair BlockchainKeypair) GetIdentity() BlockchainIdentity {
+func (pair BlockchainKeypair) GetIdentity() *BlockchainIdentity {
 	return pair.id
 }

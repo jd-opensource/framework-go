@@ -8,13 +8,13 @@ import "github.com/blockchain-jd-com/framework-go/crypto/framework"
  */
 
 type PreparedTransaction interface {
-	GetHash() framework.HashDigest
+	GetHash() *framework.HashDigest
 
-	GetTransactionContent() TransactionContent
+	GetTransactionContent() *TransactionContent
 
-	Sign(keyPair framework.AsymmetricKeypair) DigitalSignature
+	Sign(keyPair *framework.AsymmetricKeypair) (*DigitalSignature, error)
 
-	AddSignature(signature DigitalSignature)
+	AddSignature(signature *DigitalSignature)
 
-	Commit() (TransactionResponse, error)
+	Commit() (*TransactionResponse, error)
 }

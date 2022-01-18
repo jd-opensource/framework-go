@@ -11,21 +11,26 @@ type SignatureDigest struct {
 	BaseCryptoBytes
 }
 
-func NewSignatureDigest(algorithm CryptoAlgorithm, rawCryptoBytes []byte) SignatureDigest {
-	return SignatureDigest{
+func NewSignatureDigest(algorithm CryptoAlgorithm, rawCryptoBytes []byte) *SignatureDigest {
+	return &SignatureDigest{
 		NewBaseCryptoBytes(algorithm, rawCryptoBytes),
 	}
 }
 
-func ParseSignatureDigest(cryptoBytes []byte) SignatureDigest {
-	return SignatureDigest{
-		ParseBaseCryptoBytes(cryptoBytes, supportSignature),
+func ParseSignatureDigest(cryptoBytes []byte) (*SignatureDigest, error) {
+	bytes, err := ParseBaseCryptoBytes(cryptoBytes, supportSignature)
+	if err != nil {
+		return nil, err
 	}
+	return &SignatureDigest{
+		*bytes,
+	}, nil
 }
 
 func (s SignatureDigest) GetRawDigest() []byte {
-	slice := s.GetRawCryptoBytes()
-	return slice.GetBytesCopy(0, slice.Size)
+	slice, _ := s.GetRawCryptoBytes()
+	bytesCopy, _ := slice.GetBytesCopy(0, slice.Size)
+	return bytesCopy
 }
 
 func supportSignature(algorithm CryptoAlgorithm) bool {

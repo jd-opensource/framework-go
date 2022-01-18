@@ -69,16 +69,16 @@ func resolveSMCertificate(cert string) (*x5092.Certificate, error) {
 }
 
 // 解析证书公钥信息
-func RetrievePubKey(certificate *ca.Certificate) framework.PubKey {
+func RetrievePubKey(certificate *ca.Certificate) (*framework.PubKey, error) {
 	return crypto.GetSignatureFunctionByName(certificate.Algorithm).RetrievePubKeyFromCA(certificate)
 }
 
 // 解析X509私钥文件
-func RetrievePrivKey(algorithm string, privkey string) (framework.PrivKey, error) {
+func RetrievePrivKey(algorithm string, privkey string) (*framework.PrivKey, error) {
 	return crypto.GetSignatureFunctionByName(algorithm).RetrievePrivKey(privkey)
 }
 
 // 解析X509加密私钥文件
-func RetrieveEncrypedPrivKey(algorithm string, privkey string, pwd []byte) (framework.PrivKey, error) {
+func RetrieveEncrypedPrivKey(algorithm string, privkey string, pwd []byte) (*framework.PrivKey, error) {
 	return crypto.GetSignatureFunctionByName(algorithm).RetrieveEncrypedPrivKey(privkey, pwd)
 }

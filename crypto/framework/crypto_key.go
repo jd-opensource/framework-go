@@ -13,5 +13,5 @@ type CryptoKey interface {
 	GetKeyType() CryptoKeyType
 
 	// 原始的密钥数据
-	GetRawKeyBytes() []byte
+	GetRawKeyBytes() ([]byte, error)
 }

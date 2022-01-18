@@ -5,6 +5,6 @@ package framework
  * @Date: 2020/4/28 2:16 下午
  */
 type AsymmetricKeypairGenerator interface {
-	GenerateKeypair() AsymmetricKeypair
-	GenerateKeypairWithSeed(seed []byte) (AsymmetricKeypair, error)
+	GenerateKeypair() (*AsymmetricKeypair, error)
+	GenerateKeypairWithSeed(seed []byte) (*AsymmetricKeypair, error)
 }

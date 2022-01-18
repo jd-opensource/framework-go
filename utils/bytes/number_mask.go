@@ -1,6 +1,9 @@
 package bytes
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 /**
  * @Author: imuge
@@ -188,22 +191,23 @@ func (mask *NumberMask) WriteMask(number int64) []byte {
 // headByte 掩码的头字节；即掩码的字节序列的首个字节
 // 返回掩码实例的完整长度
 // 注：在字节流中，对首字节解析获取该值后减 1，可以得到该掩码后续要读取的字节长度
-func (mask *NumberMask) ResolveMaskLength(headByte byte) int32 {
+func (mask *NumberMask) ResolveMaskLength(headByte byte) (int32, error) {
 	len := int32(((headByte & 0xFF) >> (8 - mask.BIT_COUNT)) + 1)
 	if len < 1 {
-		panic(
-			fmt.Sprintf("Illegal length [%d] was resolved from the head byte of NumberMask!", len))
+		return len, errors.New(fmt.Sprintf("Illegal length [%d] was resolved from the head byte of NumberMask!", len))
 	}
 	if len > mask.MAX_HEADER_LENGTH {
-		panic(fmt.Sprintf(
-			"Illegal length [%d] was resolved from the head byte of NumberMask!", len))
+		return len, errors.New(fmt.Sprintf("Illegal length [%d] was resolved from the head byte of NumberMask!", len))
 	}
-	return len
+	return len, nil
 }
 
 // 从字节中解析掩码表示的数值
-func (mask *NumberMask) ResolveMaskedNumber(markBytes []byte) int64 {
-	maskLen := mask.ResolveMaskLength(markBytes[0])
+func (mask *NumberMask) ResolveMaskedNumber(markBytes []byte) (int64, error) {
+	maskLen, err := mask.ResolveMaskLength(markBytes[0])
+	if err != nil {
+		return 0, err
+	}
 
 	// 清除首字节的标识位；
 	numberHead := markBytes[0] & (0xFF >> mask.BIT_COUNT)
@@ -214,5 +218,5 @@ func (mask *NumberMask) ResolveMaskedNumber(markBytes []byte) int64 {
 		number = number*256 + int64(markBytes[i]&0xFF)
 	}
 
-	return number
+	return number, nil
 }

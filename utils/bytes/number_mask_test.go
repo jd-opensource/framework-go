@@ -74,9 +74,10 @@ func testLong(t *testing.T, number int64, expectedLength int32) {
 
 	length := NUMBERMASK_LONG.GetMaskLength(number)
 
-	resolvedLen := NUMBERMASK_LONG.ResolveMaskLength(bytes[0])
-	resolvedNumber := NUMBERMASK_LONG.ResolveMaskedNumber(bytes)
-
+	resolvedLen, err := NUMBERMASK_LONG.ResolveMaskLength(bytes[0])
+	require.Nil(t, err)
+	resolvedNumber, err := NUMBERMASK_LONG.ResolveMaskedNumber(bytes)
+	require.Nil(t, err)
 	require.Equal(t, number, resolvedNumber)
 	require.Equal(t, int(expectedLength), len(bytes))
 	require.Equal(t, expectedLength, length)

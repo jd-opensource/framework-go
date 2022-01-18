@@ -1,6 +1,7 @@
 package framework
 
 import (
+	"errors"
 	"fmt"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
 )
@@ -24,21 +25,21 @@ func NewBaseCryptoBytes(algorithm CryptoAlgorithm, rawCryptoBytes []byte) BaseCr
 	}
 }
 
-func ParseBaseCryptoBytes(cryptoBytes []byte, support func(CryptoAlgorithm) bool) BaseCryptoBytes {
+func ParseBaseCryptoBytes(cryptoBytes []byte, support func(CryptoAlgorithm) bool) (*BaseCryptoBytes, error) {
 	algorithm := DecodeAlgorithm(cryptoBytes)
 	if !support(CryptoAlgorithm{Code: algorithm}) {
-		panic(fmt.Sprintf("Not supported algorithm [code:%d]!", algorithm))
+		return nil, errors.New(fmt.Sprintf("Not supported algorithm [code:%d]!", algorithm))
 	}
-	return BaseCryptoBytes{
+	return &BaseCryptoBytes{
 		bytes.NewBytes(cryptoBytes),
 		algorithm,
-	}
+	}, nil
 }
 
 func (b BaseCryptoBytes) GetAlgorithm() int16 {
 	return b.algorithm
 }
 
-func (b BaseCryptoBytes) GetRawCryptoBytes() bytes.Slice {
+func (b BaseCryptoBytes) GetRawCryptoBytes() (*bytes.Slice, error) {
 	return bytes.NewSliceWithOffset(b.GetDirectBytes(), CODE_SIZE)
 }

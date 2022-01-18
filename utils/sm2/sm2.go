@@ -14,16 +14,16 @@ import (
 
 var DEFAULT_UID = []byte("1234567812345678")
 
-func GenerateKeyPair() (*sm2.PrivateKey, *sm2.PublicKey) {
+func GenerateKeyPair() (*sm2.PrivateKey, *sm2.PublicKey, error) {
 	priv, pub, err := sm2.GenerateKey(rand.Reader)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
-	return priv, pub
+	return priv, pub, nil
 }
 
-func GenerateKeyPairWithSeed(seed []byte) (*sm2.PrivateKey, *sm2.PublicKey) {
+func GenerateKeyPairWithSeed(seed []byte) (*sm2.PrivateKey, *sm2.PublicKey, error) {
 	panic("not support yet")
 }
 
@@ -36,22 +36,22 @@ func PubKeyToBytes(pub *sm2.PublicKey) []byte {
 	return append([]byte{0x04}, append(pub.X.Bytes(), pub.Y.Bytes()...)...)
 }
 
-func BytesToPubKey(b []byte) (pub *sm2.PublicKey) {
+func BytesToPubKey(b []byte) (*sm2.PublicKey, error) {
 	pub, err := sm2.RawBytesToPublicKey(b[1:])
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return pub
+	return pub, nil
 }
 
-func RawBytesToPubKey(b []byte) (pub *sm2.PublicKey) {
+func RawBytesToPubKey(b []byte) (*sm2.PublicKey, error) {
 	pub, err := sm2.RawBytesToPublicKey(b)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return pub
+	return pub, nil
 }
 
 func RetrievePubKey(priv *sm2.PrivateKey) *sm2.PublicKey {
@@ -65,40 +65,40 @@ func PrivKeyToBytes(priv *sm2.PrivateKey) []byte {
 	return priv.D.Bytes()
 }
 
-func BytesToPrivKey(b []byte) *sm2.PrivateKey {
+func BytesToPrivKey(b []byte) (*sm2.PrivateKey, error) {
 	priv, err := sm2.RawBytesToPrivateKey(b)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return priv
+	return priv, nil
 }
 
-func Encrypt(pub *sm2.PublicKey, plainBytes []byte) []byte {
+func Encrypt(pub *sm2.PublicKey, plainBytes []byte) ([]byte, error) {
 	encrypt, err := sm2.Encrypt(pub, plainBytes, sm2.C1C3C2)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return encrypt
+	return encrypt, nil
 }
 
-func Decrypt(priv *sm2.PrivateKey, cipherBytes []byte) []byte {
+func Decrypt(priv *sm2.PrivateKey, cipherBytes []byte) ([]byte, error) {
 	decrypt, err := sm2.Decrypt(priv, cipherBytes, sm2.C1C3C2)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return decrypt
+	return decrypt, nil
 }
 
-func Sign(priv *sm2.PrivateKey, plainBytes []byte) []byte {
+func Sign(priv *sm2.PrivateKey, plainBytes []byte) ([]byte, error) {
 	r, s, err := sm2.SignToRS(priv, DEFAULT_UID, plainBytes)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return append(r.Bytes(), s.Bytes()...)
+	return append(r.Bytes(), s.Bytes()...), nil
 }
 
 func Verify(pub *sm2.PublicKey, plainBytes, cipherBytes []byte) bool {

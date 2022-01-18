@@ -19,6 +19,10 @@ func EncodeKeyBytes(rawKeyBytes []byte, keyType CryptoKeyType) []byte {
 	return bytes.Concat([]byte{keyType.Code}, rawKeyBytes)
 }
 
-func DecodeKeyType(cryptoBytes bytes.Slice) CryptoKeyType {
-	return GetCryptoKeyType(cryptoBytes.GetByte(0))
+func DecodeKeyType(cryptoBytes bytes.Slice) (CryptoKeyType, error) {
+	getByte, err := cryptoBytes.GetByte(0)
+	if err != nil {
+		return PUBLIC, err
+	}
+	return GetCryptoKeyType(getByte)
 }

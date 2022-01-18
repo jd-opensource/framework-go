@@ -3,6 +3,7 @@ package sm
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
+	"errors"
 	"github.com/blockchain-jd-com/framework-go/crypto/ca"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/utils/base64"
@@ -32,7 +33,7 @@ var _ framework.SignatureFunction = (*SM2CryptoFunction)(nil)
 type SM2CryptoFunction struct {
 }
 
-func (S SM2CryptoFunction) RetrievePrivKey(privateKey string) (framework.PrivKey, error) {
+func (S SM2CryptoFunction) RetrievePrivKey(privateKey string) (*framework.PrivKey, error) {
 	index := strings.Index(privateKey, "END EC PARAMETERS-----")
 	if index > 0 && strings.Contains(privateKey[:index], "BggqgRzPVQGCLQ==") {
 		privateKey = privateKey[index+22:]
@@ -48,13 +49,13 @@ func (S SM2CryptoFunction) RetrievePrivKey(privateKey string) (framework.PrivKey
 	if err != nil {
 		sm2Key, err = x5092.ParseSm2PrivateKey(encoded)
 		if err != nil {
-			return framework.PrivKey{}, err
+			return nil, err
 		}
 	}
 	return framework.NewPrivKey(S.GetAlgorithm(), sm2Key.D.Bytes()), nil
 }
 
-func (S SM2CryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (framework.PrivKey, error) {
+func (S SM2CryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (*framework.PrivKey, error) {
 	index := strings.Index(privateKey, "END EC PARAMETERS-----")
 	if index > 0 && strings.Contains(privateKey[:index], "BggqgRzPVQGCLQ==") {
 		privateKey = privateKey[index+22:]
@@ -70,55 +71,73 @@ func (S SM2CryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte
 	if err != nil {
 		sm2Key, err = x5092.ParseSm2PrivateKey(encoded)
 		if err != nil {
-			return framework.PrivKey{}, err
+			return nil, err
 		}
 	}
 	return framework.NewPrivKey(S.GetAlgorithm(), sm2Key.D.Bytes()), nil
 }
 
-func (S SM2CryptoFunction) RetrievePubKeyFromCA(cert *ca.Certificate) framework.PubKey {
-	key := cert.SMCert.PublicKey.(*ecdsa.PublicKey)
-	return framework.NewPubKey(S.GetAlgorithm(), elliptic.Marshal(key, key.X, key.Y))
+func (S SM2CryptoFunction) RetrievePubKeyFromCA(cert *ca.Certificate) (*framework.PubKey, error) {
+	key, ok := cert.SMCert.PublicKey.(*ecdsa.PublicKey)
+	if !ok {
+		return nil, errors.New("not sm2 public key")
+	}
+	return framework.NewPubKey(S.GetAlgorithm(), elliptic.Marshal(key, key.X, key.Y)), nil
 }
 
-func (S SM2CryptoFunction) Encrypt(pubKey framework.PubKey, data []byte) framework.AsymmetricCiphertext {
+func (S SM2CryptoFunction) Encrypt(pubKey *framework.PubKey, data []byte) (*framework.AsymmetricCiphertext, error) {
 	rawPubKeyBytes := pubKey.GetRawKeyBytes()
 
 	// 验证原始公钥长度为65字节
 	if len(rawPubKeyBytes) != SM2_ECPOINT_SIZE {
-		panic("This key has wrong format!")
+		return nil, errors.New("This key has wrong format!")
 	}
 
 	// 验证密钥数据的算法标识对应SM2算法
 	if pubKey.GetAlgorithm() != S.GetAlgorithm().Code {
-		panic("The is not sm2 public key!")
+		return nil, errors.New("This key is not sm2 public key!")
 	}
 
+	key, err := sm2.BytesToPubKey(rawPubKeyBytes)
+	if err != nil {
+		return nil, err
+	}
+	encrypt, err := sm2.Encrypt(key, data)
+	if err != nil {
+		return nil, err
+	}
 	// 调用SM2加密算法计算密文
-	return framework.NewAsymmetricCiphertext(S.GetAlgorithm(), sm2.Encrypt(sm2.BytesToPubKey(rawPubKeyBytes), data))
+	return framework.NewAsymmetricCiphertext(S.GetAlgorithm(), encrypt), nil
 }
 
-func (S SM2CryptoFunction) Decrypt(privKey framework.PrivKey, ciphertext framework.AsymmetricCiphertext) []byte {
-	rawPrivKeyBytes := privKey.GetRawKeyBytes()
+func (S SM2CryptoFunction) Decrypt(privKey *framework.PrivKey, ciphertext *framework.AsymmetricCiphertext) ([]byte, error) {
+	rawPrivKeyBytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
 	rawCiphertextBytes := ciphertext.GetRawCiphertext()
 
 	// 验证原始私钥长度为32字节
 	if len(rawPrivKeyBytes) != SM2_PRIVKEY_SIZE {
-		panic("This key has wrong format!")
+		return nil, errors.New("This key has wrong format!")
 	}
 
 	// 验证密钥数据的算法标识对应SM2算法
 	if privKey.GetAlgorithm() != S.GetAlgorithm().Code {
-		panic("This key is not SM2 private key!")
+		return nil, errors.New("This key is not SM2 private key!")
 	}
 
 	// 验证密文数据的算法标识对应SM2算法，并且密文符合长度要求
 	if ciphertext.GetAlgorithm() != S.GetAlgorithm().Code || len(rawCiphertextBytes) < SM2_ECPOINT_SIZE+SM2_HASHDIGEST_SIZE {
-		panic("This is not SM2 ciphertext!")
+		return nil, errors.New("This is not SM2 ciphertext!")
 	}
 
+	key, err := sm2.BytesToPrivKey(rawPrivKeyBytes)
+	if err != nil {
+		return nil, err
+	}
 	// 调用SM2解密算法得到明文结果
-	return sm2.Decrypt(sm2.BytesToPrivKey(rawPrivKeyBytes), rawCiphertextBytes)
+	return sm2.Decrypt(key, rawCiphertextBytes)
 }
 
 func (S SM2CryptoFunction) SupportCiphertext(ciphertextBytes []byte) bool {
@@ -126,56 +145,78 @@ func (S SM2CryptoFunction) SupportCiphertext(ciphertextBytes []byte) bool {
 	return len(ciphertextBytes) >= framework.ALGORYTHM_CODE_SIZE+SM2_ECPOINT_SIZE+SM2_HASHDIGEST_SIZE && S.GetAlgorithm().Match(ciphertextBytes, 0)
 }
 
-func (S SM2CryptoFunction) ParseCiphertext(ciphertextBytes []byte) framework.AsymmetricCiphertext {
+func (S SM2CryptoFunction) ParseCiphertext(ciphertextBytes []byte) (*framework.AsymmetricCiphertext, error) {
 	if S.SupportCiphertext(ciphertextBytes) {
 		return framework.ParseAsymmetricCiphertext(ciphertextBytes)
 	} else {
-		panic("ciphertextBytes are invalid!")
+		return nil, errors.New("ciphertextBytes are invalid!")
 	}
 }
 
-func (S SM2CryptoFunction) Sign(privKey framework.PrivKey, data []byte) framework.SignatureDigest {
-	rawPrivKeyBytes := privKey.GetRawKeyBytes()
+func (S SM2CryptoFunction) Sign(privKey *framework.PrivKey, data []byte) (*framework.SignatureDigest, error) {
+	rawPrivKeyBytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
 
 	// 验证原始私钥长度为256比特，即32字节
 	if len(rawPrivKeyBytes) != SM2_PRIVKEY_SIZE {
-		panic("This key has wrong format!")
+		return nil, errors.New("This key has wrong format!")
 	}
 
 	// 验证密钥数据的算法标识对应SM2签名算法
 	if privKey.GetAlgorithm() != S.GetAlgorithm().Code {
-		panic("This key is not SM2 private key!")
+		return nil, errors.New("This key is not SM2 private key!")
 	}
 
+	key, err := sm2.BytesToPrivKey(rawPrivKeyBytes)
+	if err != nil {
+		return nil, err
+	}
+	sign, err := sm2.Sign(key, data)
+	if err != nil {
+		return nil, err
+	}
 	// 调用SM2签名算法计算签名结果
-	return framework.NewSignatureDigest(S.GetAlgorithm(), sm2.Sign(sm2.BytesToPrivKey(rawPrivKeyBytes), data))
+	return framework.NewSignatureDigest(S.GetAlgorithm(), sign), nil
 }
 
-func (S SM2CryptoFunction) Verify(pubKey framework.PubKey, data []byte, digest framework.SignatureDigest) bool {
+func (S SM2CryptoFunction) Verify(pubKey *framework.PubKey, data []byte, digest *framework.SignatureDigest) bool {
 	rawPubKeyBytes := pubKey.GetRawKeyBytes()
 	rawDigestBytes := digest.GetRawDigest()
 
 	// 验证原始公钥长度为520比特，即65字节
 	if len(rawPubKeyBytes) != SM2_ECPOINT_SIZE {
-		panic("This key has wrong format!")
+		return false
 	}
 
 	// 验证密钥数据的算法标识对应SM2签名算法
 	if pubKey.GetAlgorithm() != S.GetAlgorithm().Code {
-		panic("This key is not SM2 public key!")
+		return false
 	}
 
 	// 验证签名数据的算法标识对应SM2签名算法，并且原始签名长度为64字节
 	if digest.GetAlgorithm() != S.GetAlgorithm().Code || len(rawDigestBytes) != SM2_SIGNATUREDIGEST_SIZE {
-		panic("This is not SM2 signature digest!")
+		return false
 	}
-
+	key, err := sm2.BytesToPubKey(rawPubKeyBytes)
+	if err != nil {
+		return false
+	}
 	// 调用SM2验签算法验证签名结果
-	return sm2.Verify(sm2.BytesToPubKey(rawPubKeyBytes), data, rawDigestBytes)
+	return sm2.Verify(key, data, rawDigestBytes)
 }
 
-func (S SM2CryptoFunction) RetrievePubKey(privKey framework.PrivKey) framework.PubKey {
-	return framework.NewPubKey(S.GetAlgorithm(), sm2.PubKeyToBytes(sm2.RetrievePubKey(sm2.BytesToPrivKey(privKey.GetRawKeyBytes()))))
+func (S SM2CryptoFunction) RetrievePubKey(privKey *framework.PrivKey) (*framework.PubKey, error) {
+	bytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
+	key, err := sm2.BytesToPrivKey(bytes)
+	if err != nil {
+		return nil, err
+	}
+	return framework.NewPubKey(S.GetAlgorithm(), sm2.PubKeyToBytes(sm2.RetrievePubKey(key))), nil
 }
 
 func (S SM2CryptoFunction) SupportPrivKey(privKeyBytes []byte) bool {
@@ -183,11 +224,11 @@ func (S SM2CryptoFunction) SupportPrivKey(privKeyBytes []byte) bool {
 	return len(privKeyBytes) == SM2_PRIVKEY_LENGTH && S.GetAlgorithm().Match(privKeyBytes, 0) && privKeyBytes[framework.ALGORYTHM_CODE_SIZE] == framework.PRIVATE.Code
 }
 
-func (S SM2CryptoFunction) ParsePrivKey(privKeyBytes []byte) framework.PrivKey {
+func (S SM2CryptoFunction) ParsePrivKey(privKeyBytes []byte) (*framework.PrivKey, error) {
 	if S.SupportPrivKey(privKeyBytes) {
 		return framework.ParsePrivKey(privKeyBytes)
 	} else {
-		panic("privKeyBytes are invalid!")
+		return nil, errors.New("invalid privKeyBytes!")
 	}
 }
 
@@ -196,11 +237,11 @@ func (S SM2CryptoFunction) SupportPubKey(pubKeyBytes []byte) bool {
 	return len(pubKeyBytes) == SM2_PUBKEY_LENGTH && S.GetAlgorithm().Match(pubKeyBytes, 0) && pubKeyBytes[framework.ALGORYTHM_CODE_SIZE] == framework.PUBLIC.Code
 }
 
-func (S SM2CryptoFunction) ParsePubKey(pubKeyBytes []byte) framework.PubKey {
+func (S SM2CryptoFunction) ParsePubKey(pubKeyBytes []byte) (*framework.PubKey, error) {
 	if S.SupportPubKey(pubKeyBytes) {
 		return framework.ParsePubKey(pubKeyBytes)
 	} else {
-		panic("pubKeyBytes are invalid!")
+		return nil, errors.New("invalid pubKeyBytes!")
 	}
 }
 
@@ -209,21 +250,24 @@ func (S SM2CryptoFunction) SupportDigest(digestBytes []byte) bool {
 	return len(digestBytes) == SM2_SIGNATUREDIGEST_LENGTH && S.GetAlgorithm().Match(digestBytes, 0)
 }
 
-func (S SM2CryptoFunction) ParseDigest(digestBytes []byte) framework.SignatureDigest {
+func (S SM2CryptoFunction) ParseDigest(digestBytes []byte) (*framework.SignatureDigest, error) {
 	if S.SupportDigest(digestBytes) {
 		return framework.ParseSignatureDigest(digestBytes)
 	} else {
-		panic("digestBytes are invalid!")
+		return nil, errors.New("invalid digestBytes!")
 	}
 }
 
-func (S SM2CryptoFunction) GenerateKeypair() framework.AsymmetricKeypair {
-	priv, pub := sm2.GenerateKeyPair()
+func (S SM2CryptoFunction) GenerateKeypair() (*framework.AsymmetricKeypair, error) {
+	priv, pub, err := sm2.GenerateKeyPair()
+	if err != nil {
+		return nil, err
+	}
 	return framework.NewAsymmetricKeypair(framework.NewPubKey(S.GetAlgorithm(), sm2.PubKeyToBytes(pub)), framework.NewPrivKey(S.GetAlgorithm(), sm2.PrivKeyToBytes(priv)))
 }
 
-func (S SM2CryptoFunction) GenerateKeypairWithSeed(seed []byte) (keypair framework.AsymmetricKeypair, err error) {
-	panic("not support yet")
+func (S SM2CryptoFunction) GenerateKeypairWithSeed(seed []byte) (keypair *framework.AsymmetricKeypair, err error) {
+	return nil, errors.New("not support yet")
 }
 
 func (S SM2CryptoFunction) GetAlgorithm() framework.CryptoAlgorithm {

@@ -10,10 +10,14 @@ type PrivKey struct {
 	BaseCryptoKey
 }
 
-func NewPrivKey(algorithm CryptoAlgorithm, rawKeyBytes []byte) PrivKey {
-	return PrivKey{NewBaseCryptoKey(algorithm, rawKeyBytes, PRIVATE)}
+func NewPrivKey(algorithm CryptoAlgorithm, rawKeyBytes []byte) *PrivKey {
+	return &PrivKey{NewBaseCryptoKey(algorithm, rawKeyBytes, PRIVATE)}
 }
 
-func ParsePrivKey(keyBytes []byte) PrivKey {
-	return PrivKey{ParseBaseCryptoKey(keyBytes)}
+func ParsePrivKey(keyBytes []byte) (*PrivKey, error) {
+	key, err := ParseBaseCryptoKey(keyBytes)
+	if err != nil {
+		return nil, err
+	}
+	return &PrivKey{*key}, nil
 }

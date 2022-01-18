@@ -15,7 +15,7 @@ type AsymmetricEncryptionFunction interface {
 	 * @param data
 	 * @return
 	 */
-	Encrypt(pubKey PubKey, data []byte) AsymmetricCiphertext
+	Encrypt(pubKey *PubKey, data []byte) (*AsymmetricCiphertext, error)
 
 	/**
 	 * 解密；
@@ -24,7 +24,7 @@ type AsymmetricEncryptionFunction interface {
 	 * @param ciphertext
 	 * @return
 	 */
-	Decrypt(privKey PrivKey, ciphertext AsymmetricCiphertext) []byte
+	Decrypt(privKey *PrivKey, ciphertext *AsymmetricCiphertext) ([]byte, error)
 
 	/**
 	 * 使用私钥恢复公钥；
@@ -32,7 +32,7 @@ type AsymmetricEncryptionFunction interface {
 	 * @param privKey PrivKey形式的私钥信息
 	 * @return PubKey形式的公钥信息
 	 */
-	RetrievePubKey(privKey PrivKey) PubKey
+	RetrievePubKey(privKey *PrivKey) (*PubKey, error)
 
 	/**
 	 * 校验私钥格式是否满足要求；
@@ -48,7 +48,7 @@ type AsymmetricEncryptionFunction interface {
 	 * @param privKeyBytes 包含算法标识和私钥的字节数组
 	 * @return PrivKey形式的私钥
 	 */
-	ParsePrivKey(privKeyBytes []byte) PrivKey
+	ParsePrivKey(privKeyBytes []byte) (*PrivKey, error)
 
 	/**
 	 * 校验公钥格式是否满足要求；
@@ -64,7 +64,7 @@ type AsymmetricEncryptionFunction interface {
 	 * @param pubKeyBytes 包含算法标识和公钥的字节数组
 	 * @return PubKey形式的公钥
 	 */
-	ParsePubKey(pubKeyBytes []byte) PubKey
+	ParsePubKey(pubKeyBytes []byte) (*PubKey, error)
 
 	/**
 	 * 校验密文格式是否满足要求；
@@ -80,5 +80,5 @@ type AsymmetricEncryptionFunction interface {
 	 * @param ciphertextBytes 包含算法标识和密文的字节数组
 	 * @return AsymmetricCiphertext形式的签名摘要
 	 */
-	ParseCiphertext(ciphertextBytes []byte) AsymmetricCiphertext
+	ParseCiphertext(ciphertextBytes []byte) (*AsymmetricCiphertext, error)
 }

@@ -6,5 +6,5 @@ package ledger_model
  */
 
 type TransactionService interface {
-	Process(txRequest TransactionRequest) (TransactionResponse, error)
+	Process(txRequest *TransactionRequest) (*TransactionResponse, error)
 }

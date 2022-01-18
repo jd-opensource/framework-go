@@ -25,9 +25,6 @@ type Bytes struct {
 }
 
 func NewBytes(b []byte) *Bytes {
-	if b == nil {
-		panic("data is null!")
-	}
 	return &Bytes{
 		prefix: nil,
 		data:   b,
@@ -35,9 +32,6 @@ func NewBytes(b []byte) *Bytes {
 }
 
 func NewBytesWithPrefix(prefix *Bytes, b []byte) *Bytes {
-	if b == nil {
-		panic("data is null!")
-	}
 	return &Bytes{
 		prefix: prefix,
 		data:   b,
@@ -104,10 +98,7 @@ func (b *Bytes) Equals(obj interface{}) bool {
 }
 
 func (b *Bytes) CopyTo(buffer []byte, offset int, size int) int {
-	if size < 0 {
-		panic("Argument len is negative!")
-	}
-	if size == 0 {
+	if size <= 0 {
 		return 0
 	}
 	s := 0
@@ -179,10 +170,10 @@ func FromString(str string) *Bytes {
 	return NewBytes(StringToBytes(str))
 }
 
-func FromBase58(str string) *Bytes {
+func FromBase58(str string) (*Bytes, error) {
 	bytes, err := base58.Decode(str)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return NewBytes(bytes)
+	return NewBytes(bytes), nil
 }

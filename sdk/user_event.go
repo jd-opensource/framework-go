@@ -28,16 +28,16 @@ func NewUserEventPoint(eventAccount, eventName string, sequence int64) UserEvent
 
 // 事件监听器
 type UserEventListener interface {
-	OnEvent(event ledger_model.Event, context UserEventContext)
+	OnEvent(event *ledger_model.Event, context *UserEventContext)
 }
 
 type UserEventContext struct {
-	LedgerHash   framework.HashDigest
+	LedgerHash   *framework.HashDigest
 	EventHandler *UserEventListenerHandle
 }
 
-func NewUserEventContext(ledgerHash framework.HashDigest, eventHandler *UserEventListenerHandle) UserEventContext {
-	return UserEventContext{
+func NewUserEventContext(ledgerHash *framework.HashDigest, eventHandler *UserEventListenerHandle) *UserEventContext {
+	return &UserEventContext{
 		LedgerHash:   ledgerHash,
 		EventHandler: eventHandler,
 	}
@@ -46,7 +46,7 @@ func NewUserEventContext(ledgerHash framework.HashDigest, eventHandler *UserEven
 // 事件监听处理器
 type UserEventListenerHandle struct {
 	queryService ledger_model.BlockchainQueryService // 区块链查询器
-	ledgerHash   framework.HashDigest                // 账本hash
+	ledgerHash   *framework.HashDigest               // 账本hash
 
 	eventPoints []UserEventPoint  // 监听事件列表
 	listener    UserEventListener // 事件监听器
@@ -56,7 +56,7 @@ type UserEventListenerHandle struct {
 	stop bool
 }
 
-func NewUserEventListenerHandle(queryService ledger_model.BlockchainQueryService, ledgerHash framework.HashDigest, eventPoints []UserEventPoint, listener UserEventListener) UserEventListenerHandle {
+func NewUserEventListenerHandle(queryService ledger_model.BlockchainQueryService, ledgerHash *framework.HashDigest, eventPoints []UserEventPoint, listener UserEventListener) UserEventListenerHandle {
 	// init event sequences
 	eventSequences := make(map[string]int64, len(eventPoints))
 	for _, point := range eventPoints {

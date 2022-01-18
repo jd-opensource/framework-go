@@ -12,38 +12,50 @@ import (
  */
 
 func TestEncrypt(t *testing.T) {
-	priv, pub := GenerateKeyPair()
+	priv, pub, err := GenerateKeyPair()
+	require.Nil(t, err)
 	plainBytes := []byte("imuge")
-	encrypt := Encrypt(pub, plainBytes)
-	decrypt := Decrypt(priv, encrypt)
+	encrypt, err := Encrypt(pub, plainBytes)
+	require.Nil(t, err)
+	decrypt, err := Decrypt(priv, encrypt)
+	require.Nil(t, err)
 	require.True(t, bytes.Equals(plainBytes, decrypt))
 }
 
 func TestSign(t *testing.T) {
-	priv, pub := GenerateKeyPair()
+	priv, pub, err := GenerateKeyPair()
+	require.Nil(t, err)
 	plainBytes := []byte("imuge")
-	sign := Sign(priv, plainBytes)
+	sign, err := Sign(priv, plainBytes)
+	require.Nil(t, err)
 	require.True(t, Verify(pub, plainBytes, sign))
 
 	pubBytes := PubKeyToBytes(pub)
-	pubDec := BytesToPubKey(pubBytes)
+	pubDec, err := BytesToPubKey(pubBytes)
+	require.Nil(t, err)
 	privBytes := PrivKeyToBytes(priv)
-	privDec := BytesToPrivKey(privBytes)
-	sign = Sign(privDec, plainBytes)
+	privDec, err := BytesToPrivKey(privBytes)
+	require.Nil(t, err)
+	sign, err = Sign(privDec, plainBytes)
+	require.Nil(t, err)
 	require.True(t, Verify(pubDec, plainBytes, sign))
 }
 
 func TestPubKeyToBytes(t *testing.T) {
-	_, pub := GenerateKeyPair()
+	_, pub, err := GenerateKeyPair()
+	require.Nil(t, err)
 	pubBytes := PubKeyToBytes(pub)
-	pubDec := BytesToPubKey(pubBytes)
+	pubDec, err := BytesToPubKey(pubBytes)
+	require.Nil(t, err)
 	require.Equal(t, pub, pubDec)
 }
 
 func TestPrivKeyToBytes(t *testing.T) {
-	priv, _ := GenerateKeyPair()
+	priv, _, err := GenerateKeyPair()
+	require.Nil(t, err)
 	privBytes := PrivKeyToBytes(priv)
-	privDec := BytesToPrivKey(privBytes)
+	privDec, err := BytesToPrivKey(privBytes)
+	require.Nil(t, err)
 	privDecBytes := PrivKeyToBytes(privDec)
 	require.True(t, bytes.Equals(privBytes, privDecBytes))
 }

@@ -18,10 +18,11 @@ func TestEncodeDecodePubKey(t *testing.T) {
 		if !ok {
 			continue
 		}
-		keypair := f1.GenerateKeypair()
-
+		keypair, err := f1.GenerateKeypair()
+		require.Nil(t, err)
 		base58PubKey := EncodePubKey(keypair.PubKey)
-		decPubKey := DecodePubKey(base58PubKey)
+		decPubKey, err := DecodePubKey(base58PubKey)
+		require.Nil(t, err)
 		fmt.Println(base58PubKey)
 		require.NotNil(t, decPubKey)
 		require.Equal(t, base58PubKey, EncodePubKey(decPubKey))
@@ -35,14 +36,19 @@ func TestEncodeDecodePrivKey(t *testing.T) {
 		if !ok {
 			continue
 		}
-		keypair := f1.GenerateKeypair()
+		keypair, err := f1.GenerateKeypair()
+		require.Nil(t, err)
 		pwd := []byte("abc")
 
-		base58PrivKey := EncodePrivKey(keypair.PrivKey, sha.Sha256(pwd))
+		base58PrivKey, err := EncodePrivKey(keypair.PrivKey, sha.Sha256(pwd))
+		require.Nil(t, err)
 		fmt.Println(base58PrivKey)
-		decPrivKey := DecodePrivKey(base58PrivKey, sha.Sha256(pwd))
+		decPrivKey, err := DecodePrivKey(base58PrivKey, sha.Sha256(pwd))
+		require.Nil(t, err)
 		require.NotNil(t, decPrivKey)
-		require.Equal(t, base58PrivKey, EncodePrivKey(decPrivKey, sha.Sha256(pwd)))
+		keyEncoded, err := EncodePrivKey(decPrivKey, sha.Sha256(pwd))
+		require.Nil(t, err)
+		require.Equal(t, base58PrivKey, keyEncoded)
 	}
 }
 
@@ -53,20 +59,25 @@ func TestEncodeDecodePrivKeyWithRawPwd(t *testing.T) {
 		if !ok {
 			continue
 		}
-		keypair := f1.GenerateKeypair()
-
+		keypair, err := f1.GenerateKeypair()
+		require.Nil(t, err)
 		pwd := "abc"
-		base58PrivKey := EncodePrivKeyWithRawPwd(keypair.PrivKey, pwd)
-		decPrivKey := DecodePrivKeyWithRawPwd(base58PrivKey, pwd)
+		base58PrivKey, err := EncodePrivKeyWithRawPwd(keypair.PrivKey, pwd)
+		require.Nil(t, err)
+		decPrivKey, err := DecodePrivKeyWithRawPwd(base58PrivKey, pwd)
+		require.Nil(t, err)
 		require.NotNil(t, decPrivKey)
-		require.Equal(t, base58PrivKey, EncodePrivKeyWithRawPwd(decPrivKey, pwd))
+		encodedKey, err := EncodePrivKeyWithRawPwd(decPrivKey, pwd)
+		require.Nil(t, err)
+		require.Equal(t, base58PrivKey, encodedKey)
 	}
 }
 
 // 从公钥生成地址
 func TestGenerateAddress(t *testing.T) {
 	function := GetCryptoFunctionByName(classic.ED25519_ALGORITHM.Name).(framework.AsymmetricKeypairGenerator)
-	keyPair := function.GenerateKeypair()
+	keyPair, err := function.GenerateKeypair()
+	require.Nil(t, err)
 	address := framework.GenerateAddress(keyPair.PubKey)
 	fmt.Println(base58.Encode(address))
 }

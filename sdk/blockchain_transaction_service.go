@@ -13,8 +13,8 @@ import (
 type BlockchainTransactionService interface {
 
 	// 发起新交易
-	NewTransaction(ledgerHash framework.HashDigest) ledger_model.TransactionTemplate
+	NewTransaction(ledgerHash *framework.HashDigest) ledger_model.TransactionTemplate
 
 	// 根据交易内容准备交易实例
-	PrepareTransaction(content ledger_model.TransactionContent) ledger_model.PreparedTransaction
+	PrepareTransaction(content *ledger_model.TransactionContent) (ledger_model.PreparedTransaction, error)
 }

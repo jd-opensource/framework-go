@@ -56,7 +56,8 @@ func TestResolvePubKey(t *testing.T) {
 		certificate, err := RetrieveCertificate(cert[1])
 		require.Nil(t, err)
 		require.Equal(t, cert[0], certificate.Algorithm)
-		key := RetrievePubKey(certificate)
+		key, err := RetrievePubKey(certificate)
+		require.Nil(t, err)
 		require.Equal(t, crypto.EncodePubKey(key), cert[6])
 	}
 }
@@ -66,7 +67,7 @@ func TestResolvePrivKey(t *testing.T) {
 		certificate, err := RetrieveCertificate(cert[1])
 		fmt.Println(certificate.ToPEMString())
 		require.Nil(t, err)
-		var key framework.PrivKey
+		var key *framework.PrivKey
 		if len(cert[3]) == 0 {
 			key, err = RetrievePrivKey(certificate.Algorithm, cert[2])
 			require.Nil(t, err)
@@ -74,12 +75,16 @@ func TestResolvePrivKey(t *testing.T) {
 			key, err = RetrieveEncrypedPrivKey(certificate.Algorithm, cert[2], []byte(cert[3]))
 			require.Nil(t, err)
 		}
-		require.Equal(t, cert[4], crypto.EncodePrivKey(key, base58.MustDecode(cert[5])))
+		privKey, err := crypto.EncodePrivKey(key, base58.MustDecode(cert[5]))
+		require.Nil(t, err)
+		require.Equal(t, cert[4], privKey)
 
 		fmt.Println(certificate.Algorithm)
 		function := crypto.GetSignatureFunctionByName(certificate.Algorithm)
-		sign := function.Sign(key, []byte("imuge"))
-		pubKey := RetrievePubKey(certificate)
+		sign, err := function.Sign(key, []byte("imuge"))
+		require.Nil(t, err)
+		pubKey, err := RetrievePubKey(certificate)
+		require.Nil(t, err)
 		require.True(t, function.Verify(pubKey, []byte("imuge"), sign))
 	}
 }

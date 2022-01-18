@@ -11,7 +11,7 @@ func init() {
 // 账本初始配置
 type LedgerInitSetting struct {
 	LedgerSeed             []byte              `primitiveType:"BYTES"`
-	ConsensusParticipants  []ParticipantNode   `refContract:"1569" list:"true"`
+	ConsensusParticipants  []*ParticipantNode  `refContract:"1569" list:"true"`
 	CryptoSetting          CryptoSetting       `refContract:"1602"`
 	ConsensusProvider      string              `primitiveType:"TEXT"`
 	ConsensusSettings      []byte              `primitiveType:"BYTES"`

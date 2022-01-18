@@ -17,14 +17,14 @@ func init() {
 }
 
 type TransactionRequest struct {
-	TransactionHash    []byte             `primitiveType:"BYTES"`
-	TransactionContent TransactionContent `refContract:"512"`
-	EndpointSignatures []DigitalSignature `refContract:"2864" list:"true"`
-	NodeSignatures     []DigitalSignature `refContract:"2864" list:"true"`
+	TransactionHash    []byte              `primitiveType:"BYTES"`
+	TransactionContent *TransactionContent `refContract:"512"`
+	EndpointSignatures []*DigitalSignature `refContract:"2864" list:"true"`
+	NodeSignatures     []*DigitalSignature `refContract:"2864" list:"true"`
 }
 
-func NewTransactionRequest(transactionHash []byte, content TransactionContent) TransactionRequest {
-	return TransactionRequest{
+func NewTransactionRequest(transactionHash []byte, content *TransactionContent) *TransactionRequest {
+	return &TransactionRequest{
 		TransactionHash:    transactionHash,
 		TransactionContent: content,
 	}
@@ -52,6 +52,6 @@ func (t *TransactionRequest) ContainsEndpointSignature(pubKey []byte) bool {
 	return false
 }
 
-func (t *TransactionRequest) AddEndpointSignatures(signature DigitalSignature) {
+func (t *TransactionRequest) AddEndpointSignatures(signature *DigitalSignature) {
 	t.EndpointSignatures = append(t.EndpointSignatures, signature)
 }

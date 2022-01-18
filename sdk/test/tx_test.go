@@ -66,7 +66,7 @@ func TestRegisterUser(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 生成公私钥对
-	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	user := sdk.NewBlockchainKeyGenerator().MustGenerate(classic.ED25519_ALGORITHM)
 	address := framework.GenerateAddress(user.PubKey)
 
 	// 注册用户
@@ -111,7 +111,7 @@ func TestRegisterUserWithCA(t *testing.T) {
 	//     // 1. CA 身份认证模式
 	// 生成公私钥对
 	userCert, _ := ca.RetrieveCertificate("-----BEGIN CERTIFICATE-----\nMIIB3zCCAYagAwIBAgIEFgKY7jAKBggqhkjOPQQDAjBwMQwwCgYDVQQKDANKRFQxDTALBgNVBAsM\nBFJPT1QxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJCSjELMAkGA1UEBwwCQkoxDTALBgNVBAMMBHJv\nb3QxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpkLmNvbTAeFw0yMTEwMTUxMTQxMjVaFw0zMTEwMTMx\nMTQxMjVaMHExDDAKBgNVBAoMA0pEVDENMAsGA1UECwwEVVNFUjELMAkGA1UEBhMCQ04xCzAJBgNV\nBAgMAkJKMQswCQYDVQQHDAJCSjEOMAwGA1UEAwwFdXNlcjExGzAZBgkqhkiG9w0BCQEWDGltdWdl\nQGpkLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABAI1OVeItk5prWS/+Bc23ExVz8420VGh\n0oa/NmzIf/aJewN0KpT1j8+wybmEyEWwdqV2rUbuJktjepkTPtpdjcyjDTALMAkGA1UdEwQCMAAw\nCgYIKoZIzj0EAwIDRwAwRAIgAtgfbwZS3yJdtYfnkoCZKM29jtBIvJLj5qXcDOHWW/YCIF0XKgwh\ng5RDHhdI3a7lh6CE5vGNZJH781MFHVCO6Ma5\n-----END CERTIFICATE-----")
-	pubkey := ca.RetrievePubKey(userCert)
+	pubkey, _ := ca.RetrievePubKey(userCert)
 	address := framework.GenerateAddress(pubkey)
 	// 注册用户
 	txTemp.Users().RegisterWithCA(userCert)
@@ -240,7 +240,7 @@ func TestDataAccountRegister(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 生成公私钥对
-	dataAccount := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	dataAccount := sdk.NewBlockchainKeyGenerator().MustGenerate(classic.ED25519_ALGORITHM)
 	// 注册数据账户
 	txTemp.DataAccounts().Register(dataAccount.GetIdentity())
 
@@ -326,7 +326,7 @@ func TestDataAccountPermission(t *testing.T) {
 
 func TestContractDeploy(t *testing.T) {
 	// 生成公私钥对
-	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	user := sdk.NewBlockchainKeyGenerator().MustGenerate(classic.ED25519_ALGORITHM)
 
 	// 连接网关，获取节点服务
 	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
@@ -466,7 +466,7 @@ func TestUserEventAccountRegister(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 生成公私钥对
-	eventAccount := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	eventAccount := sdk.NewBlockchainKeyGenerator().MustGenerate(classic.ED25519_ALGORITHM)
 	// 注册事件账户
 	txTemp.EventAccounts().Register(eventAccount.GetIdentity())
 
@@ -556,7 +556,7 @@ func TestUserEventListener(t *testing.T) {
 	ledgerHashs, err := service.GetLedgerHashs()
 	require.Nil(t, err)
 
-	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	user := sdk.NewBlockchainKeyGenerator().MustGenerate(classic.ED25519_ALGORITHM)
 	handler := service.MonitorUserEvent(ledgerHashs[0], base58.Encode(user.GetAddress()), "e", 0, EUserEventListener{})
 
 	// 创建交易
@@ -593,7 +593,7 @@ var _ sdk.UserEventListener = (*EUserEventListener)(nil)
 type EUserEventListener struct {
 }
 
-func (E EUserEventListener) OnEvent(event ledger_model.Event, context sdk.UserEventContext) {
+func (E EUserEventListener) OnEvent(event *ledger_model.Event, context *sdk.UserEventContext) {
 	fmt.Printf("event topic : %s \r\n", event.Name)
 	fmt.Printf("event sequence : %d \n", event.Sequence)
 	switch event.Content.Type {
@@ -641,7 +641,7 @@ func TestSystemEventListener(t *testing.T) {
 	// 提交交易
 	for i := 0; i < 20; i++ {
 		txTemp := service.NewTransaction(ledgerHashs[0])
-		user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+		user := sdk.NewBlockchainKeyGenerator().MustGenerate(classic.ED25519_ALGORITHM)
 		txTemp.EventAccounts().Register(user.GetIdentity())
 		prepTx := txTemp.Prepare()
 		prepTx.Sign(NODE_KEY.AsymmetricKeypair)
@@ -688,7 +688,7 @@ func TestRegisterParticipant(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 生成公私钥对
-	user := sdk.NewBlockchainKeyGenerator().Generate(classic.ED25519_ALGORITHM)
+	user := sdk.NewBlockchainKeyGenerator().MustGenerate(classic.ED25519_ALGORITHM)
 	address := framework.GenerateAddress(user.PubKey)
 	fmt.Println(address)
 
@@ -733,7 +733,7 @@ func TestRegisterParticipantWithCA(t *testing.T) {
 
 	// 解析证书
 	peerCert, _ := ca.RetrieveCertificate("-----BEGIN CERTIFICATE-----\nMIICFTCCAbugAwIBAgIEVZ132DAKBggqhkjOPQQDAjBwMQwwCgYDVQQKDANKRFQx\nDTALBgNVBAsMBFJPT1QxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJCSjELMAkGA1UE\nBwwCQkoxDTALBgNVBAMMBHJvb3QxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpkLmNv\nbTAeFw0yMTEyMjkwNjUwMDBaFw0zMTEyMjcwNjUwMDBaMHExDDAKBgNVBAoMA0pE\nVDENMAsGA1UECwwEUEVFUjELMAkGA1UEBhMCQ04xCzAJBgNVBAgMAkJKMQswCQYD\nVQQHDAJCSjEOMAwGA1UEAwwFcGVlcjQxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpk\nLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGjWubawm0nFKDEchGb4636w\nGOuR/JpWjww6R9Cm5f9pxk0PFQIyUY/8fCHtnxeYK2VPk8qKdnQ0bEDKKZY7LIaj\nQjBAMA4GA1UdDwEB/wQEAwIHgDAgBgNVHQ4BAf8EFgQUFCVXcNggdSxRKRbVs0JR\nWgVA1/wwDAYDVR0TAQH/BAIwADAKBggqhkjOPQQDAgNIADBFAiBr4dbTMJIY7zhK\nz3XCBGiTsF7LH7tJS2bVQYps6+6kLgIhAN/JoQtiGYqGiMEguZIomLopWWMjT7dn\nqA9nRSsqoWfK\n-----END CERTIFICATE-----")
-	pubkey := ca.RetrievePubKey(peerCert)
+	pubkey, _ := ca.RetrievePubKey(peerCert)
 	address := framework.GenerateAddress(pubkey)
 	fmt.Println(base58.Encode(address))
 	// 注册参与方

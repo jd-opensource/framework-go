@@ -1,6 +1,9 @@
 package framework
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 /**
  * @Author: imuge
@@ -20,15 +23,15 @@ type CryptoKeyType struct {
 	Code byte
 }
 
-func GetCryptoKeyType(code byte) CryptoKeyType {
+func GetCryptoKeyType(code byte) (CryptoKeyType, error) {
 	switch code {
 	case 0x01:
-		return PUBLIC
+		return PUBLIC, nil
 	case 0x02:
-		return PRIVATE
+		return PRIVATE, nil
 	case 0x03:
-		return SYMMETRIC
+		return SYMMETRIC, nil
 	default:
-		panic(fmt.Sprintf("CryptoKeyType doesn't support enum code[%s]!", code))
+		return PUBLIC, errors.New(fmt.Sprintf("CryptoKeyType doesn't support enum code[%s]!", code))
 	}
 }

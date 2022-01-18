@@ -11,21 +11,26 @@ type AsymmetricCiphertext struct {
 	BaseCryptoBytes
 }
 
-func NewAsymmetricCiphertext(algorithm CryptoAlgorithm, rawCryptoBytes []byte) AsymmetricCiphertext {
-	return AsymmetricCiphertext{
+func NewAsymmetricCiphertext(algorithm CryptoAlgorithm, rawCryptoBytes []byte) *AsymmetricCiphertext {
+	return &AsymmetricCiphertext{
 		NewBaseCryptoBytes(algorithm, rawCryptoBytes),
 	}
 }
 
-func ParseAsymmetricCiphertext(cryptoBytes []byte) AsymmetricCiphertext {
-	return AsymmetricCiphertext{
-		ParseBaseCryptoBytes(cryptoBytes, supportAsymmetric),
+func ParseAsymmetricCiphertext(cryptoBytes []byte) (*AsymmetricCiphertext, error) {
+	bytes, err := ParseBaseCryptoBytes(cryptoBytes, supportAsymmetric)
+	if err != nil {
+		return nil, err
 	}
+	return &AsymmetricCiphertext{
+		*bytes,
+	}, nil
 }
 
 func (s AsymmetricCiphertext) GetRawCiphertext() []byte {
-	slice := s.GetRawCryptoBytes()
-	return slice.GetBytesCopy(0, slice.Size)
+	slice, _ := s.GetRawCryptoBytes()
+	bytesCopy, _ := slice.GetBytesCopy(0, slice.Size)
+	return bytesCopy
 }
 
 func supportAsymmetric(algorithm CryptoAlgorithm) bool {

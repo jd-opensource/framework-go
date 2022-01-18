@@ -9,17 +9,17 @@ import "github.com/blockchain-jd-com/framework-go/crypto/framework"
 
 // 已就绪的交易
 type TransactionRequestBuilder interface {
-	GetTransactionHash() framework.HashDigest
+	GetTransactionHash() *framework.HashDigest
 
-	GetTransactionContent() TransactionContent
+	GetTransactionContent() *TransactionContent
 
-	SignAsEndpoint(keyPair framework.AsymmetricKeypair) DigitalSignature
+	SignAsEndpoint(keyPair *framework.AsymmetricKeypair) (*DigitalSignature, error)
 
-	SignAsNode(keyPair framework.AsymmetricKeypair) DigitalSignature
+	SignAsNode(keyPair *framework.AsymmetricKeypair) (*DigitalSignature, error)
 
-	AddEndpointSignature(signature DigitalSignature)
+	AddEndpointSignature(signature *DigitalSignature)
 
-	AddNodeSignature(signature DigitalSignature)
+	AddNodeSignature(signature *DigitalSignature)
 
-	BuildRequest() TransactionRequest
+	BuildRequest() *TransactionRequest
 }

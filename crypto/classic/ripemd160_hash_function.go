@@ -25,15 +25,11 @@ func (R RIPEMD160HashFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return RIPEMD160_ALGORITHM
 }
 
-func (R RIPEMD160HashFunction) Hash(data []byte) framework.HashDigest {
-	if data == nil {
-		panic("data is null!")
-	}
-
+func (R RIPEMD160HashFunction) Hash(data []byte) *framework.HashDigest {
 	return framework.NewHashDigest(R.GetAlgorithm(), ripemd160.Hash(data))
 }
 
-func (R RIPEMD160HashFunction) Verify(digest framework.HashDigest, data []byte) bool {
+func (R RIPEMD160HashFunction) Verify(digest *framework.HashDigest, data []byte) bool {
 	hashDigest := R.Hash(data)
 	return bytes.Equals(hashDigest.ToBytes(), digest.ToBytes())
 }
@@ -43,6 +39,6 @@ func (R RIPEMD160HashFunction) SupportHashDigest(digestBytes []byte) bool {
 	return RIPEMD160_DIGEST_LENGTH == len(digestBytes) && R.GetAlgorithm().Match(digestBytes, 0)
 }
 
-func (R RIPEMD160HashFunction) ParseHashDigest(digestBytes []byte) framework.HashDigest {
+func (R RIPEMD160HashFunction) ParseHashDigest(digestBytes []byte) (*framework.HashDigest, error) {
 	return framework.ParseHashDigest(digestBytes)
 }

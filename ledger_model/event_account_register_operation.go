@@ -14,7 +14,7 @@ func init() {
 }
 
 type EventAccountRegisterOperation struct {
-	EventAccountID BlockchainIdentity `refContract:"144"`
+	EventAccountID *BlockchainIdentity `refContract:"144"`
 }
 
 func (e EventAccountRegisterOperation) ContractCode() int32 {

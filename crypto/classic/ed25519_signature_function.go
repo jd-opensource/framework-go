@@ -31,7 +31,7 @@ var _ framework.SignatureFunction = (*ED25519SignatureFunction)(nil)
 type ED25519SignatureFunction struct {
 }
 
-func (E ED25519SignatureFunction) RetrievePrivKey(privateKey string) (framework.PrivKey, error) {
+func (E ED25519SignatureFunction) RetrievePrivKey(privateKey string) (*framework.PrivKey, error) {
 	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "\n", "")
@@ -46,10 +46,10 @@ func (E ED25519SignatureFunction) RetrievePrivKey(privateKey string) (framework.
 		return framework.NewPrivKey(E.GetAlgorithm(), ed25519Key[:32]), nil
 	}
 
-	return framework.PrivKey{}, errors.New("not ed25519 private key")
+	return nil, errors.New("not ed25519 private key")
 }
 
-func (E ED25519SignatureFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (framework.PrivKey, error) {
+func (E ED25519SignatureFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (*framework.PrivKey, error) {
 	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "\n", "")
@@ -57,11 +57,11 @@ func (E ED25519SignatureFunction) RetrieveEncrypedPrivKey(privateKey string, pwd
 	encoded := base64.MustDecode(privateKey)
 	block, rest := pem.Decode(encoded)
 	if len(rest) > 0 {
-		return framework.PrivKey{}, errors.New("extra data included in key")
+		return nil, errors.New("extra data included in key")
 	}
 	encoded, err := x509.DecryptPEMBlock(block, pwd)
 	if err != nil {
-		return framework.PrivKey{}, errors.New("decrypt error")
+		return nil, errors.New("decrypt error")
 	}
 	key, err := x509.ParsePKCS8PrivateKey(encoded)
 	if err != nil {
@@ -72,63 +72,61 @@ func (E ED25519SignatureFunction) RetrieveEncrypedPrivKey(privateKey string, pwd
 		return framework.NewPrivKey(E.GetAlgorithm(), ed25519Key[:32]), nil
 	}
 
-	return framework.PrivKey{}, errors.New("not ed25519 private key")
+	return nil, errors.New("not ed25519 private key")
 }
 
-func (E ED25519SignatureFunction) RetrievePubKeyFromCA(cert *ca.Certificate) framework.PubKey {
-	return framework.NewPubKey(E.GetAlgorithm(), cert.ClassicCert.PublicKey.(ed255192.PublicKey))
+func (E ED25519SignatureFunction) RetrievePubKeyFromCA(cert *ca.Certificate) (*framework.PubKey, error) {
+	return framework.NewPubKey(E.GetAlgorithm(), cert.ClassicCert.PublicKey.(ed255192.PublicKey)), nil
 }
 
-func (E ED25519SignatureFunction) GenerateKeypair() framework.AsymmetricKeypair {
+func (E ED25519SignatureFunction) GenerateKeypair() (*framework.AsymmetricKeypair, error) {
 	pub, seed := ed25519.GenerateKeyPair()
 
 	return framework.NewAsymmetricKeypair(framework.NewPubKey(E.GetAlgorithm(), pub), framework.NewPrivKey(E.GetAlgorithm(), seed))
 }
 
-func (E ED25519SignatureFunction) GenerateKeypairWithSeed(seed []byte) (keypair framework.AsymmetricKeypair, err error) {
-	defer func() {
-		r := recover()
-		if r != nil {
-			err = errors.New(r.(string))
-			return
-		}
-	}()
+func (E ED25519SignatureFunction) GenerateKeypairWithSeed(seed []byte) (keypair *framework.AsymmetricKeypair, err error) {
 	if len(seed) < 32 {
-		panic("seed length must gte 32")
+		return nil, errors.New("seed length must gte 32")
 	}
 	pub, seed := ed25519.GenerateKeyPairWithSeed(seed)
-	keypair = framework.NewAsymmetricKeypair(framework.NewPubKey(E.GetAlgorithm(), pub), framework.NewPrivKey(E.GetAlgorithm(), seed))
-
-	return
+	return framework.NewAsymmetricKeypair(framework.NewPubKey(E.GetAlgorithm(), pub), framework.NewPrivKey(E.GetAlgorithm(), seed))
 }
 
 func (E ED25519SignatureFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return ED25519_ALGORITHM
 }
 
-func (E ED25519SignatureFunction) Sign(privKey framework.PrivKey, data []byte) framework.SignatureDigest {
-	rawPrivKeyBytes := privKey.GetRawKeyBytes()
+func (E ED25519SignatureFunction) Sign(privKey *framework.PrivKey, data []byte) (*framework.SignatureDigest, error) {
+	rawPrivKeyBytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
 
 	// 验证原始私钥长度为256比特，即32字节
 	if len(rawPrivKeyBytes) != ED25519_PRIVKEY_SIZE {
-		panic("This key has wrong format!")
+		return nil, errors.New("This key has wrong format!")
 	}
 
 	// 验证密钥数据的算法标识对应ED25519签名算法
 	if privKey.GetAlgorithm() != E.GetAlgorithm().Code {
-		panic("This key is not ED25519 private key!")
+		return nil, errors.New("This key is not ED25519 private key!")
 	}
 
 	// 调用ED25519签名算法计算签名结果
-	return framework.NewSignatureDigest(E.GetAlgorithm(), ed25519.Sign(rawPrivKeyBytes, data))
+	return framework.NewSignatureDigest(E.GetAlgorithm(), ed25519.Sign(rawPrivKeyBytes, data)), nil
 }
 
-func (E ED25519SignatureFunction) Verify(pubKey framework.PubKey, data []byte, digest framework.SignatureDigest) bool {
+func (E ED25519SignatureFunction) Verify(pubKey *framework.PubKey, data []byte, digest *framework.SignatureDigest) bool {
 	return ed25519.Verify(pubKey.GetRawKeyBytes(), data, digest.GetRawDigest())
 }
 
-func (E ED25519SignatureFunction) RetrievePubKey(privKey framework.PrivKey) framework.PubKey {
-	return framework.NewPubKey(E.GetAlgorithm(), ed25519.RetrievePubKey(privKey.GetRawKeyBytes()))
+func (E ED25519SignatureFunction) RetrievePubKey(privKey *framework.PrivKey) (*framework.PubKey, error) {
+	bytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
+	return framework.NewPubKey(E.GetAlgorithm(), ed25519.RetrievePubKey(bytes)), nil
 }
 
 func (E ED25519SignatureFunction) SupportPrivKey(privKeyBytes []byte) bool {
@@ -136,11 +134,11 @@ func (E ED25519SignatureFunction) SupportPrivKey(privKeyBytes []byte) bool {
 	return len(privKeyBytes) == ED25519_PRIVKEY_LENGTH && E.GetAlgorithm().Match(privKeyBytes, 0) && privKeyBytes[framework.ALGORYTHM_CODE_SIZE] == framework.PRIVATE.Code
 }
 
-func (E ED25519SignatureFunction) ParsePrivKey(privKeyBytes []byte) framework.PrivKey {
+func (E ED25519SignatureFunction) ParsePrivKey(privKeyBytes []byte) (*framework.PrivKey, error) {
 	if E.SupportPrivKey(privKeyBytes) {
 		return framework.ParsePrivKey(privKeyBytes)
 	} else {
-		panic("privKeyBytes are invalid!")
+		return nil, errors.New("invalid privKeyBytes!")
 	}
 }
 
@@ -149,11 +147,11 @@ func (E ED25519SignatureFunction) SupportPubKey(pubKeyBytes []byte) bool {
 	return len(pubKeyBytes) == ED25519_PUBKEY_LENGTH && E.GetAlgorithm().Match(pubKeyBytes, 0) && pubKeyBytes[framework.ALGORYTHM_CODE_SIZE] == framework.PUBLIC.Code
 }
 
-func (E ED25519SignatureFunction) ParsePubKey(pubKeyBytes []byte) framework.PubKey {
+func (E ED25519SignatureFunction) ParsePubKey(pubKeyBytes []byte) (*framework.PubKey, error) {
 	if E.SupportPubKey(pubKeyBytes) {
 		return framework.ParsePubKey(pubKeyBytes)
 	} else {
-		panic("pubKeyBytes are invalid!")
+		return nil, errors.New("invalid pubKeyBytes!")
 	}
 }
 
@@ -162,10 +160,10 @@ func (E ED25519SignatureFunction) SupportDigest(digestBytes []byte) bool {
 	return len(digestBytes) == ED25519_SIGNATUREDIGEST_LENGTH && E.GetAlgorithm().Match(digestBytes, 0)
 }
 
-func (E ED25519SignatureFunction) ParseDigest(digestBytes []byte) framework.SignatureDigest {
+func (E ED25519SignatureFunction) ParseDigest(digestBytes []byte) (*framework.SignatureDigest, error) {
 	if E.SupportDigest(digestBytes) {
 		return framework.ParseSignatureDigest(digestBytes)
 	} else {
-		panic("digestBytes are invalid!")
+		return nil, errors.New("invalid digestBytes!")
 	}
 }

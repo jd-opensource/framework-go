@@ -15,5 +15,5 @@ type BlockchainService interface {
 	BlockchainTransactionService
 	BlockchainEventService
 
-	GetCryptoSetting(ledger framework.HashDigest) ledger_model.CryptoSetting
+	GetCryptoSetting(ledger *framework.HashDigest) ledger_model.CryptoSetting
 }

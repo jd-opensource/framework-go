@@ -1,6 +1,7 @@
 package sm
 
 import (
+	"errors"
 	"github.com/ZZMarquis/gm/sm3"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/utils/bytes"
@@ -25,16 +26,12 @@ func (S SM3HashFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return SM3_ALGORITHM
 }
 
-func (S SM3HashFunction) Hash(data []byte) framework.HashDigest {
-	if data == nil {
-		panic("data is null!")
-	}
-
+func (S SM3HashFunction) Hash(data []byte) *framework.HashDigest {
 	digestBytes := sm3.Sum(data)
 	return framework.NewHashDigest(S.GetAlgorithm(), digestBytes[:])
 }
 
-func (S SM3HashFunction) Verify(digest framework.HashDigest, data []byte) bool {
+func (S SM3HashFunction) Verify(digest *framework.HashDigest, data []byte) bool {
 	hashDigest := S.Hash(data)
 	return bytes.Equals(hashDigest.ToBytes(), digest.ToBytes())
 }
@@ -44,10 +41,10 @@ func (S SM3HashFunction) SupportHashDigest(digestBytes []byte) bool {
 	return S.GetAlgorithm().Match(digestBytes, 0) && SM3_DIGEST_LENGTH == len(digestBytes)
 }
 
-func (S SM3HashFunction) ParseHashDigest(digestBytes []byte) framework.HashDigest {
+func (S SM3HashFunction) ParseHashDigest(digestBytes []byte) (*framework.HashDigest, error) {
 	if S.SupportHashDigest(digestBytes) {
 		return framework.ParseHashDigest(digestBytes)
 	} else {
-		panic("digestBytes is invalid!")
+		return nil, errors.New("invalid digestBytes!")
 	}
 }

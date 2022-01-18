@@ -18,7 +18,7 @@ func NewUserRegisterOperationBuilder(factory *BlockchainOperationFactory) *UserR
 	return &UserRegisterOperationBuilder{factory: factory}
 }
 
-func (urob *UserRegisterOperationBuilder) Register(userID BlockchainIdentity) UserRegisterOperation {
+func (urob *UserRegisterOperationBuilder) Register(userID *BlockchainIdentity) UserRegisterOperation {
 	operation := UserRegisterOperation{
 		UserID: userID,
 	}
@@ -29,14 +29,18 @@ func (urob *UserRegisterOperationBuilder) Register(userID BlockchainIdentity) Us
 	return operation
 }
 
-func (urob *UserRegisterOperationBuilder) RegisterWithCA(cert *ca2.Certificate) UserRegisterOperation {
-	operation := UserRegisterOperation{
-		UserID:      NewBlockchainIdentity(ca.RetrievePubKey(cert)),
+func (urob *UserRegisterOperationBuilder) RegisterWithCA(cert *ca2.Certificate) (*UserRegisterOperation, error) {
+	key, err := ca.RetrievePubKey(cert)
+	if err != nil {
+		return nil, err
+	}
+	operation := &UserRegisterOperation{
+		UserID:      NewBlockchainIdentity(key),
 		Certificate: cert.ToPEMString(),
 	}
 	if urob.factory != nil {
 		urob.factory.addOperation(operation)
 	}
 
-	return operation
+	return operation, nil
 }

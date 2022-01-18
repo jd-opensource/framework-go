@@ -13,7 +13,7 @@ func NewEventAccountRegisterOperationBuilder(factory *BlockchainOperationFactory
 	return &EventAccountRegisterOperationBuilder{factory: factory}
 }
 
-func (earob *EventAccountRegisterOperationBuilder) Register(accountIdentity BlockchainIdentity) EventAccountRegisterOperation {
+func (earob *EventAccountRegisterOperationBuilder) Register(accountIdentity *BlockchainIdentity) EventAccountRegisterOperation {
 	operation := EventAccountRegisterOperation{
 		EventAccountID: accountIdentity,
 	}

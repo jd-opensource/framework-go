@@ -20,7 +20,7 @@ func NewStatefulPreparedTx(tx *PreparedTx, stateManager *TxStateManager) *Statef
 	}
 }
 
-func (s *StatefulPreparedTx) Commit() (TransactionResponse, error) {
+func (s *StatefulPreparedTx) Commit() (*TransactionResponse, error) {
 	s.stateManager.commit()
 	return s.PreparedTx.Commit()
 }

@@ -18,17 +18,28 @@ func NewBlockchainKeyGenerator() *BlockchainKeyGenerator {
 	return &BlockchainKeyGenerator{}
 }
 
-func (b BlockchainKeyGenerator) Generate(algorithm framework.CryptoAlgorithm) ledger_model.BlockchainKeypair {
+func (b BlockchainKeyGenerator) Generate(algorithm framework.CryptoAlgorithm) (*ledger_model.BlockchainKeypair, error) {
 	signFunc := crypto.GetSignatureFunction(algorithm)
-	cryptoKeyPair := signFunc.GenerateKeypair()
+	cryptoKeyPair, err := signFunc.GenerateKeypair()
+	if err != nil {
+		return nil, err
+	}
 	return ledger_model.NewBlockchainKeypair(cryptoKeyPair.PubKey, cryptoKeyPair.PrivKey)
 }
 
-func (b BlockchainKeyGenerator) GenerateWithSeed(algorithm framework.CryptoAlgorithm, seed []byte) (ledger_model.BlockchainKeypair, error) {
+func (b BlockchainKeyGenerator) MustGenerate(algorithm framework.CryptoAlgorithm) *ledger_model.BlockchainKeypair {
+	signFunc := crypto.GetSignatureFunction(algorithm)
+	cryptoKeyPair, _ := signFunc.GenerateKeypair()
+	keypair, _ := ledger_model.NewBlockchainKeypair(cryptoKeyPair.PubKey, cryptoKeyPair.PrivKey)
+
+	return keypair
+}
+
+func (b BlockchainKeyGenerator) GenerateWithSeed(algorithm framework.CryptoAlgorithm, seed []byte) (*ledger_model.BlockchainKeypair, error) {
 	signFunc := crypto.GetSignatureFunction(algorithm)
 	cryptoKeyPair, err := signFunc.GenerateKeypairWithSeed(seed)
 	if err != nil {
-		return ledger_model.BlockchainKeypair{}, err
+		return nil, err
 	}
-	return ledger_model.NewBlockchainKeypair(cryptoKeyPair.PubKey, cryptoKeyPair.PrivKey), nil
+	return ledger_model.NewBlockchainKeypair(cryptoKeyPair.PubKey, cryptoKeyPair.PrivKey)
 }

@@ -22,8 +22,8 @@ type TransactionContent struct {
 	Timestamp  int64                       `primitiveType:"INT64"`
 }
 
-func NewTransactionContent(ledgerHash framework.HashDigest, operations []binary_proto.DataContract, time int64) TransactionContent {
-	return TransactionContent{
+func NewTransactionContent(ledgerHash *framework.HashDigest, operations []binary_proto.DataContract, time int64) *TransactionContent {
+	return &TransactionContent{
 		LedgerHash: ledgerHash.ToBytes(),
 		Operations: operations,
 		Timestamp:  time,

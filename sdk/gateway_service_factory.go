@@ -21,7 +21,7 @@ func NewGatewayServiceFactory(blockchainService BlockchainService) *GatewayServi
 	}
 }
 
-func MustConnect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair) *GatewayServiceFactory {
+func MustConnect(gatewayHost string, gatewayPort int, userKey *ledger_model.BlockchainKeypair) *GatewayServiceFactory {
 	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
 	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort))
 	ledgerHashs, err := queryService.GetLedgerHashs()
@@ -40,7 +40,7 @@ func MustConnect(gatewayHost string, gatewayPort int, userKey ledger_model.Block
 	return NewGatewayServiceFactory(service)
 }
 
-func MustSecureConnect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair, security *SSLSecurity) *GatewayServiceFactory {
+func MustSecureConnect(gatewayHost string, gatewayPort int, userKey *ledger_model.BlockchainKeypair, security *SSLSecurity) *GatewayServiceFactory {
 	queryService := NewSecureRestyQueryService(gatewayHost, gatewayPort, security)
 	txService := NewEndpointAutoSigner(userKey, NewSecureRestyTxService(gatewayHost, gatewayPort, security))
 	ledgerHashs, err := queryService.GetLedgerHashs()
@@ -59,7 +59,7 @@ func MustSecureConnect(gatewayHost string, gatewayPort int, userKey ledger_model
 	return NewGatewayServiceFactory(service)
 }
 
-func Connect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair) (*GatewayServiceFactory, error) {
+func Connect(gatewayHost string, gatewayPort int, userKey *ledger_model.BlockchainKeypair) (*GatewayServiceFactory, error) {
 	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
 	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort))
 	ledgerHashs, err := queryService.GetLedgerHashs()
@@ -78,7 +78,7 @@ func Connect(gatewayHost string, gatewayPort int, userKey ledger_model.Blockchai
 	return NewGatewayServiceFactory(service), nil
 }
 
-func SecureConnect(gatewayHost string, gatewayPort int, userKey ledger_model.BlockchainKeypair, security *SSLSecurity) (*GatewayServiceFactory, error) {
+func SecureConnect(gatewayHost string, gatewayPort int, userKey *ledger_model.BlockchainKeypair, security *SSLSecurity) (*GatewayServiceFactory, error) {
 	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
 	txService := NewEndpointAutoSigner(userKey, NewSecureRestyTxService(gatewayHost, gatewayPort, security))
 	ledgerHashs, err := queryService.GetLedgerHashs()

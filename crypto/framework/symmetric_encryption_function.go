@@ -16,7 +16,7 @@ type SymmetricEncryptionFunction interface {
 	 * @param data 明文；
 	 * @return
 	 */
-	Encrypt(key SymmetricKey, data []byte) SymmetricCiphertext
+	Encrypt(key *SymmetricKey, data []byte) (*SymmetricCiphertext, error)
 
 	/**
 	 * 解密；
@@ -25,7 +25,7 @@ type SymmetricEncryptionFunction interface {
 	 * @param ciphertext 密文；
 	 * @return
 	 */
-	Decrypt(key SymmetricKey, ciphertext SymmetricCiphertext) []byte
+	Decrypt(key *SymmetricKey, ciphertext *SymmetricCiphertext) ([]byte, error)
 
 	/**
 	 * 校验对称密钥格式是否满足要求；
@@ -41,7 +41,7 @@ type SymmetricEncryptionFunction interface {
 	 * @param symmetricKeyBytes 包含算法标识、密钥掩码和对称密钥的字节数组
 	 * @return SymmetricKey形式的对称密钥
 	 */
-	ParseSymmetricKey(symmetricKeyBytes []byte) SymmetricKey
+	ParseSymmetricKey(symmetricKeyBytes []byte) (*SymmetricKey, error)
 
 	/**
 	 * 校验密文格式是否满足要求；
@@ -58,5 +58,5 @@ type SymmetricEncryptionFunction interface {
 	 * @return SymmetricCiphertext形式的签名摘要
 	 */
 
-	ParseCiphertext(ciphertextBytes []byte) SymmetricCiphertext
+	ParseCiphertext(ciphertextBytes []byte) (*SymmetricCiphertext, error)
 }

@@ -24,20 +24,34 @@ func NewBaseCryptoKey(algorithm CryptoAlgorithm, rawKeyBytes []byte, keyType Cry
 	}
 }
 
-func ParseBaseCryptoKey(cryptoBytes []byte) BaseCryptoKey {
-	bcbs := ParseBaseCryptoBytes(cryptoBytes, supportAsymmetricOrSymmetric)
-	return BaseCryptoKey{
-		bcbs,
-		DecodeKeyType(bcbs.GetRawCryptoBytes()),
+func ParseBaseCryptoKey(cryptoBytes []byte) (*BaseCryptoKey, error) {
+	bcbs, err := ParseBaseCryptoBytes(cryptoBytes, supportAsymmetricOrSymmetric)
+	if err != nil {
+		return nil, err
 	}
+	bytes, err := bcbs.GetRawCryptoBytes()
+	if err != nil {
+		return nil, err
+	}
+	keyType, err := DecodeKeyType(*bytes)
+	if err != nil {
+		return nil, err
+	}
+	return &BaseCryptoKey{
+		*bcbs,
+		keyType,
+	}, nil
 }
 
 func (b BaseCryptoKey) GetKeyType() CryptoKeyType {
 	return b.keyType
 }
 
-func (b BaseCryptoKey) GetRawKeyBytes() []byte {
-	slice := b.GetRawCryptoBytes()
+func (b BaseCryptoKey) GetRawKeyBytes() ([]byte, error) {
+	slice, err := b.GetRawCryptoBytes()
+	if err != nil {
+		return nil, err
+	}
 	return slice.GetBytesCopy(1, slice.Size-1)
 }
 

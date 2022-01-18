@@ -1,6 +1,7 @@
 package sm
 
 import (
+	"errors"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/utils/sm4"
 )
@@ -24,7 +25,7 @@ var _ framework.SymmetricEncryptionFunction = (*SM4EncryptionFunction)(nil)
 type SM4EncryptionFunction struct {
 }
 
-func (S SM4EncryptionFunction) GenerateSymmetricKey() framework.SymmetricKey {
+func (S SM4EncryptionFunction) GenerateSymmetricKey() *framework.SymmetricKey {
 	return framework.NewSymmetricKey(S.GetAlgorithm(), sm4.GenerateSymmetricKey())
 }
 
@@ -32,12 +33,12 @@ func (S SM4EncryptionFunction) GetAlgorithm() framework.CryptoAlgorithm {
 	return SM4_ALGORITHM
 }
 
-func (S SM4EncryptionFunction) Encrypt(key framework.SymmetricKey, data []byte) framework.SymmetricCiphertext {
-	return framework.NewSymmetricCiphertext(S.GetAlgorithm(), sm4.Encrypt(key.GetRawKeyBytes(), data))
+func (S SM4EncryptionFunction) Encrypt(key *framework.SymmetricKey, data []byte) (*framework.SymmetricCiphertext, error) {
+	return framework.NewSymmetricCiphertext(S.GetAlgorithm(), sm4.Encrypt(key.GetRawKeyBytes(), data)), nil
 }
 
-func (S SM4EncryptionFunction) Decrypt(key framework.SymmetricKey, ciphertext framework.SymmetricCiphertext) []byte {
-	return sm4.Decrypt(key.GetRawKeyBytes(), ciphertext.GetRawCiphertext())
+func (S SM4EncryptionFunction) Decrypt(key *framework.SymmetricKey, ciphertext *framework.SymmetricCiphertext) ([]byte, error) {
+	return sm4.Decrypt(key.GetRawKeyBytes(), ciphertext.GetRawCiphertext()), nil
 }
 
 func (S SM4EncryptionFunction) SupportSymmetricKey(symmetricKeyBytes []byte) bool {
@@ -45,11 +46,11 @@ func (S SM4EncryptionFunction) SupportSymmetricKey(symmetricKeyBytes []byte) boo
 	return len(symmetricKeyBytes) == SM4_SYMMETRICKEY_LENGTH && S.GetAlgorithm().Match(symmetricKeyBytes, 0) && symmetricKeyBytes[framework.ALGORYTHM_CODE_SIZE] == framework.SYMMETRIC.Code
 }
 
-func (S SM4EncryptionFunction) ParseSymmetricKey(symmetricKeyBytes []byte) framework.SymmetricKey {
+func (S SM4EncryptionFunction) ParseSymmetricKey(symmetricKeyBytes []byte) (*framework.SymmetricKey, error) {
 	if S.SupportSymmetricKey(symmetricKeyBytes) {
 		return framework.ParseSymmetricKey(symmetricKeyBytes)
 	} else {
-		panic("symmetricKeyBytes is invalid!")
+		return nil, errors.New("invalid symmetricKeyBytes!")
 	}
 }
 
@@ -58,10 +59,10 @@ func (S SM4EncryptionFunction) SupportCiphertext(ciphertextBytes []byte) bool {
 	return (len(ciphertextBytes)-framework.ALGORYTHM_CODE_SIZE)%SM4_BLOCK_SIZE == 0 && S.GetAlgorithm().Match(ciphertextBytes, 0)
 }
 
-func (S SM4EncryptionFunction) ParseCiphertext(ciphertextBytes []byte) framework.SymmetricCiphertext {
+func (S SM4EncryptionFunction) ParseCiphertext(ciphertextBytes []byte) (*framework.SymmetricCiphertext, error) {
 	if S.SupportCiphertext(ciphertextBytes) {
 		return framework.ParseSymmetricCiphertext(ciphertextBytes)
 	} else {
-		panic("ciphertextBytes is invalid!")
+		return nil, errors.New("invalid ciphertextBytes!")
 	}
 }

@@ -14,7 +14,7 @@ func init() {
 }
 
 type UserAccountHeader struct {
-	BlockchainIdentity
+	*BlockchainIdentity
 	State       AccountState `refEnum:"788"`
 	Certificate string       `primitiveType:"TEXT"`
 }

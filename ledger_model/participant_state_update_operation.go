@@ -14,7 +14,7 @@ func init() {
 }
 
 type ParticipantStateUpdateOperation struct {
-	ParticipantID BlockchainIdentity   `refContract:"144"`
+	ParticipantID *BlockchainIdentity  `refContract:"144"`
 	State         ParticipantNodeState `refEnum:"2852"`
 }
 

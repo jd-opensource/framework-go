@@ -21,8 +21,8 @@ type BlockchainIdentity struct {
 	PubKey  []byte `primitiveType:"BYTES" json:"pubkey"`
 }
 
-func NewBlockchainIdentity(pubKey framework.PubKey) BlockchainIdentity {
-	return BlockchainIdentity{
+func NewBlockchainIdentity(pubKey *framework.PubKey) *BlockchainIdentity {
+	return &BlockchainIdentity{
 		Address: framework.GenerateAddress(pubKey),
 		PubKey:  pubKey.ToBytes(),
 	}

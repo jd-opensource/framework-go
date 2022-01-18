@@ -14,8 +14,8 @@ func init() {
 }
 
 type DataAccountRegisterOperation struct {
-	AccountID        BlockchainIdentity `refContract:"144"`
-	AddressSignature DigitalSignature   `refContract:"2864"`
+	AccountID        *BlockchainIdentity `refContract:"144"`
+	AddressSignature *DigitalSignature   `refContract:"2864"`
 }
 
 func (d DataAccountRegisterOperation) ContractCode() int32 {

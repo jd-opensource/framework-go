@@ -1,5 +1,7 @@
 package bytes
 
+import "errors"
+
 /**
  * @Author: imuge
  * @Date: 2020/4/29 9:21 上午
@@ -23,77 +25,94 @@ func NewSlice(bytes []byte) Slice {
 	}
 }
 
-func NewSliceWithOffset(bytes []byte, offset int) Slice {
+func NewSliceWithOffset(bytes []byte, offset int) (*Slice, error) {
+	if offset >= len(bytes) {
+		return nil, errors.New("offset out of bounds")
+	}
 	return NewSliceWithOffsetAndSize(bytes, offset, len(bytes)-offset)
 }
 
-func NewSliceWithOffsetAndSize(bytes []byte, offset, size int) Slice {
+func NewSliceWithOffsetAndSize(bytes []byte, offset, size int) (*Slice, error) {
 	if offset+size > len(bytes) {
-		panic("index out of bounds")
+		return nil, errors.New("index out of bounds")
 	}
-	return Slice{
+	return &Slice{
 		bytes,
 		offset,
 		size,
-	}
+	}, nil
 }
 
 func (s Slice) IsEmpty() bool {
 	return s.Size == 0
 }
 
-func (s Slice) GetByte(offset int) byte {
+func (s Slice) GetByte(offset int) (byte, error) {
 	off := s.Offset + offset
-	s.checkBoundary(off, 1)
-	return s.Bytes[off]
+	if !s.checkBoundary(off, 1) {
+		return 0, errors.New("accessing index is out of BytesSlice's bounds!")
+	}
+	return s.Bytes[off], nil
 }
 
-func (s Slice) GetInt16(offset int) int16 {
+func (s Slice) GetInt16(offset int) (int16, error) {
 	off := s.Offset + offset
-	s.checkBoundary(off, 2)
-	return ToInt16(s.Bytes[off : off+2])
+	if !s.checkBoundary(off, 2) {
+		return 0, errors.New("accessing index is out of BytesSlice's bounds!")
+	}
+	return ToInt16(s.Bytes[off : off+2]), nil
 }
 
-func (s Slice) GetInt32(offset int) int32 {
+func (s Slice) GetInt32(offset int) (int32, error) {
 	off := s.Offset + offset
-	s.checkBoundary(off, 4)
-	return ToInt32(s.Bytes[off : off+4])
+	if !s.checkBoundary(off, 4) {
+		return 0, errors.New("accessing index is out of BytesSlice's bounds!")
+	}
+	return ToInt32(s.Bytes[off : off+4]), nil
 }
 
-func (s Slice) GetInt64(offset int) int64 {
+func (s Slice) GetInt64(offset int) (int64, error) {
 	off := s.Offset + offset
-	s.checkBoundary(off, 8)
-	return ToInt64(s.Bytes[off : off+8])
+	if !s.checkBoundary(off, 8) {
+		return 0, errors.New("accessing index is out of BytesSlice's bounds!")
+	}
+	return ToInt64(s.Bytes[off : off+8]), nil
 }
 
 func (s Slice) GetString() string {
 	return ToString(s.Bytes[s.Offset : s.Offset+s.Size])
 }
 
-func (s Slice) GetBytesCopy(offset, size int) []byte {
+func (s Slice) GetBytesCopy(offset, size int) ([]byte, error) {
 	newOffset := s.Offset + offset
-	s.checkBoundary(newOffset, size)
-
+	if !s.checkBoundary(newOffset, size) {
+		return nil, errors.New("accessing index is out of BytesSlice's bounds!")
+	}
 	if size == 0 {
-		return []byte{}
+		return []byte{}, nil
 	}
 	dst := make([]byte, size)
 	copy(dst, s.Bytes[newOffset:newOffset+size])
-	return dst
+	return dst, nil
 }
 
-func (s Slice) GetSlice(offset, size int) Slice {
+func (s Slice) GetSlice(offset, size int) (*Slice, error) {
 	newOffset := s.Offset + offset
-	s.checkBoundary(newOffset, size)
+	if !s.checkBoundary(newOffset, size) {
+		return nil, errors.New("accessing index is out of BytesSlice's bounds!")
+	}
 	return NewSliceWithOffsetAndSize(s.Bytes, newOffset, size)
 }
 
 func (s Slice) ToBytes() []byte {
-	return s.GetBytesCopy(0, s.Size)
+	bs, _ := s.GetBytesCopy(0, s.Size)
+	return bs
 }
 
-func (s Slice) checkBoundary(offset, len int) {
+func (s Slice) checkBoundary(offset, len int) bool {
 	if offset < s.Offset || offset+len > s.Offset+s.Size {
-		panic("The accessing index is out of BytesSlice's bounds!")
+		return false
 	}
+
+	return true
 }

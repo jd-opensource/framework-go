@@ -15,7 +15,7 @@ import (
 var _ TransactionBuilder = (*TxBuilder)(nil)
 
 type TxBuilder struct {
-	ledgerHash    framework.HashDigest
+	ledgerHash    *framework.HashDigest
 	hashAlgorithm framework.CryptoAlgorithm
 	opFactory     BlockchainOperationFactory
 }
@@ -52,7 +52,7 @@ func (t *TxBuilder) States() *ParticipantStateUpdateOperationBuilder {
 	return t.opFactory.States()
 }
 
-func NewTxBuilder(ledgerHash framework.HashDigest, hashAlgorithm framework.CryptoAlgorithm) *TxBuilder {
+func NewTxBuilder(ledgerHash *framework.HashDigest, hashAlgorithm framework.CryptoAlgorithm) *TxBuilder {
 	return &TxBuilder{
 		ledgerHash:    ledgerHash,
 		hashAlgorithm: hashAlgorithm,
@@ -68,7 +68,7 @@ func (t *TxBuilder) Security() *SecurityOperationBuilder {
 	return t.opFactory.Security()
 }
 
-func (t *TxBuilder) GetLedgerHash() framework.HashDigest {
+func (t *TxBuilder) GetLedgerHash() *framework.HashDigest {
 	return t.ledgerHash
 }
 
@@ -84,35 +84,40 @@ func (t *TxBuilder) DataAccount(accountAddress []byte) *DataAccountOperationBuil
 	return t.opFactory.DataAccount(accountAddress)
 }
 
-func (t *TxBuilder) PrepareRequestNow() TransactionRequestBuilder {
+func (t *TxBuilder) PrepareRequestNow() (TransactionRequestBuilder, error) {
 	return t.PrepareRequest(time.Now().UnixNano() / 1e6)
 }
 
-func (t *TxBuilder) PrepareRequest(time int64) TransactionRequestBuilder {
+func (t *TxBuilder) PrepareRequest(time int64) (TransactionRequestBuilder, error) {
 	txContent := t.PrepareContent(time)
-	transactionHash := ComputeTxContentHash(t.hashAlgorithm, txContent)
-
-	return NewTxRequestBuilder(transactionHash, txContent)
+	transactionHash, err := ComputeTxContentHash(t.hashAlgorithm, txContent)
+	if err != nil {
+		return nil, err
+	}
+	return NewTxRequestBuilder(transactionHash, txContent), nil
 }
 
-func (t *TxBuilder) PrepareContentNow() TransactionContent {
+func (t *TxBuilder) PrepareContentNow() *TransactionContent {
 	return t.PrepareContent(time.Now().UnixNano() / 1e6)
 }
 
-func (t *TxBuilder) PrepareContent(time int64) TransactionContent {
+func (t *TxBuilder) PrepareContent(time int64) *TransactionContent {
 	return NewTransactionContent(t.ledgerHash, t.opFactory.operationList, time)
 }
 
-func ComputeTxContentHash(algorithm framework.CryptoAlgorithm, txContent TransactionContent) framework.HashDigest {
+func ComputeTxContentHash(algorithm framework.CryptoAlgorithm, txContent *TransactionContent) (*framework.HashDigest, error) {
 	contentBodyBytes, err := binary_proto.NewCodec().Encode(txContent)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	contentHash := crypto.GetHashFunction(algorithm).Hash(contentBodyBytes)
-	return contentHash
+	return contentHash, nil
 }
 
-func VerifyTxContentHash(algorithm framework.CryptoAlgorithm, txContent TransactionContent, verifiedHash framework.HashDigest) bool {
-	hash := ComputeTxContentHash(algorithm, txContent)
+func VerifyTxContentHash(algorithm framework.CryptoAlgorithm, txContent *TransactionContent, verifiedHash *framework.HashDigest) bool {
+	hash, err := ComputeTxContentHash(algorithm, txContent)
+	if err != nil {
+		return false
+	}
 	return hash.Equals(verifiedHash)
 }

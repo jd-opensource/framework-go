@@ -41,11 +41,11 @@ type SystemEventListener interface {
 }
 
 type SystemEventContext struct {
-	LedgerHash   framework.HashDigest
+	LedgerHash   *framework.HashDigest
 	EventHandler *SystemEventListenerHandle
 }
 
-func NewSystemEventContext(ledgerHash framework.HashDigest, eventHandler *SystemEventListenerHandle) SystemEventContext {
+func NewSystemEventContext(ledgerHash *framework.HashDigest, eventHandler *SystemEventListenerHandle) SystemEventContext {
 	return SystemEventContext{
 		LedgerHash:   ledgerHash,
 		EventHandler: eventHandler,
@@ -55,7 +55,7 @@ func NewSystemEventContext(ledgerHash framework.HashDigest, eventHandler *System
 // 事件监听处理器
 type SystemEventListenerHandle struct {
 	queryService ledger_model.BlockchainQueryService // 区块链查询器
-	ledgerHash   framework.HashDigest                // 账本hash
+	ledgerHash   *framework.HashDigest               // 账本hash
 
 	eventPoint SystemEventPoint    // 监听事件
 	listener   SystemEventListener // 事件监听器
@@ -65,7 +65,7 @@ type SystemEventListenerHandle struct {
 	stop bool
 }
 
-func NewSystemEventListenerHandle(queryService ledger_model.BlockchainQueryService, ledgerHash framework.HashDigest, eventPoint SystemEventPoint, listener SystemEventListener) SystemEventListenerHandle {
+func NewSystemEventListenerHandle(queryService ledger_model.BlockchainQueryService, ledgerHash *framework.HashDigest, eventPoint SystemEventPoint, listener SystemEventListener) SystemEventListenerHandle {
 	handler := SystemEventListenerHandle{
 		queryService: queryService,
 		ledgerHash:   ledgerHash,

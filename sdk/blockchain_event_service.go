@@ -17,7 +17,7 @@ type BlockchainEventService interface {
 	 * @param listener
 	 * @return
 	 */
-	MonitorSystemEvent(ledgerHash framework.HashDigest, eventPoint SystemEventPoint, listener SystemEventListener) SystemEventListenerHandle
+	MonitorSystemEvent(ledgerHash *framework.HashDigest, eventPoint SystemEventPoint, listener SystemEventListener) SystemEventListenerHandle
 
 	/**
 	 * 监听用户事件；
@@ -29,7 +29,7 @@ type BlockchainEventService interface {
 	 * @param listener
 	 * @return
 	 */
-	MonitorUserEvent(ledgerHash framework.HashDigest, eventAccount, eventName string, startSequence int64, listener UserEventListener) UserEventListenerHandle
+	MonitorUserEvent(ledgerHash *framework.HashDigest, eventAccount, eventName string, startSequence int64, listener UserEventListener) UserEventListenerHandle
 
 	/**
 	* 监听用户事件列表
@@ -39,5 +39,5 @@ type BlockchainEventService interface {
 	* @param listener
 	* @return
 	 */
-	MonitorUserEvents(ledgerHash framework.HashDigest, startingEventPoints []UserEventPoint, listener UserEventListener) UserEventListenerHandle
+	MonitorUserEvents(ledgerHash *framework.HashDigest, startingEventPoints []UserEventPoint, listener UserEventListener) UserEventListenerHandle
 }

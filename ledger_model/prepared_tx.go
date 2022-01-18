@@ -23,25 +23,28 @@ func NewPreparedTx(txReqBuilder TransactionRequestBuilder, txService Transaction
 	}
 }
 
-func (p *PreparedTx) GetHash() framework.HashDigest {
+func (p *PreparedTx) GetHash() *framework.HashDigest {
 	return p.txReqBuilder.GetTransactionHash()
 }
 
-func (p *PreparedTx) GetTransactionContent() TransactionContent {
+func (p *PreparedTx) GetTransactionContent() *TransactionContent {
 	return p.txReqBuilder.GetTransactionContent()
 }
 
-func (p *PreparedTx) Sign(keyPair framework.AsymmetricKeypair) DigitalSignature {
-	signature := Sign(p.txReqBuilder.GetTransactionHash(), keyPair)
+func (p *PreparedTx) Sign(keyPair *framework.AsymmetricKeypair) (*DigitalSignature, error) {
+	signature, err := Sign(p.txReqBuilder.GetTransactionHash(), keyPair)
+	if err != nil {
+		return nil, err
+	}
 	p.AddSignature(signature)
-	return signature
+	return signature, nil
 }
 
-func (p *PreparedTx) AddSignature(signature DigitalSignature) {
+func (p *PreparedTx) AddSignature(signature *DigitalSignature) {
 	p.txReqBuilder.AddEndpointSignature(signature)
 }
 
-func (p *PreparedTx) Commit() (TransactionResponse, error) {
+func (p *PreparedTx) Commit() (*TransactionResponse, error) {
 	// 生成请求；
 	txReq := p.txReqBuilder.BuildRequest()
 	// 发起交易请求；

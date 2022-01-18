@@ -40,7 +40,7 @@ var _ framework.SignatureFunction = (*RSACryptoFunction)(nil)
 type RSACryptoFunction struct {
 }
 
-func (R RSACryptoFunction) RetrievePrivKey(privateKey string) (framework.PrivKey, error) {
+func (R RSACryptoFunction) RetrievePrivKey(privateKey string) (*framework.PrivKey, error) {
 	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN RSA PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
@@ -66,10 +66,10 @@ func (R RSACryptoFunction) RetrievePrivKey(privateKey string) (framework.PrivKey
 			nil
 	}
 
-	return framework.PrivKey{}, errors.New("not rsa private key")
+	return nil, errors.New("not rsa private key")
 }
 
-func (R RSACryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (framework.PrivKey, error) {
+func (R RSACryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte) (*framework.PrivKey, error) {
 	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "-----BEGIN RSA PRIVATE KEY-----", "")
 	privateKey = strings.ReplaceAll(privateKey, "-----END PRIVATE KEY-----", "")
@@ -79,11 +79,11 @@ func (R RSACryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte
 	encoded := base64.MustDecode(privateKey)
 	block, rest := pem.Decode(encoded)
 	if len(rest) > 0 {
-		return framework.PrivKey{}, errors.New("extra data included in key")
+		return nil, errors.New("extra data included in key")
 	}
 	encoded, err := x509.DecryptPEMBlock(block, pwd)
 	if err != nil {
-		return framework.PrivKey{}, errors.New("decrypt error")
+		return nil, errors.New("decrypt error")
 	}
 	key, err := x509.ParsePKCS8PrivateKey(encoded)
 	if err != nil {
@@ -103,51 +103,57 @@ func (R RSACryptoFunction) RetrieveEncrypedPrivKey(privateKey string, pwd []byte
 			nil
 	}
 
-	return framework.PrivKey{}, errors.New("not rsa private key")
+	return nil, errors.New("not rsa private key")
 }
 
-func (R RSACryptoFunction) RetrievePubKeyFromCA(cert *ca.Certificate) framework.PubKey {
-	key := cert.ClassicCert.PublicKey.(*rsa2.PublicKey)
-	return framework.NewPubKey(R.GetAlgorithm(), bytes2.Concat(key.N.Bytes(), big.NewInt(int64(key.E)).Bytes()))
+func (R RSACryptoFunction) RetrievePubKeyFromCA(cert *ca.Certificate) (*framework.PubKey, error) {
+	key, ok := cert.ClassicCert.PublicKey.(*rsa2.PublicKey)
+	if !ok {
+		return nil, errors.New("not rsa public key")
+	}
+	return framework.NewPubKey(R.GetAlgorithm(), bytes2.Concat(key.N.Bytes(), big.NewInt(int64(key.E)).Bytes())), nil
 }
 
-func (R RSACryptoFunction) Encrypt(pubKey framework.PubKey, data []byte) framework.AsymmetricCiphertext {
+func (R RSACryptoFunction) Encrypt(pubKey *framework.PubKey, data []byte) (*framework.AsymmetricCiphertext, error) {
 	rawPubBytes := pubKey.GetRawKeyBytes()
 
 	// 验证原始公钥长度为257字节
 	if len(rawPubBytes) != RSA_PUBKEY_SIZE {
-		panic("This key has wrong format!")
+		return nil, errors.New("This key has wrong format!")
 	}
 
 	// 验证密钥数据的算法标识对应RSA算法
 	if pubKey.GetAlgorithm() != R.GetAlgorithm().Code {
-		panic("The is not RSA public key!")
+		return nil, errors.New("The is not RSA public key!")
 	}
 
-	return framework.NewAsymmetricCiphertext(R.GetAlgorithm(), rsa.Encrypt(rsa.BytesToPubKey(rawPubBytes), data))
+	return framework.NewAsymmetricCiphertext(R.GetAlgorithm(), rsa.Encrypt(rsa.BytesToPubKey(rawPubBytes), data)), nil
 }
 
-func (R RSACryptoFunction) Decrypt(privKey framework.PrivKey, ciphertext framework.AsymmetricCiphertext) []byte {
-	rawPrivBytes := privKey.GetRawKeyBytes()
+func (R RSACryptoFunction) Decrypt(privKey *framework.PrivKey, ciphertext *framework.AsymmetricCiphertext) ([]byte, error) {
+	rawPrivBytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
 	rawCiphertextBytes := ciphertext.GetRawCiphertext()
 
 	// 验证原始私钥长度为1153字节
 	if len(rawPrivBytes) != RSA_PRIVKEY_SIZE {
-		panic("This key has wrong format!")
+		return nil, errors.New("This key has wrong format!")
 	}
 
 	// 验证密钥数据的算法标识对应RSA算法
 	if privKey.GetAlgorithm() != R.GetAlgorithm().Code {
-		panic("This key is not RSA private key!")
+		return nil, errors.New("This key is not RSA private key!")
 	}
 
 	// 验证密文数据的算法标识对应RSA算法，并且密文是分组长度的整数倍
 	if ciphertext.GetAlgorithm() != R.GetAlgorithm().Code || len(rawCiphertextBytes)%RSA_CIPHERTEXTBLOCK_SIZE != 0 {
-		panic("This is not RSA ciphertext!")
+		return nil, errors.New("This is not RSA ciphertext!")
 	}
 
 	// 调用RSA解密算法得到明文结果
-	return rsa.Decrypt(rsa.BytesToPrivKey(rawPrivBytes), rawCiphertextBytes)
+	return rsa.Decrypt(rsa.BytesToPrivKey(rawPrivBytes), rawCiphertextBytes), nil
 }
 
 func (R RSACryptoFunction) SupportCiphertext(ciphertextBytes []byte) bool {
@@ -155,53 +161,59 @@ func (R RSACryptoFunction) SupportCiphertext(ciphertextBytes []byte) bool {
 	return (len(ciphertextBytes)%RSA_CIPHERTEXTBLOCK_SIZE == framework.ALGORYTHM_CODE_SIZE) && R.GetAlgorithm().Match(ciphertextBytes, 0)
 }
 
-func (R RSACryptoFunction) ParseCiphertext(ciphertextBytes []byte) framework.AsymmetricCiphertext {
+func (R RSACryptoFunction) ParseCiphertext(ciphertextBytes []byte) (*framework.AsymmetricCiphertext, error) {
 	return framework.ParseAsymmetricCiphertext(ciphertextBytes)
 }
 
-func (R RSACryptoFunction) Sign(privKey framework.PrivKey, data []byte) framework.SignatureDigest {
-	rawPrivKeyBytes := privKey.GetRawKeyBytes()
-
+func (R RSACryptoFunction) Sign(privKey *framework.PrivKey, data []byte) (*framework.SignatureDigest, error) {
+	rawPrivKeyBytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
 	// 验证原始私钥长度为1153字节
 	if len(rawPrivKeyBytes) != RSA_PRIVKEY_SIZE {
-		panic("This key has wrong format!")
+		return nil, errors.New("This key has wrong format!")
 	}
 
 	// 验证密钥数据的算法标识对应RSA签名算法
 	if privKey.GetAlgorithm() != R.GetAlgorithm().Code {
-		panic("This key is not RSA private key!")
+		return nil, errors.New("This key is not RSA private key!")
 	}
 
 	// 调用RSA签名算法计算签名结果
-	return framework.NewSignatureDigest(R.GetAlgorithm(), rsa.Sign(rsa.BytesToPrivKey(rawPrivKeyBytes), data))
+	return framework.NewSignatureDigest(R.GetAlgorithm(), rsa.Sign(rsa.BytesToPrivKey(rawPrivKeyBytes), data)), nil
 }
 
-func (R RSACryptoFunction) Verify(pubKey framework.PubKey, data []byte, digest framework.SignatureDigest) bool {
+func (R RSACryptoFunction) Verify(pubKey *framework.PubKey, data []byte, digest *framework.SignatureDigest) bool {
 	rawPubKeyBytes := pubKey.GetRawKeyBytes()
 	rawDigestBytes := digest.GetRawDigest()
 
 	// 验证原始公钥长度为257字节
 	if len(rawPubKeyBytes) != RSA_PUBKEY_SIZE {
-		panic("This key has wrong format!")
+		return false
 	}
 
 	// 验证密钥数据的算法标识对应RSA签名算法
 	if pubKey.GetAlgorithm() != R.GetAlgorithm().Code {
-		panic("This key is not RSA public key!")
+		return false
 	}
 
 	// 验证签名数据的算法标识对应RSA签名算法，并且原始签名长度为256字节
 	if digest.GetAlgorithm() != R.GetAlgorithm().Code || len(rawDigestBytes) != RSA_SIGNATUREDIGEST_SIZE {
-		panic("This is not RSA signature digest!")
+		return false
 	}
 
 	// 调用RSA验签算法验证签名结果
 	return rsa.Verify(rsa.BytesToPubKey(rawPubKeyBytes), data, rawDigestBytes)
 }
 
-func (R RSACryptoFunction) RetrievePubKey(privKey framework.PrivKey) framework.PubKey {
-	priv := rsa.BytesToPrivKey(privKey.GetRawKeyBytes())
-	return framework.NewPubKey(R.GetAlgorithm(), rsa.PubKeyToBytes(&priv.PublicKey))
+func (R RSACryptoFunction) RetrievePubKey(privKey *framework.PrivKey) (*framework.PubKey, error) {
+	bytes, err := privKey.GetRawKeyBytes()
+	if err != nil {
+		return nil, err
+	}
+	priv := rsa.BytesToPrivKey(bytes)
+	return framework.NewPubKey(R.GetAlgorithm(), rsa.PubKeyToBytes(&priv.PublicKey)), nil
 }
 
 func (R RSACryptoFunction) SupportPrivKey(privKeyBytes []byte) bool {
@@ -209,7 +221,7 @@ func (R RSACryptoFunction) SupportPrivKey(privKeyBytes []byte) bool {
 	return len(privKeyBytes) == RSA_PRIVKEY_LENGTH && R.GetAlgorithm().Match(privKeyBytes, 0) && privKeyBytes[framework.ALGORYTHM_CODE_SIZE] == framework.PRIVATE.Code
 }
 
-func (R RSACryptoFunction) ParsePrivKey(privKeyBytes []byte) framework.PrivKey {
+func (R RSACryptoFunction) ParsePrivKey(privKeyBytes []byte) (*framework.PrivKey, error) {
 	return framework.ParsePrivKey(privKeyBytes)
 }
 
@@ -218,7 +230,7 @@ func (R RSACryptoFunction) SupportPubKey(pubKeyBytes []byte) bool {
 	return len(pubKeyBytes) == RSA_PUBKEY_LENGTH && R.GetAlgorithm().Match(pubKeyBytes, 0) && pubKeyBytes[framework.ALGORYTHM_CODE_SIZE] == framework.PUBLIC.Code
 }
 
-func (R RSACryptoFunction) ParsePubKey(pubKeyBytes []byte) framework.PubKey {
+func (R RSACryptoFunction) ParsePubKey(pubKeyBytes []byte) (*framework.PubKey, error) {
 	return framework.ParsePubKey(pubKeyBytes)
 }
 
@@ -227,17 +239,17 @@ func (R RSACryptoFunction) SupportDigest(digestBytes []byte) bool {
 	return len(digestBytes) == RSA_SIGNATUREDIGEST_LENGTH && RSA_ALGORITHM.Match(digestBytes, 0)
 }
 
-func (R RSACryptoFunction) ParseDigest(digestBytes []byte) framework.SignatureDigest {
+func (R RSACryptoFunction) ParseDigest(digestBytes []byte) (*framework.SignatureDigest, error) {
 	return framework.ParseSignatureDigest(digestBytes)
 }
 
-func (R RSACryptoFunction) GenerateKeypair() framework.AsymmetricKeypair {
+func (R RSACryptoFunction) GenerateKeypair() (*framework.AsymmetricKeypair, error) {
 	priv := rsa.GenerateKeyPair()
 	return framework.NewAsymmetricKeypair(framework.NewPubKey(R.GetAlgorithm(), rsa.PubKeyToBytes(&priv.PublicKey)), framework.NewPrivKey(R.GetAlgorithm(), rsa.PrivKeyToBytes(priv)))
 }
 
-func (R RSACryptoFunction) GenerateKeypairWithSeed(seed []byte) (keypair framework.AsymmetricKeypair, err error) {
-	panic("not support yet")
+func (R RSACryptoFunction) GenerateKeypairWithSeed(seed []byte) (keypair *framework.AsymmetricKeypair, err error) {
+	return nil, errors.New("not support yet")
 }
 
 func (R RSACryptoFunction) GetAlgorithm() framework.CryptoAlgorithm {

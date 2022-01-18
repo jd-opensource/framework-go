@@ -18,7 +18,7 @@ func NewParticipantRegisterOperationBuilder(factory *BlockchainOperationFactory)
 	return &ParticipantRegisterOperationBuilder{factory: factory}
 }
 
-func (prob *ParticipantRegisterOperationBuilder) Register(participantName string, participantPubKey BlockchainIdentity) ParticipantRegisterOperation {
+func (prob *ParticipantRegisterOperationBuilder) Register(participantName string, participantPubKey *BlockchainIdentity) ParticipantRegisterOperation {
 	operation := ParticipantRegisterOperation{
 		ParticipantName: participantName,
 		ParticipantID:   participantPubKey,
@@ -30,15 +30,19 @@ func (prob *ParticipantRegisterOperationBuilder) Register(participantName string
 	return operation
 }
 
-func (prob *ParticipantRegisterOperationBuilder) RegisterWithCA(participantName string, certificate *ca.Certificate) ParticipantRegisterOperation {
-	operation := ParticipantRegisterOperation{
+func (prob *ParticipantRegisterOperationBuilder) RegisterWithCA(participantName string, certificate *ca.Certificate) (*ParticipantRegisterOperation, error) {
+	key, err := ca2.RetrievePubKey(certificate)
+	if err != nil {
+		return nil, err
+	}
+	operation := &ParticipantRegisterOperation{
 		ParticipantName: participantName,
-		ParticipantID: NewBlockchainIdentity(ca2.RetrievePubKey(certificate)),
-		Certificate: certificate.ToPEMString(),
+		ParticipantID:   NewBlockchainIdentity(key),
+		Certificate:     certificate.ToPEMString(),
 	}
 	if prob.factory != nil {
 		prob.factory.addOperation(operation)
 	}
 
-	return operation
+	return operation, nil
 }

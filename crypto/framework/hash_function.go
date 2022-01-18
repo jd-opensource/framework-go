@@ -14,7 +14,7 @@ type HashFunction interface {
 	 * @param data
 	 * @return
 	 */
-	Hash(data []byte) HashDigest
+	Hash(data []byte) *HashDigest
 
 	/**
 	 * 校验 hash 摘要与指定的数据是否匹配；
@@ -23,7 +23,7 @@ type HashFunction interface {
 	 * @param data
 	 * @return
 	 */
-	Verify(digest HashDigest, data []byte) bool
+	Verify(digest *HashDigest, data []byte) bool
 
 	/**
 	 * 校验字节数组形式的hash摘要的格式是否满足要求；
@@ -39,5 +39,5 @@ type HashFunction interface {
 	 * @param digestBytes 包含算法标识和hash摘要的字节数组
 	 * @return HashDigest形式的hash摘要
 	 */
-	ParseHashDigest(digestBytes []byte) HashDigest
+	ParseHashDigest(digestBytes []byte) (*HashDigest, error)
 }

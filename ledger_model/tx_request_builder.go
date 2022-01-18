@@ -12,48 +12,54 @@ import (
 var _ TransactionRequestBuilder = (*TxRequestBuilder)(nil)
 
 type TxRequestBuilder struct {
-	transactionHash    framework.HashDigest
-	txContent          TransactionContent
-	endpointSignatures []DigitalSignature
-	nodeSignatures     []DigitalSignature
+	transactionHash    *framework.HashDigest
+	txContent          *TransactionContent
+	endpointSignatures []*DigitalSignature
+	nodeSignatures     []*DigitalSignature
 }
 
-func NewTxRequestBuilder(transactionHash framework.HashDigest, txContent TransactionContent) *TxRequestBuilder {
+func NewTxRequestBuilder(transactionHash *framework.HashDigest, txContent *TransactionContent) *TxRequestBuilder {
 	return &TxRequestBuilder{
 		transactionHash: transactionHash,
 		txContent:       txContent,
 	}
 }
 
-func (t *TxRequestBuilder) GetTransactionHash() framework.HashDigest {
+func (t *TxRequestBuilder) GetTransactionHash() *framework.HashDigest {
 	return t.transactionHash
 }
 
-func (t *TxRequestBuilder) GetTransactionContent() TransactionContent {
+func (t *TxRequestBuilder) GetTransactionContent() *TransactionContent {
 	return t.txContent
 }
 
-func (t *TxRequestBuilder) SignAsEndpoint(keyPair framework.AsymmetricKeypair) DigitalSignature {
-	signature := Sign(t.transactionHash, keyPair)
+func (t *TxRequestBuilder) SignAsEndpoint(keyPair *framework.AsymmetricKeypair) (*DigitalSignature, error) {
+	signature, err := Sign(t.transactionHash, keyPair)
+	if err != nil {
+		return nil, err
+	}
 	t.AddEndpointSignature(signature)
-	return signature
+	return signature, nil
 }
 
-func (t *TxRequestBuilder) SignAsNode(keyPair framework.AsymmetricKeypair) DigitalSignature {
-	signature := Sign(t.transactionHash, keyPair)
+func (t *TxRequestBuilder) SignAsNode(keyPair *framework.AsymmetricKeypair) (*DigitalSignature, error) {
+	signature, err := Sign(t.transactionHash, keyPair)
+	if err != nil {
+		return nil, err
+	}
 	t.AddNodeSignature(signature)
-	return signature
+	return signature, nil
 }
 
-func (t *TxRequestBuilder) AddEndpointSignature(signature DigitalSignature) {
+func (t *TxRequestBuilder) AddEndpointSignature(signature *DigitalSignature) {
 	t.endpointSignatures = append(t.endpointSignatures, signature)
 }
 
-func (t *TxRequestBuilder) AddNodeSignature(signature DigitalSignature) {
+func (t *TxRequestBuilder) AddNodeSignature(signature *DigitalSignature) {
 	t.nodeSignatures = append(t.nodeSignatures, signature)
 }
 
-func (t *TxRequestBuilder) BuildRequest() TransactionRequest {
+func (t *TxRequestBuilder) BuildRequest() *TransactionRequest {
 	txMessage := NewTransactionRequest(t.transactionHash.ToBytes(), t.txContent)
 	txMessage.EndpointSignatures = append(txMessage.EndpointSignatures, t.endpointSignatures...)
 	txMessage.NodeSignatures = append(txMessage.NodeSignatures, t.nodeSignatures...)

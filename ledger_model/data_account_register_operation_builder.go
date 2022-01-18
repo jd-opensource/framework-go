@@ -13,7 +13,7 @@ func NewDataAccountRegisterOperationBuilder(factory *BlockchainOperationFactory)
 	return &DataAccountRegisterOperationBuilder{factory: factory}
 }
 
-func (drob *DataAccountRegisterOperationBuilder) Register(id BlockchainIdentity) DataAccountRegisterOperation {
+func (drob *DataAccountRegisterOperationBuilder) Register(id *BlockchainIdentity) DataAccountRegisterOperation {
 	operation := DataAccountRegisterOperation{
 		AccountID: id,
 	}
