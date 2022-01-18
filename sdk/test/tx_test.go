@@ -759,6 +759,7 @@ func TestActiveParticipant(t *testing.T) {
 	params["ledgerHash"] = "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA" // 账本哈希
 	params["consensusHost"] = "127.0.0.1"                                   // 待激活节点共识地址
 	params["consensusPort"] = "10088"                                       // 待激活节点共识端口
+	params["consensusStorage"] = ""                                         // Set the participant consensus storage. (raft consensus needed)
 	params["consensusSecure"] = "false"                                     // 待激活节点共识服务是否启动安全连接
 	params["remoteManageHost"] = "127.0.0.1"                                // 数据同步节点地址
 	params["remoteManagePort"] = "7080"                                     // 数据同步节点端口
