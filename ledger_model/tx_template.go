@@ -19,14 +19,14 @@ type TxTemplate struct {
 	stateManager *TxStateManager
 }
 
-func (t *TxTemplate) SwitchHashAlgo() *CryptoHashAlgoUpdateOperationBuilder {
+func (t *TxTemplate) Settings() *SettingsOperationBuilder {
 	t.stateManager.operate()
-	return t.txBuilder.SwitchHashAlgo()
+	return t.txBuilder.Settings()
 }
 
-func (t *TxTemplate) SwitchSettings() *ConsensusTypeUpdateOperationBuilder {
+func (t *TxTemplate) Consensus() *ConsensusSettingsUpdateOperationBuilder {
 	t.stateManager.operate()
-	return t.txBuilder.SwitchSettings()
+	return t.txBuilder.Consensus()
 }
 
 func (t *TxTemplate) MetaInfo() *MetaInfoUpdateOperationBuilder {
@@ -102,12 +102,15 @@ func (t *TxTemplate) DataAccount(accountAddress []byte) *DataAccountOperationBui
 	return t.txBuilder.DataAccount(accountAddress)
 }
 
-func (t *TxTemplate) GetLedgerHash() framework.HashDigest {
+func (t *TxTemplate) GetLedgerHash() *framework.HashDigest {
 	return t.txBuilder.GetLedgerHash()
 }
 
 func (t *TxTemplate) Prepare() PreparedTransaction {
 	t.stateManager.prepare()
-	txReqBuilder := t.txBuilder.PrepareRequestNow()
+	txReqBuilder, err := t.txBuilder.PrepareRequestNow()
+	if err != nil {
+		panic(err)
+	}
 	return NewStatefulPreparedTx(NewPreparedTx(txReqBuilder, t.txService), t.stateManager)
 }

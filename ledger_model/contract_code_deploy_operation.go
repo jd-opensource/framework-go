@@ -23,6 +23,8 @@ type ContractCodeDeployOperation struct {
 	AddressSignature *DigitalSignature `refContract:"2864"`
 
 	ChainCodeVersion int64 `primitiveType:"INT64"`
+
+	Lang ContractLang `refEnum:"2561"`
 }
 
 func (c ContractCodeDeployOperation) ContractCode() int32 {

@@ -2,11 +2,12 @@ package test
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/blockchain-jd-com/framework-go/crypto/classic"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
@@ -344,7 +345,7 @@ func TestContractDeploy(t *testing.T) {
 	require.Nil(t, err)
 	contract, err := ioutil.ReadAll(file)
 	require.Nil(t, err)
-	txTemp.Contracts().Deploy(user.GetIdentity(), contract, -1)
+	txTemp.Contracts().Deploy(user.GetIdentity(), contract)
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
@@ -786,7 +787,7 @@ func TestInactiveParticipant(t *testing.T) {
 }
 
 // 共识切换
-func TestConsensusTypeUpdate(t *testing.T) {
+func TestConsensusSwitch(t *testing.T) {
 	// 连接网关，获取节点服务
 	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
 	service := serviceFactory.GetBlockchainService()
@@ -799,7 +800,7 @@ func TestConsensusTypeUpdate(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 更新共识算法
-	txTemp.SwitchSettings().UpdateWithConfigFile("com.jd.blockchain.consensus.raft.RaftConsensusProvider", "raft.config")
+	txTemp.Consensus().Update("com.jd.blockchain.consensus.raft.RaftConsensusProvider", "/home/imuge/jd/nodes/peer0/config/init/raft.config")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
@@ -827,7 +828,7 @@ func TestHashAlgoUpdate(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 更新哈希算法
-	txTemp.SwitchHashAlgo().Update("SHA256")
+	txTemp.Settings().HashAlgorithm("SHA256")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()

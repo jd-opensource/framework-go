@@ -9,6 +9,6 @@ import "github.com/blockchain-jd-com/framework-go/crypto/framework"
 
 type TransactionTemplate interface {
 	ClientOperator
-	GetLedgerHash() framework.HashDigest
+	GetLedgerHash() *framework.HashDigest
 	Prepare() PreparedTransaction
 }

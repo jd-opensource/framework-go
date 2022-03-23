@@ -18,11 +18,12 @@ type LedgerMetadata_V2 struct {
 	// 角色权限集合的根哈希
 	RolePrivilegesHash []byte `primitiveType:"BYTES"`
 	// 用户角色授权集合的根哈希
-	UserRolesHash          []byte        `primitiveType:"BYTES"`
-	LedgerStructureVersion int64         `primitiveType:"INT64"`
-	IdentityMode           IdentityMode  `refEnum:"1604"`
-	LedgerCertificates     []string      `primitiveType:"TEXT" list:"true"`
-	GenesisUsers           []GenesisUser `refContract:"1605" list:"true"`
+	UserRolesHash          []byte                `primitiveType:"BYTES"`
+	LedgerStructureVersion int64                 `primitiveType:"INT64"`
+	IdentityMode           IdentityMode          `refEnum:"1604"`
+	LedgerCertificates     []string              `primitiveType:"TEXT" list:"true"`
+	GenesisUsers           []GenesisUser         `refContract:"1605" list:"true"`
+	ContractRuntimeConfig  ContractRuntimeConfig `refEnum:"2562"`
 }
 
 func (l LedgerMetadata_V2) ContractCode() int32 {

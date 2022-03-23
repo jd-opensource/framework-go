@@ -5,7 +5,8 @@ import binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 var _ binary_proto.DataContract = (*ConsensusSettingsUpdateOperation)(nil)
 
 type ConsensusSettingsUpdateOperation struct {
-	Properties []Property
+	Properties [][]byte `primitiveType:"BYTES" list:"true"`
+	Provider   string   `primitiveType:"TEXT"`
 }
 
 func (c ConsensusSettingsUpdateOperation) ContractCode() int32 {

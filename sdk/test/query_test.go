@@ -47,7 +47,7 @@ func TestQuery(t *testing.T) {
 		// 返回当前账本的元数据
 		metadata, err := blockchainService.GetLedgerMetadata(ledger)
 		require.Nil(t, err)
-		require.Equal(t, metadata, adminInfo.Metadata.LedgerMetadata)
+		require.Equal(t, *metadata, adminInfo.Metadata.LedgerMetadata)
 
 		// 遍历所有区块
 		for height := int64(0); height <= ledgerInfo.LatestBlockHeight; height++ {
@@ -55,7 +55,8 @@ func TestQuery(t *testing.T) {
 			// 返回指定账本序号的区块
 			block, err := blockchainService.GetBlockByHeight(ledger, height)
 			require.Nil(t, err)
-			blockHash := framework.ParseHashDigest(block.Hash)
+			blockHash, err := framework.ParseHashDigest(block.Hash)
+			require.Nil(t, err)
 
 			// 返回指定区块hash的区块
 			ledgerBlock, err := blockchainService.GetBlockByHash(ledger, blockHash)
@@ -119,7 +120,8 @@ func TestQuery(t *testing.T) {
 			// 遍历所有交易
 			for _, tx := range txsByHeight {
 
-				txHash := framework.ParseHashDigest(tx.Request.TransactionHash)
+				txHash, err := framework.ParseHashDigest(tx.Request.TransactionHash)
+				require.Nil(t, err)
 
 				// 根据交易内容的哈希获取对应的交易记录
 				txByHash, err := blockchainService.GetTransactionByContentHash(ledger, txHash)

@@ -19,10 +19,11 @@ type ContractInfo struct {
 	ChainCode  []byte         `primitiveType:"BYTES"`
 	State      AccountState   `refEnum:"788"`
 	Permission DataPermission `json:"permission"`
+	Lang       ContractLang   `refEnum:"2561"`
 }
 
 func (c ContractInfo) ContractCode() int32 {
-	return binary_proto.CONTRACT_INFO
+	return binary_proto.CONTRACT_ACCOUNT_HEADER
 }
 
 func (c ContractInfo) ContractName() string {

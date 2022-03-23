@@ -41,6 +41,12 @@ const (
 	ACCOUNT_REGISTER_CONFLICT = TransactionState(0x12)
 	// 角色不存在
 	ROLE_DOES_NOT_EXIST = TransactionState(0x13)
+	// 不支持的HASH算法
+	UNSUPPORTED_HASH_ALGORITHM = TransactionState(0x14)
+	// 合约方法不存在
+	CONTRACT_METHOD_NOT_FOUND = TransactionState(0x15)
+	//合约参数错误
+	CONTRACT_PARAMETER_ERROR = TransactionState(0x16)
 	// 由于在错误的账本上执行交易而被忽略
 	IGNORED_BY_WRONG_LEDGER = TransactionState(0x40)
 	// 由于交易内容的验签失败而忽略
@@ -133,6 +139,12 @@ func (t TransactionState) GetValue(CODE int32) binary_proto.EnumContract {
 		return ACCOUNT_REGISTER_CONFLICT
 	case int32(0x13):
 		return ROLE_DOES_NOT_EXIST
+	case int32(0x14):
+		return UNSUPPORTED_HASH_ALGORITHM
+	case int32(0x15):
+		return CONTRACT_METHOD_NOT_FOUND
+	case int32(0x16):
+		return CONTRACT_PARAMETER_ERROR
 	case int32(0x40):
 		return IGNORED_BY_WRONG_LEDGER
 	case int32(0x41):
@@ -202,6 +214,12 @@ func (t TransactionState) GetValueByName(name string) binary_proto.EnumContract 
 		return ACCOUNT_REGISTER_CONFLICT
 	case "ROLE_DOES_NOT_EXIST":
 		return ROLE_DOES_NOT_EXIST
+	case "UNSUPPORTED_HASH_ALGORITHM":
+		return UNSUPPORTED_HASH_ALGORITHM
+	case "CONTRACT_METHOD_NOT_FOUND":
+		return CONTRACT_METHOD_NOT_FOUND
+	case "CONTRACT_PARAMETER_ERROR":
+		return CONTRACT_PARAMETER_ERROR
 	case "IGNORED_BY_WRONG_LEDGER":
 		return IGNORED_BY_WRONG_LEDGER
 	case "IGNORED_BY_ILLEGAL_CONTENT_SIGNATURE":

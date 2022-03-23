@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"errors"
+
 	"github.com/blockchain-jd-com/framework-go/crypto"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/ledger_model"
@@ -160,7 +161,7 @@ func (b *GatewayBlockchainService) GetTransactionByContentHash(ledgerHash, conte
 	return b.QueryService.GetTransactionByContentHash(ledgerHash, contentHash)
 }
 
-func (b *GatewayBlockchainService) GetTransactionStateByContentHash(ledgerHash, contentHash *framework.HashDigest) (*ledger_model.TransactionState, error) {
+func (b *GatewayBlockchainService) GetTransactionStateByContentHash(ledgerHash, contentHash *framework.HashDigest) (ledger_model.TransactionState, error) {
 	return b.QueryService.GetTransactionStateByContentHash(ledgerHash, contentHash)
 }
 
@@ -248,15 +249,15 @@ func (b *GatewayBlockchainService) GetUserEventsTotalCount(digest *framework.Has
 	return b.QueryService.GetUserEventsTotalCount(digest, address, eventName)
 }
 
-func (b *GatewayBlockchainService) GetLatestSystemEvent(ledgerHash *framework.HashDigest, eventName string) (ledger_model.Event, error) {
+func (b *GatewayBlockchainService) GetLatestSystemEvent(ledgerHash *framework.HashDigest, eventName string) (*ledger_model.Event, error) {
 	return b.QueryService.GetLatestSystemEvent(ledgerHash, eventName)
 }
 
-func (b *GatewayBlockchainService) GetLatestUserEvent(ledgerHash *framework.HashDigest, address string, eventName string) (ledger_model.Event, error) {
+func (b *GatewayBlockchainService) GetLatestUserEvent(ledgerHash *framework.HashDigest, address string, eventName string) (*ledger_model.Event, error) {
 	return b.QueryService.GetLatestUserEvent(ledgerHash, address, eventName)
 }
 
-func (b *GatewayBlockchainService) GetLatestBlock(ledgerHash *framework.HashDigest) (ledger_model.LedgerBlock, error) {
+func (b *GatewayBlockchainService) GetLatestBlock(ledgerHash *framework.HashDigest) (*ledger_model.LedgerBlock, error) {
 	return b.QueryService.GetLatestBlock(ledgerHash)
 }
 

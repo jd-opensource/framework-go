@@ -1,10 +1,11 @@
 package ledger_model
 
 import (
+	"time"
+
 	binary_proto "github.com/blockchain-jd-com/framework-go/binary-proto"
 	"github.com/blockchain-jd-com/framework-go/crypto"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
-	"time"
 )
 
 /*
@@ -20,12 +21,12 @@ type TxBuilder struct {
 	opFactory     BlockchainOperationFactory
 }
 
-func (t *TxBuilder) SwitchHashAlgo() *CryptoHashAlgoUpdateOperationBuilder {
-	return t.opFactory.SwitchHashAlgo()
+func (t *TxBuilder) Settings() *SettingsOperationBuilder {
+	return t.opFactory.Settings()
 }
 
-func (t *TxBuilder) SwitchSettings() *ConsensusTypeUpdateOperationBuilder {
-	return t.opFactory.SwitchSettings()
+func (t *TxBuilder) Consensus() *ConsensusSettingsUpdateOperationBuilder {
+	return t.opFactory.Consensus()
 }
 
 func (t *TxBuilder) MetaInfo() *MetaInfoUpdateOperationBuilder {
