@@ -19,6 +19,16 @@ type TxTemplate struct {
 	stateManager *TxStateManager
 }
 
+func (t *TxTemplate) SwitchHashAlgo() *CryptoHashAlgoUpdateOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.SwitchHashAlgo()
+}
+
+func (t *TxTemplate) SwitchSettings() *ConsensusTypeUpdateOperationBuilder {
+	t.stateManager.operate()
+	return t.txBuilder.SwitchSettings()
+}
+
 func (t *TxTemplate) MetaInfo() *MetaInfoUpdateOperationBuilder {
 	t.stateManager.operate()
 	return t.txBuilder.MetaInfo()

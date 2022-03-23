@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
@@ -753,39 +752,91 @@ func TestRegisterParticipantWithCA(t *testing.T) {
 
 // 激活参与方
 func TestActiveParticipant(t *testing.T) {
-	host := "127.0.0.1"
-	port := "7084"
-	params := map[string]string{}
-	params["ledgerHash"] = "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA" // 账本哈希
-	params["consensusHost"] = "127.0.0.1"                                   // 待激活节点共识地址
-	params["consensusPort"] = "10088"                                       // 待激活节点共识端口
-	params["consensusSecure"] = "false"                                     // 待激活节点共识服务是否启动安全连接
-	params["remoteManageHost"] = "127.0.0.1"                                // 数据同步节点地址
-	params["remoteManagePort"] = "7080"                                     // 数据同步节点端口
-	params["remoteManageSecure"] = "false"                                  // 数据同步节点服务是否启动安全连接
-	params["shutdown"] = "false"                                            // 是否停止旧的节点服务
-	resp, err := resty.New().R().
-		EnableTrace().
-		SetHeader("Content-Type", "application/bin-obj").
-		SetFormData(params).
-		Post("http://" + host + ":" + port + "/management/delegate/activeparticipant")
+	security, err := sdk.NewSSLSecurity(SSL_ROOT_CERT, SSL_CLIENT_CERT, SSL_CLIENT_KEY)
 	require.Nil(t, err)
-	require.True(t, resp.IsSuccess())
+	consensusService := sdk.NewSecureRestyConsensusService("127.0.0.1", 7084, security)
+	//consensusService := sdk.NewRestyConsensusService("127.0.0.1", 7084)
+	resp, err := consensusService.ActivateParticipant(ledger_model.ActivateParticipantParams{
+		LedgerHash:         "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA", // 账本哈希
+		ConsensusHost:      "127.0.0.1",                                      // 待激活节点共识地址
+		ConsensusPort:      10088,                                            // 待激活节点共识端口
+		ConsensusStorage:   "",                                               // Set the participant consensus storage. (raft consensus needed)
+		ConsensusSecure:    true,                                             // 待激活节点共识服务是否启动安全连接
+		RemoteManageHost:   "127.0.0.1",                                      // 数据同步节点地址
+		RemoteManagePort:   7080,                                             // 数据同步节点端口
+		RemoteManageSecure: false,                                            // 数据同步节点服务是否启动安全连接
+		Shutdown:           false,                                            // 是否停止旧的节点服务
+	})
+	require.Nil(t, err)
+	require.True(t, resp)
 }
 
 // 移除参与方
 func TestInactiveParticipant(t *testing.T) {
-	host := "127.0.0.1"
-	port := "7084"
-	params := map[string]string{}
-	params["ledgerHash"] = "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA" // 账本哈希
-	params["participantAddress"] = "LdePL6sEWw8RdtiEejyXguaXreoENoeJbResZ"  // 待移除参与方地址
-
-	resp, err := resty.New().R().
-		EnableTrace().
-		SetHeader("Content-Type", "application/bin-obj").
-		SetFormData(params).
-		Post("http://" + host + ":" + port + "/management/delegate/deactiveparticipant")
+	security, err := sdk.NewSSLSecurity(SSL_ROOT_CERT, SSL_CLIENT_CERT, SSL_CLIENT_KEY)
 	require.Nil(t, err)
-	require.True(t, resp.IsSuccess())
+	consensusService := sdk.NewSecureRestyConsensusService("127.0.0.1", 7084, security)
+	//consensusService := sdk.NewRestyConsensusService("127.0.0.1", 7084)
+	resp, err := consensusService.InactivateParticipant(ledger_model.InactivateParticipantParams{
+		LedgerHash:         "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA", // 账本哈希
+		ParticipantAddress: "LdePL6sEWw8RdtiEejyXguaXreoENoeJbResZ",          // 待移除参与方地址
+	})
+	require.Nil(t, err)
+	require.True(t, resp)
+}
+
+// 共识切换
+func TestConsensusTypeUpdate(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 更新共识算法
+	txTemp.SwitchSettings().UpdateWithConfigFile("com.jd.blockchain.consensus.raft.RaftConsensusProvider", "raft.config")
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
+}
+
+// 哈希算法变更
+func TestHashAlgoUpdate(t *testing.T) {
+	// 连接网关，获取节点服务
+	serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
+	service := serviceFactory.GetBlockchainService()
+
+	// 获取账本信息
+	ledgerHashs, err := service.GetLedgerHashs()
+	require.Nil(t, err)
+
+	// 创建交易
+	txTemp := service.NewTransaction(ledgerHashs[0])
+
+	// 更新哈希算法
+	txTemp.SwitchHashAlgo().Update("SHA256")
+
+	// TX 准备就绪；
+	prepTx := txTemp.Prepare()
+
+	// 使用私钥进行签名；
+	prepTx.Sign(NODE_KEY.AsymmetricKeypair)
+
+	// 提交交易；
+	resp, err := prepTx.Commit()
+	require.Nil(t, err)
+	require.True(t, resp.Success)
 }

@@ -5,21 +5,31 @@ package ledger_model
  * Date: 2020/6/29 下午2:54
  */
 
-type ActiveParticipantService interface {
+type ParticipantService interface {
 	/**
-	ledgerHash	账本HASH
-	ip 待激活节点IP
-	port 待激活节点端口
-	remoteManageHost	其他任一非拜占庭节点IP
-	remoteManagePort	其他任一非拜占庭节点管理端口
+	激活参与方
 	*/
-	ActivateParticipant(ledgerHash, ip string, port int, remoteManageHost string, remoteManagePort int, shutdown bool) (bool, error)
+	ActivateParticipant(params ActivateParticipantParams) (bool, error)
 
 	/**
-	ledgerHash	账本HASH
-	participantAddress 待移除节点地址
-	remoteManageHost	其他任一非拜占庭节点IP
-	remoteManagePort	其他任一非拜占庭节点管理端口
+	移除参与方
 	*/
-	InactivateParticipant(ledgerHash, participantAddress, remoteManageHost string, remoteManagePort int) (bool, error)
+	InactivateParticipant(params InactivateParticipantParams) (bool, error)
+}
+
+type ActivateParticipantParams struct {
+	LedgerHash         string
+	ConsensusHost      string // 待激活节点共识地址
+	ConsensusPort      int    // 待激活节点共识端口
+	ConsensusStorage   string // Set the participant consensus storage. (raft consensus needed)
+	ConsensusSecure    bool   // 待激活节点共识服务是否启动安全连接
+	RemoteManageHost   string // 数据同步节点地址
+	RemoteManagePort   int    // 数据同步节点端口
+	RemoteManageSecure bool   // 数据同步节点服务是否启动安全连接
+	Shutdown           bool   // 是否停止旧的节点服务
+}
+
+type InactivateParticipantParams struct {
+	LedgerHash         string
+	ParticipantAddress string
 }

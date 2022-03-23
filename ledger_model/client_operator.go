@@ -13,4 +13,6 @@ type ClientOperator interface {
 	ParticipantOperator
 	EventOperator
 	MetaInfoOperator
+	ConsensusOperator
+	CryptoOperator
 }
