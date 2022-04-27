@@ -3,7 +3,7 @@ package ca
 import (
 	"crypto/x509"
 	"encoding/pem"
-	x5092 "github.com/tjfoc/gmsm/x509"
+	x5092 "github.com/blockchain-jd-com/framework-go/gmsm/x509"
 )
 
 type Certificate struct {

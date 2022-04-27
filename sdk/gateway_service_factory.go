@@ -59,6 +59,25 @@ func MustSecureConnect(gatewayHost string, gatewayPort int, userKey *ledger_mode
 	return NewGatewayServiceFactory(service)
 }
 
+func MustGMSecureConnect(gatewayHost string, gatewayPort int, userKey *ledger_model.BlockchainKeypair, security *GMSSLSecurity) *GatewayServiceFactory {
+	queryService := NewGMSecureRestyQueryService(gatewayHost, gatewayPort, security)
+	txService := NewEndpointAutoSigner(userKey, NewGMSecureRestyTxService(gatewayHost, gatewayPort, security))
+	ledgerHashs, err := queryService.GetLedgerHashs()
+	if err != nil {
+		panic(err)
+	}
+	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
+	for i, ledger := range ledgerHashs {
+		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		if err != nil {
+			panic(err)
+		}
+		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+	}
+	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
+	return NewGatewayServiceFactory(service)
+}
+
 func Connect(gatewayHost string, gatewayPort int, userKey *ledger_model.BlockchainKeypair) (*GatewayServiceFactory, error) {
 	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
 	txService := NewEndpointAutoSigner(userKey, NewRestyTxService(gatewayHost, gatewayPort))
@@ -119,6 +138,25 @@ func MustConnectWithoutUserKey(gatewayHost string, gatewayPort int) *GatewayServ
 func MustSecureConnectWithoutUserKey(gatewayHost string, gatewayPort int, security *SSLSecurity) *GatewayServiceFactory {
 	queryService := NewRestyQueryService(gatewayHost, gatewayPort)
 	txService := NewSecureRestyTxService(gatewayHost, gatewayPort, security)
+	ledgerHashs, err := queryService.GetLedgerHashs()
+	if err != nil {
+		panic(err)
+	}
+	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
+	for i, ledger := range ledgerHashs {
+		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		if err != nil {
+			panic(err)
+		}
+		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+	}
+	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
+	return NewGatewayServiceFactory(service)
+}
+
+func MustGMSecureConnectWithoutUserKey(gatewayHost string, gatewayPort int, security *GMSSLSecurity) *GatewayServiceFactory {
+	queryService := NewGMSecureRestyQueryService(gatewayHost, gatewayPort, security)
+	txService := NewGMSecureRestyTxService(gatewayHost, gatewayPort, security)
 	ledgerHashs, err := queryService.GetLedgerHashs()
 	if err != nil {
 		panic(err)

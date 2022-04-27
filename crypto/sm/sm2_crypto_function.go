@@ -6,9 +6,9 @@ import (
 	"errors"
 	"github.com/blockchain-jd-com/framework-go/crypto/ca"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
+	x5092 "github.com/blockchain-jd-com/framework-go/gmsm/x509"
 	"github.com/blockchain-jd-com/framework-go/utils/base64"
 	"github.com/blockchain-jd-com/framework-go/utils/sm2"
-	x5092 "github.com/tjfoc/gmsm/x509"
 	"strings"
 )
 

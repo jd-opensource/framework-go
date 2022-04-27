@@ -9,8 +9,8 @@ import (
 	"github.com/blockchain-jd-com/framework-go/crypto/classic"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/crypto/sm"
+	x5092 "github.com/blockchain-jd-com/framework-go/gmsm/x509"
 	bytes2 "github.com/blockchain-jd-com/framework-go/utils/bytes"
-	x5092 "github.com/tjfoc/gmsm/x509"
 	"strings"
 )
 

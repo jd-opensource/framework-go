@@ -21,28 +21,55 @@ import (
 
 // ssl 安全连接
 func TestSSLConnect(t *testing.T) {
-	// 是否建立安全连接
-	if SECURE {
+	var serviceFactory *sdk.GatewayServiceFactory
+	// 是否建立国密安全连接
+	if GM_SECURE {
+		// 判断是否忽略证书
+		if len(SSL_ROOT_CERT) > 0 && len(SSL_CLIENT_ENC_KEY) > 0 && len(SSL_CLIENT_ENC_CERT) > 0 && len(SSL_CLIENT_SIGN_KEY) > 0 && len(SSL_CLIENT_SIGN_CERT) > 0 {
+			security, err := sdk.NewTwoWayGMSSLSecurity(SSL_ROOT_CERT, SSL_CLIENT_SIGN_CERT, SSL_CLIENT_SIGN_KEY, SSL_CLIENT_ENC_CERT, SSL_CLIENT_ENC_KEY)
+			assert.Nil(t, err)
+			serviceFactory = sdk.MustGMSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, security)
+			// serviceFactory = sdk.MustGMSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, security)
+
+			serviceFactory.GetBlockchainService()
+		} else if len(SSL_ROOT_CERT) > 0 {
+			security, err := sdk.NewGMSSLSecurity(SSL_ROOT_CERT)
+			assert.Nil(t, err)
+			serviceFactory = sdk.MustGMSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, security)
+			// serviceFactory = sdk.MustGMSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, security)
+
+			serviceFactory.GetBlockchainService()
+		} else { // 忽略证书
+			serviceFactory = sdk.MustGMSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, nil)
+			// serviceFactory = sdk.MustGMSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, nil)
+
+			serviceFactory.GetBlockchainService()
+		}
+	} else if SECURE {
 		// 判断是否忽略证书
 		if len(SSL_ROOT_CERT) > 0 && len(SSL_CLIENT_CERT) > 0 && len(SSL_CLIENT_KEY) > 0 {
 			security, err := sdk.NewSSLSecurity(SSL_ROOT_CERT, SSL_CLIENT_CERT, SSL_CLIENT_KEY)
 			assert.Nil(t, err)
-			serviceFactory := sdk.MustSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, security)
-			//serviceFactory := sdk.MustSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, security)
+			serviceFactory = sdk.MustSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, security)
+			//serviceFactory = sdk.MustSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, security)
 
 			serviceFactory.GetBlockchainService()
 		} else { // 忽略证书
-			serviceFactory := sdk.MustSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, nil)
-			//serviceFactory := sdk.MustSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, nil)
+			serviceFactory = sdk.MustSecureConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY, nil)
+			//serviceFactory = sdk.MustSecureConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT, nil)
 
 			serviceFactory.GetBlockchainService()
 		}
 	} else {
-		serviceFactory := sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
-		//serviceFactory := sdk.MustConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT)
+		serviceFactory = sdk.MustConnect(GATEWAY_HOST, GATEWAY_PORT, NODE_KEY)
+		//serviceFactory = sdk.MustConnectWithoutUserKey(GATEWAY_HOST, GATEWAY_PORT)
 
 		serviceFactory.GetBlockchainService()
 	}
+
+	hs, err := serviceFactory.GetBlockchainService().GetLedgerHashs()
+	require.Nil(t, err)
+	fmt.Println(hs[0].Bytes.ToString())
 }
 
 /*
