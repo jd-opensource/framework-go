@@ -2,6 +2,7 @@ package crypto
 
 import (
 	"fmt"
+	"github.com/blockchain-jd-com/framework-go/crypto/adv"
 	"github.com/blockchain-jd-com/framework-go/crypto/classic"
 	"github.com/blockchain-jd-com/framework-go/crypto/framework"
 	"github.com/blockchain-jd-com/framework-go/crypto/sm"
@@ -27,6 +28,12 @@ func init() {
 	}
 	smArray := sm.NewSMCryptoService().GetFunctions()
 	for _, function := range smArray {
+		functions[function.GetAlgorithm().Code] = function
+		algorithms[function.GetAlgorithm().Code] = function.GetAlgorithm()
+		names[function.GetAlgorithm().Name] = function.GetAlgorithm().Code
+	}
+	advArray := adv.NewAdvCryptoService().GetFunctions()
+	for _, function := range advArray {
 		functions[function.GetAlgorithm().Code] = function
 		algorithms[function.GetAlgorithm().Code] = function.GetAlgorithm()
 		names[function.GetAlgorithm().Name] = function.GetAlgorithm().Code
