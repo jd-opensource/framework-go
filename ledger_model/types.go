@@ -21,4 +21,9 @@ const (
 	OperationTypeLedgerInitOperation              = "LedgerInitOperation"              // 账本初始化
 	OperationTypeConsensusSettingsUpdateOperation = "ConsensusSettingsUpdateOperation" // 共识信息变更
 	OperationTypeCryptoHashAlgoUpdateOperation    = "HashAlgorithmUpdateOperation"     // Hash算法变更
+
+	// Consensus Providers
+	BFTSMaRtConsensusProvider = "com.jd.blockchain.consensus.bftsmart.BftsmartConsensusProvider"
+	RaftConsensusProvider     = "com.jd.blockchain.consensus.raft.RaftConsensusProvider"
+	MQConsensusProvider       = "com.jd.blockchain.consensus.mq.MsgQueueConsensusProvider"
 )

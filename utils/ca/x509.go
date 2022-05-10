@@ -11,6 +11,7 @@ import (
 	"github.com/blockchain-jd-com/framework-go/crypto/sm"
 	x5092 "github.com/blockchain-jd-com/framework-go/gmsm/x509"
 	bytes2 "github.com/blockchain-jd-com/framework-go/utils/bytes"
+	"io/ioutil"
 	"strings"
 )
 
@@ -23,6 +24,36 @@ var caSignatureAlgorithms = map[string]framework.CryptoAlgorithm{
 
 // 解析X509证书，支持RSA 2048,ECDSA P-256,ED25519,SM2 SM3WithSM2
 func RetrieveCertificate(cert string) (*ca.Certificate, error) {
+	var algorithm string
+	var smCert *x5092.Certificate
+	classicCert, err := resolveClassicCertificate(cert)
+	if err != nil {
+		smCert, err = resolveSMCertificate(cert)
+		if err != nil {
+			return nil, errors.New("can not parse certificate")
+		}
+		algorithm = smCert.SignatureAlgorithm.String()
+	} else {
+		algorithm = classicCert.SignatureAlgorithm.String()
+	}
+	cryptoAlgorithm, ok := caSignatureAlgorithms[strings.ToUpper(algorithm)]
+	if !ok {
+		return nil, errors.New("can not parse certificate with algorithm: " + algorithm)
+	}
+
+	return &ca.Certificate{
+		Algorithm:   cryptoAlgorithm.Name,
+		ClassicCert: classicCert,
+		SMCert:      smCert,
+	}, nil
+}
+
+func RetrieveCertificateFile(certFile string) (*ca.Certificate, error) {
+	bytes, err := ioutil.ReadFile(certFile)
+	if err != nil {
+		return nil, err
+	}
+	cert := string(bytes)
 	var algorithm string
 	var smCert *x5092.Certificate
 	classicCert, err := resolveClassicCertificate(cert)
@@ -76,6 +107,14 @@ func RetrievePubKey(certificate *ca.Certificate) (*framework.PubKey, error) {
 // 解析X509私钥文件
 func RetrievePrivKey(algorithm string, privkey string) (*framework.PrivKey, error) {
 	return crypto.GetSignatureFunctionByName(algorithm).RetrievePrivKey(privkey)
+}
+
+func RetrievePrivKeyFile(algorithm string, privkeyFile string) (*framework.PrivKey, error) {
+	bytes, err := ioutil.ReadFile(privkeyFile)
+	if err != nil {
+		return nil, err
+	}
+	return crypto.GetSignatureFunctionByName(algorithm).RetrievePrivKey(string(bytes))
 }
 
 // 解析X509加密私钥文件

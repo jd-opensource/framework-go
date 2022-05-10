@@ -759,7 +759,7 @@ func TestRegisterParticipantWithCA(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 解析证书
-	peerCert, _ := ca.RetrieveCertificate("-----BEGIN CERTIFICATE-----\nMIICFTCCAbugAwIBAgIEVZ132DAKBggqhkjOPQQDAjBwMQwwCgYDVQQKDANKRFQx\nDTALBgNVBAsMBFJPT1QxCzAJBgNVBAYTAkNOMQswCQYDVQQIDAJCSjELMAkGA1UE\nBwwCQkoxDTALBgNVBAMMBHJvb3QxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpkLmNv\nbTAeFw0yMTEyMjkwNjUwMDBaFw0zMTEyMjcwNjUwMDBaMHExDDAKBgNVBAoMA0pE\nVDENMAsGA1UECwwEUEVFUjELMAkGA1UEBhMCQ04xCzAJBgNVBAgMAkJKMQswCQYD\nVQQHDAJCSjEOMAwGA1UEAwwFcGVlcjQxGzAZBgkqhkiG9w0BCQEWDGltdWdlQGpk\nLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGjWubawm0nFKDEchGb4636w\nGOuR/JpWjww6R9Cm5f9pxk0PFQIyUY/8fCHtnxeYK2VPk8qKdnQ0bEDKKZY7LIaj\nQjBAMA4GA1UdDwEB/wQEAwIHgDAgBgNVHQ4BAf8EFgQUFCVXcNggdSxRKRbVs0JR\nWgVA1/wwDAYDVR0TAQH/BAIwADAKBggqhkjOPQQDAgNIADBFAiBr4dbTMJIY7zhK\nz3XCBGiTsF7LH7tJS2bVQYps6+6kLgIhAN/JoQtiGYqGiMEguZIomLopWWMjT7dn\nqA9nRSsqoWfK\n-----END CERTIFICATE-----")
+	peerCert, _ := ca.RetrieveCertificateFile("/home/imuge/jd/nodes/peer0/config/certs/sign/peer4.crt")
 	pubkey, _ := ca.RetrievePubKey(peerCert)
 	address := framework.GenerateAddress(pubkey)
 	fmt.Println(base58.Encode(address))
@@ -788,11 +788,10 @@ func TestActiveParticipant(t *testing.T) {
 		LedgerHash:         "j5mHmUcybsuhgYpsJwWWYucn1T55jocD27cL33tfMXdefA", // 账本哈希
 		ConsensusHost:      "127.0.0.1",                                      // 待激活节点共识地址
 		ConsensusPort:      10088,                                            // 待激活节点共识端口
-		ConsensusStorage:   "",                                               // Set the participant consensus storage. (raft consensus needed)
-		ConsensusSecure:    true,                                             // 待激活节点共识服务是否启动安全连接
+		ConsensusSecure:    false,                                             // 待激活节点共识服务是否启动安全连接
 		RemoteManageHost:   "127.0.0.1",                                      // 数据同步节点地址
 		RemoteManagePort:   7080,                                             // 数据同步节点端口
-		RemoteManageSecure: false,                                            // 数据同步节点服务是否启动安全连接
+		RemoteManageSecure: false,                                             // 数据同步节点服务是否启动安全连接
 		Shutdown:           false,                                            // 是否停止旧的节点服务
 	})
 	require.Nil(t, err)
@@ -826,8 +825,8 @@ func TestConsensusSwitch(t *testing.T) {
 	// 创建交易
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
-	// 更新共识算法
-	txTemp.Consensus().Update("com.jd.blockchain.consensus.raft.RaftConsensusProvider", "/home/imuge/jd/nodes/peer0/config/init/raft.config")
+	// 更新共识算法 RaftConsensusProvider/BFTSMaRtConsensusProvider/MQConsensusProvider
+	txTemp.Consensus().Update(ledger_model.RaftConsensusProvider, "/home/imuge/jd/nodes/raft.config")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
