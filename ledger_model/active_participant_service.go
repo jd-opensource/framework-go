@@ -21,7 +21,6 @@ type ActivateParticipantParams struct {
 	LedgerHash         string
 	ConsensusHost      string // 待激活节点共识地址
 	ConsensusPort      int    // 待激活节点共识端口
-	ConsensusStorage   string // Set the participant consensus storage. (raft consensus needed)
 	ConsensusSecure    bool   // 待激活节点共识服务是否启动安全连接
 	RemoteManageHost   string // 数据同步节点地址
 	RemoteManagePort   int    // 数据同步节点端口

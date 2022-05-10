@@ -30,11 +30,11 @@ func MustConnect(gatewayHost string, gatewayPort int, userKey *ledger_model.Bloc
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			panic(err)
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service)

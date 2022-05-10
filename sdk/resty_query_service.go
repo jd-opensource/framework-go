@@ -341,6 +341,15 @@ func (r RestyQueryService) GetLedgerAdminInfo(ledgerHash *framework.HashDigest) 
 	return
 }
 
+func (r RestyQueryService) GetLedgerCryptoSetting(ledgerHash *framework.HashDigest) (info ledger_model.CryptoSetting, err error) {
+	wrp, err := r.query("/ledgers/" + ledgerHash.ToBase58() + "/settings/crypto")
+	if err != nil {
+		return info, err
+	}
+	info = parseCryptoSetting(wrp)
+	return
+}
+
 func parseCryptoSetting(info gjson.Result) ledger_model.CryptoSetting {
 	autoVerifyHash := info.Get("autoVerifyHash").Bool()
 	supportedProviders := info.Get("supportedProviders").Array()
@@ -1210,7 +1219,7 @@ func parseConsensusSettingsUpdateOperation(info gjson.Result) binary_proto.DataC
 		pss[i] = properties[i].ToBytes()
 	}
 	return &ledger_model.ConsensusSettingsUpdateOperation{
-		Provider: info.Get("provider").String(),
+		Provider:   info.Get("provider").String(),
 		Properties: pss,
 	}
 }

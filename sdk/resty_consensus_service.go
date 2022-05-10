@@ -70,7 +70,6 @@ func (r RestyConsensusService) ActivateParticipant(params ledger_model.ActivateP
 		"ledgerHash":         params.LedgerHash,
 		"consensusHost":      params.ConsensusHost,
 		"consensusPort":      strconv.Itoa(params.ConsensusPort),
-		"consensusStorage":   params.ConsensusStorage,
 		"consensusSecure":    strconv.FormatBool(params.ConsensusSecure),
 		"remoteManageHost":   params.RemoteManageHost,
 		"remoteManagePort":   strconv.Itoa(params.RemoteManagePort),

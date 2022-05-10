@@ -85,6 +85,10 @@ func (b *GatewayBlockchainService) GetLedgerAdminInfo(ledgerHash *framework.Hash
 	return b.QueryService.GetLedgerAdminInfo(ledgerHash)
 }
 
+func (b *GatewayBlockchainService) GetLedgerCryptoSetting(ledgerHash *framework.HashDigest) (ledger_model.CryptoSetting, error) {
+	return b.QueryService.GetLedgerCryptoSetting(ledgerHash)
+}
+
 func (b *GatewayBlockchainService) GetConsensusParticipants(ledgerHash *framework.HashDigest) ([]*ledger_model.ParticipantNode, error) {
 	return b.QueryService.GetConsensusParticipants(ledgerHash)
 }

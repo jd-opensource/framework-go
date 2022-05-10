@@ -20,6 +20,9 @@ type BlockChainLedgerQueryService interface {
 	// 获取账本信息
 	GetLedgerAdminInfo(ledgerHash *framework.HashDigest) (*LedgerAdminInfo, error)
 
+	// 获取账本算法配置信息
+	GetLedgerCryptoSetting(ledgerHash *framework.HashDigest) (CryptoSetting, error)
+
 	// 返回当前账本的参与者信息列表
 	GetConsensusParticipants(ledgerHash *framework.HashDigest) ([]*ParticipantNode, error)
 
