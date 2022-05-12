@@ -18,6 +18,10 @@ func (cob *ContractOperationBuilder) Invoke(event string, args ...interface{}) e
 	return cob.invokeBuilder.Invoke(-1, event, args)
 }
 
+func (cob *ContractOperationBuilder) InvokeWithVersion(version int64, event string, args ...interface{}) error {
+	return cob.invokeBuilder.Invoke(version, event, args)
+}
+
 func (cob *ContractOperationBuilder) State(state AccountState) {
 	cob.updateBuilder.State(state)
 }
