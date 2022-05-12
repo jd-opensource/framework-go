@@ -826,7 +826,7 @@ func TestConsensusSwitch(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 更新共识算法 RaftConsensusProvider/BFTSMaRtConsensusProvider/MQConsensusProvider
-	txTemp.Consensus().Update(ledger_model.RaftConsensusProvider, "/home/imuge/jd/nodes/raft.config")
+	txTemp.Consensus().UpdateWithConfigFile(ledger_model.RaftConsensusProvider, "/home/imuge/jd/nodes/raft.config")
 
 	// TX 准备就绪；
 	prepTx := txTemp.Prepare()
