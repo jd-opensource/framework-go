@@ -16,10 +16,11 @@ func init() {
 type ContractInfo struct {
 	*BlockchainIdentity
 	MerkleSnapshot
-	ChainCode  []byte         `primitiveType:"BYTES"`
-	State      AccountState   `refEnum:"788"`
-	Permission DataPermission `json:"permission"`
-	Lang       ContractLang   `refEnum:"2561"`
+	ChainCode        []byte         `primitiveType:"BYTES"`
+	ChainCodeVersion int64          `primitiveType:"INT64"`
+	State            AccountState   `refEnum:"788"`
+	Permission       DataPermission `json:"permission"`
+	Lang             ContractLang   `refEnum:"2561"`
 }
 
 func (c ContractInfo) ContractCode() int32 {

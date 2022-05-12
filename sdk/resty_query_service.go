@@ -727,6 +727,7 @@ func (r RestyQueryService) GetContract(ledgerHash *framework.HashDigest, address
 		MerkleSnapshot: ledger_model.MerkleSnapshot{
 			RootHash: base58.MustDecode(contract.Get("rootHash").String()),
 		},
+		ChainCodeVersion: contract.Get("chainCodeVersion").Int(),
 		ChainCode:  bytes.StringToBytes(contract.Get("chainCode").String()),
 		State:      ledger_model.NORMAL.GetValueByName(contract.Get("state").String()).(ledger_model.AccountState),
 		Permission: parseDataPermission(contract.Get("permission")),
