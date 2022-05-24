@@ -8,6 +8,7 @@ const (
 	Java ContractLang = iota + 1
 	JavaScript
 	Python
+	Rust
 )
 
 func init() {
@@ -43,6 +44,8 @@ func (r ContractLang) GetValue(CODE int32) binary_proto.EnumContract {
 		return JavaScript
 	} else if CODE == int32(3) {
 		return Python
+	} else if CODE == int32(4) {
+		return Rust
 	}
 
 	panic("no enum value founded")
@@ -55,6 +58,8 @@ func (r ContractLang) GetValueByName(name string) binary_proto.EnumContract {
 		return JavaScript
 	} else if name == "Python" {
 		return Python
+	} else if name == "Rust" {
+		return Rust
 	}
 
 	panic("no enum value founded")
