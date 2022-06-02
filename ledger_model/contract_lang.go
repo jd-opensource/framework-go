@@ -62,5 +62,5 @@ func (r ContractLang) GetValueByName(name string) binary_proto.EnumContract {
 		return Rust
 	}
 
-	panic("no enum value founded")
+	return Java
 }
