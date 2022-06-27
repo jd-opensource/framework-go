@@ -49,11 +49,11 @@ func MustSecureConnect(gatewayHost string, gatewayPort int, userKey *ledger_mode
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			panic(err)
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service)
@@ -68,11 +68,11 @@ func MustGMSecureConnect(gatewayHost string, gatewayPort int, userKey *ledger_mo
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			panic(err)
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service)
@@ -87,11 +87,11 @@ func Connect(gatewayHost string, gatewayPort int, userKey *ledger_model.Blockcha
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			return nil, err
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service), nil
@@ -106,11 +106,11 @@ func SecureConnect(gatewayHost string, gatewayPort int, userKey *ledger_model.Bl
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			return nil, err
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service), nil
@@ -125,11 +125,11 @@ func MustConnectWithoutUserKey(gatewayHost string, gatewayPort int) *GatewayServ
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			panic(err)
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service)
@@ -144,11 +144,11 @@ func MustSecureConnectWithoutUserKey(gatewayHost string, gatewayPort int, securi
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			panic(err)
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service)
@@ -163,11 +163,11 @@ func MustGMSecureConnectWithoutUserKey(gatewayHost string, gatewayPort int, secu
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			panic(err)
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service)
@@ -182,11 +182,11 @@ func ConnectWithoutUserKey(gatewayHost string, gatewayPort int, security *SSLSec
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			return nil, err
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service), nil
@@ -201,11 +201,11 @@ func SecureConnectWithoutUserKey(gatewayHost string, gatewayPort int, security *
 	}
 	cryptoSettings := make([]ledger_model.CryptoSetting, len(ledgerHashs))
 	for i, ledger := range ledgerHashs {
-		ledgerAdminInfo, err := queryService.GetLedgerAdminInfo(ledger)
+		cryptoSetting, err := queryService.GetLedgerCryptoSetting(ledger)
 		if err != nil {
 			return nil, err
 		}
-		cryptoSettings[i] = ledgerAdminInfo.Settings.CryptoSetting
+		cryptoSettings[i] = cryptoSetting
 	}
 	service := NewGatewayBlockchainService(ledgerHashs, cryptoSettings, txService, queryService)
 	return NewGatewayServiceFactory(service), nil
