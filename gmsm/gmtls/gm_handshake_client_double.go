@@ -309,12 +309,17 @@ func (hs *clientHandshakeStateGM) doFullHandshake() error {
 		}
 	}
 
-	var chainToSend = hs.getCertificates()
+	var chainToSend *Certificate
 	var certRequested bool
 	certReq, ok := msg.(*certificateRequestMsgGM)
 	if ok {
 		certRequested = true
 		hs.finishedHash.Write(certReq.marshal())
+
+		if chainToSend, err = hs.getCertificate(certReq); err != nil {
+			c.sendAlert(alertInternalError)
+			return err
+		}
 
 		msg, err = c.readHandshake()
 		if err != nil {
@@ -334,9 +339,7 @@ func (hs *clientHandshakeStateGM) doFullHandshake() error {
 	// certificate to send.
 	if certRequested {
 		certMsg = new(certificateMsg)
-		for i := 0; i < len(chainToSend); i++ {
-			certMsg.certificates = append(certMsg.certificates, chainToSend[i].Certificate...)
-		}
+		certMsg.certificates = chainToSend.Certificate
 		hs.finishedHash.Write(certMsg.marshal())
 		if _, err := c.writeRecord(recordTypeHandshake, certMsg.marshal()); err != nil {
 			return err
@@ -355,13 +358,13 @@ func (hs *clientHandshakeStateGM) doFullHandshake() error {
 		}
 	}
 
-	if chainToSend != nil && len(chainToSend[0].Certificate) > 0 {
+	if chainToSend != nil && len(chainToSend.Certificate) > 0 {
 		certVerify := &certificateVerifyMsg{}
 
-		key, ok := chainToSend[0].PrivateKey.(crypto.Signer)
+		key, ok := chainToSend.PrivateKey.(crypto.Signer)
 		if !ok {
 			c.sendAlert(alertInternalError)
-			return fmt.Errorf("tls: client certificate private key of type %T does not implement crypto.Signer", chainToSend[0].PrivateKey)
+			return fmt.Errorf("tls: client certificate private key of type %T does not implement crypto.Signer", chainToSend.PrivateKey)
 		}
 
 		digest := hs.finishedHash.client.Sum(nil)
@@ -576,12 +579,6 @@ func (hs *clientHandshakeStateGM) sendFinished(out []byte) error {
 	}
 	copy(out, finished.verifyData)
 	return nil
-}
-
-func (hs *clientHandshakeStateGM) getCertificates() []Certificate {
-	c := hs.c
-
-	return c.config.Certificates
 }
 
 //// tls11SignatureSchemes contains the signature schemes that we synthesise for
