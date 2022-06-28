@@ -115,10 +115,17 @@ func (r *RestyTxService) gmProcess(msg []byte) (response *ledger_model.Transacti
 	if r.gmSecurity != nil {
 		certPool = r.gmSecurity.RootCerts
 	}
+	var certificates []gmtls.Certificate
+	if nil != r.gmSecurity && nil != r.gmSecurity.EncCert && nil != r.gmSecurity.SigCert {
+		certificates = []gmtls.Certificate{*r.gmSecurity.SigCert, *r.gmSecurity.EncCert}
+	} else {
+		certificates = []gmtls.Certificate{}
+	}
 	config := &gmtls.Config{
 		GMSupport:          &gmtls.GMSupport{},
 		RootCAs:            certPool,
 		ClientAuth:         gmtls.NoClientCert,
+		Certificates:       certificates,
 		InsecureSkipVerify: r.security == nil || r.security.RootCerts == nil,
 	}
 

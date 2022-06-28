@@ -116,10 +116,17 @@ func (r RestyConsensusService) gmActive(activeUrl string, args map[string]string
 	if r.gmSecurity != nil {
 		certPool = r.gmSecurity.RootCerts
 	}
+	var certificates []gmtls.Certificate
+	if nil != r.gmSecurity && nil != r.gmSecurity.EncCert && nil != r.gmSecurity.SigCert {
+		certificates = []gmtls.Certificate{*r.gmSecurity.SigCert, *r.gmSecurity.EncCert}
+	} else {
+		certificates = []gmtls.Certificate{}
+	}
 	config := &gmtls.Config{
 		GMSupport:          &gmtls.GMSupport{},
 		RootCAs:            certPool,
 		ClientAuth:         gmtls.NoClientCert,
+		Certificates:       certificates,
 		InsecureSkipVerify: r.security == nil || r.security.RootCerts == nil,
 	}
 
@@ -192,10 +199,17 @@ func (r RestyConsensusService) gmInactive(inactiveUrl string, args map[string]st
 	if r.gmSecurity != nil {
 		certPool = r.gmSecurity.RootCerts
 	}
+	var certificates []gmtls.Certificate
+	if nil != r.gmSecurity && nil != r.gmSecurity.EncCert && nil != r.gmSecurity.SigCert {
+		certificates = []gmtls.Certificate{*r.gmSecurity.SigCert, *r.gmSecurity.EncCert}
+	} else {
+		certificates = []gmtls.Certificate{}
+	}
 	config := &gmtls.Config{
 		GMSupport:          &gmtls.GMSupport{},
 		RootCAs:            certPool,
 		ClientAuth:         gmtls.NoClientCert,
+		Certificates:       certificates,
 		InsecureSkipVerify: r.security == nil || r.security.RootCerts == nil,
 	}
 
