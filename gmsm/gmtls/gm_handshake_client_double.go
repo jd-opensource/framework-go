@@ -355,7 +355,7 @@ func (hs *clientHandshakeStateGM) doFullHandshake() error {
 		}
 	}
 
-	if chainToSend != nil && len(chainToSend[0].Certificate) > 0 {
+	if chainToSend != nil && len(chainToSend) > 0 && len(chainToSend[0].Certificate) > 0 {
 		certVerify := &certificateVerifyMsg{}
 
 		key, ok := chainToSend[0].PrivateKey.(crypto.Signer)

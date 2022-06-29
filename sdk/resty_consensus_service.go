@@ -127,7 +127,7 @@ func (r RestyConsensusService) gmActive(activeUrl string, args map[string]string
 		RootCAs:            certPool,
 		ClientAuth:         gmtls.NoClientCert,
 		Certificates:       certificates,
-		InsecureSkipVerify: r.security == nil || r.security.RootCerts == nil,
+		InsecureSkipVerify: r.gmSecurity == nil || r.gmSecurity.RootCerts == nil,
 	}
 
 	gmClient := gmtls.NewCustomHTTPSClient(config)
@@ -210,7 +210,7 @@ func (r RestyConsensusService) gmInactive(inactiveUrl string, args map[string]st
 		RootCAs:            certPool,
 		ClientAuth:         gmtls.NoClientCert,
 		Certificates:       certificates,
-		InsecureSkipVerify: r.security == nil || r.security.RootCerts == nil,
+		InsecureSkipVerify: r.gmSecurity == nil || r.gmSecurity.RootCerts == nil,
 	}
 
 	gmClient := gmtls.NewCustomHTTPSClient(config)

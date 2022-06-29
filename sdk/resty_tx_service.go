@@ -126,7 +126,7 @@ func (r *RestyTxService) gmProcess(msg []byte) (response *ledger_model.Transacti
 		RootCAs:            certPool,
 		ClientAuth:         gmtls.NoClientCert,
 		Certificates:       certificates,
-		InsecureSkipVerify: r.security == nil || r.security.RootCerts == nil,
+		InsecureSkipVerify: r.gmSecurity == nil || r.gmSecurity.RootCerts == nil,
 	}
 
 	gmClient := gmtls.NewCustomHTTPSClient(config)
