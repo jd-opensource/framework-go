@@ -72,10 +72,13 @@ func (cesob *ContractEventSendOperationBuilder) Invoke(version int64, event stri
 					bytes.Int64ToBytes(v.Int()),
 				})
 			case reflect.String:
-				params = append(params, BytesValue{
-					TEXT,
-					[]byte(v.String()),
-				})
+				// 忽略长度为0的字符参数
+				if v.Len() > 0 {
+					params = append(params, BytesValue{
+						TEXT,
+						[]byte(v.String()),
+					})
+				}
 			default:
 				return errors.New("only bool/int16/int32/int64/string/[]byte supported in args")
 			}

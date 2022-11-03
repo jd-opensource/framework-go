@@ -367,7 +367,7 @@ func TestContractDeploy(t *testing.T) {
 	txTemp := service.NewTransaction(ledgerHashs[0])
 
 	// 部署合约
-	file, err := os.Open("contract-samples-1.6.0.RELEASE.car")
+	file, err := os.Open("contract-samples-1.6.5.RELEASE.car")
 	defer file.Close()
 	require.Nil(t, err)
 	contract, err := ioutil.ReadAll(file)
